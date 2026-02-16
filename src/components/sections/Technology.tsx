@@ -1,119 +1,182 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { fadeInUp, staggerContainer } from "@/lib/animations";
+import InfiniteMarquee from "@/components/ui/InfiniteMarquee";
+import { useLanguage } from "@/context/LanguageContext";
+import type { CMSTechnology } from "@/lib/cms-types";
 
-const technologies = [
+const fallbackTechRow1 = [
   { name: "React", color: "#61DAFB" },
-  { name: "Next.js", color: "#FFFFFF" },
-  { name: "Node.js", color: "#68A063" },
-  { name: "Python", color: "#3776AB" },
-  { name: "TensorFlow", color: "#FF6F00" },
-  { name: "Kubernetes", color: "#326CE5" },
-  { name: "AWS", color: "#FF9900" },
-  { name: "PostgreSQL", color: "#336791" },
-  { name: "Docker", color: "#2496ED" },
-  { name: "Go", color: "#00ADD8" },
-  { name: "GraphQL", color: "#E10098" },
-  { name: "Redis", color: "#DC382D" },
+  { name: "Next.js", color: "#888888" },
   { name: "TypeScript", color: "#3178C6" },
-  { name: "Rust", color: "#DEA584" },
-  { name: "GCP", color: "#4285F4" },
-  { name: "Kafka", color: "#231F20" },
+  { name: "Node.js", color: "#339933" },
+  { name: "Python", color: "#3776AB" },
+  { name: "PostgreSQL", color: "#4169E1" },
+  { name: "Kubernetes", color: "#326CE5" },
+  { name: "Docker", color: "#2496ED" },
 ];
 
-function TechLogo({
+const fallbackTechRow2 = [
+  { name: "AWS", color: "#FF9900" },
+  { name: "Terraform", color: "#7B42BC" },
+  { name: "GraphQL", color: "#E10098" },
+  { name: "Redis", color: "#DC382D" },
+  { name: "TensorFlow", color: "#FF6F00" },
+  { name: "PyTorch", color: "#EE4C2C" },
+  { name: "Kafka", color: "#888888" },
+  { name: "Go", color: "#00ADD8" },
+];
+
+const fallbackTechRow3 = [
+  { name: "Rust", color: "#CE412B" },
+  { name: "Swift", color: "#F05138" },
+  { name: "MongoDB", color: "#47A248" },
+  { name: "Snowflake", color: "#29B5E8" },
+  { name: "OpenAI", color: "#00A67E" },
+  { name: "Figma", color: "#F24E1E" },
+  { name: "Vercel", color: "#888888" },
+  { name: "GitHub", color: "#888888" },
+];
+
+function TechPill({
   name,
   color,
-  index,
 }: {
   name: string;
   color: string;
-  index: number;
 }) {
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{
-        delay: index * 0.05,
-        duration: 0.5,
-        ease: [0.25, 0.46, 0.45, 0.94],
-      }}
-      whileHover={{
-        y: -8,
-        transition: { duration: 0.3, ease: "easeOut" },
-      }}
-      className="group relative flex flex-col items-center gap-3"
+    <div
+      data-cursor-hover
+      className="group flex items-center gap-3 px-6 py-3.5 rounded-full glass transition-all duration-300 hover:scale-105 flex-shrink-0"
     >
-      {/* Logo container */}
-      <div className="relative flex h-20 w-20 items-center justify-center rounded-2xl border border-white/[0.06] bg-surface/50 transition-all duration-300 group-hover:border-white/20 group-hover:bg-surface md:h-24 md:w-24">
-        {/* Glow effect */}
-        <div
-          className="absolute inset-0 rounded-2xl opacity-0 transition-opacity duration-300 group-hover:opacity-100"
-          style={{
-            boxShadow: `0 0 30px ${color}20, 0 0 60px ${color}10`,
-          }}
-        />
-        {/* Text Logo */}
-        <span
-          className="relative z-10 text-xs font-bold tracking-wider opacity-60 transition-opacity duration-300 group-hover:opacity-100"
-          style={{ color }}
-        >
-          {name.slice(0, 4).toUpperCase()}
-        </span>
-      </div>
-
-      {/* Name */}
-      <span className="text-xs text-muted/60 transition-colors duration-300 group-hover:text-muted">
+      {/* Glow dot */}
+      <div
+        className="w-2.5 h-2.5 rounded-full transition-all duration-300 group-hover:shadow-lg"
+        style={{
+          backgroundColor: color,
+          boxShadow: `0 0 0px ${color}00`,
+        }}
+      />
+      <span
+        className="text-small font-medium transition-colors duration-300 whitespace-nowrap"
+        style={{ color: "var(--text-secondary)" }}
+      >
         {name}
       </span>
-    </motion.div>
+
+      {/* Hover glow */}
+      <div
+        className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+        style={{
+          background: `radial-gradient(circle at center, ${color}06 0%, transparent 70%)`,
+        }}
+      />
+    </div>
   );
 }
 
-export default function Technology() {
-  return (
-    <section
-      id="technology"
-      className="relative section-padding overflow-hidden"
-    >
-      <div className="gradient-blob absolute left-1/2 top-0 h-[400px] w-[600px] -translate-x-1/2 bg-primary/5" />
+interface TechnologyProps {
+  technologies?: CMSTechnology[];
+}
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Header */}
+export default function Technology({ technologies }: TechnologyProps) {
+  const { t, isRTL } = useLanguage();
+
+  // Group CMS technologies by row, or fall back to hardcoded data
+  const useCMS = technologies && technologies.length > 0;
+
+  let techRow1: { name: string; color: string }[];
+  let techRow2: { name: string; color: string }[];
+  let techRow3: { name: string; color: string }[];
+
+  if (useCMS) {
+    techRow1 = technologies
+      .filter((t) => t.row === "1")
+      .sort((a, b) => a.order - b.order)
+      .map((t) => ({ name: t.name, color: t.color }));
+    techRow2 = technologies
+      .filter((t) => t.row === "2")
+      .sort((a, b) => a.order - b.order)
+      .map((t) => ({ name: t.name, color: t.color }));
+    techRow3 = technologies
+      .filter((t) => t.row === "3")
+      .sort((a, b) => a.order - b.order)
+      .map((t) => ({ name: t.name, color: t.color }));
+  } else {
+    techRow1 = fallbackTechRow1;
+    techRow2 = fallbackTechRow2;
+    techRow3 = fallbackTechRow3;
+  }
+
+  return (
+    <section id="technology" className="relative h-screen flex flex-col justify-center overflow-hidden">
+      <div className="max-w-6xl mx-auto px-6 mb-16">
+        {/* Section Header */}
         <motion.div
-          variants={fadeInUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          className="mb-16 text-center"
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
+          className="text-center"
         >
-          <span className="mb-4 inline-block text-sm font-medium tracking-wider text-primary uppercase">
-            Technology Stack
+          <span className="text-small font-mono text-brand-green uppercase tracking-widest mb-4 block">
+            &mdash; {t.technology.label}
           </span>
-          <h2 className="text-3xl font-bold tracking-tight md:text-5xl">
-            Powered by the{" "}
-            <span className="gradient-text">best in class</span>
+          <h2 className="text-display mb-4" style={{ color: "var(--text-primary)" }}>
+            {t.technology.heading}{" "}
+            <span className="text-gradient">{t.technology.headingAccent}</span>
           </h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
-            We leverage industry-leading technologies to deliver exceptional
-            results.
+          <p className="text-body-lg max-w-xl mx-auto" style={{ color: "var(--text-secondary)" }}>
+            {t.technology.description}
           </p>
         </motion.div>
+      </div>
 
-        {/* Tech Grid */}
+      {/* Marquee Rows */}
+      <div className="space-y-4">
+        {/* Row 1 */}
         <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.1 }}
-          className="grid grid-cols-4 gap-6 sm:grid-cols-4 md:grid-cols-8 md:gap-8"
+          initial={{ opacity: 0, x: isRTL ? 40 : -40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
         >
-          {technologies.map((tech, index) => (
-            <TechLogo key={tech.name} {...tech} index={index} />
-          ))}
+          <InfiniteMarquee speed={35} direction={isRTL ? "right" : "left"}>
+            <div className="flex gap-4">
+              {techRow1.map((tech) => (
+                <TechPill key={tech.name} {...tech} />
+              ))}
+            </div>
+          </InfiniteMarquee>
+        </motion.div>
+
+        {/* Row 2 */}
+        <motion.div
+          initial={{ opacity: 0, x: isRTL ? -40 : 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.35 }}
+        >
+          <InfiniteMarquee speed={40} direction={isRTL ? "left" : "right"}>
+            <div className="flex gap-4">
+              {techRow2.map((tech) => (
+                <TechPill key={tech.name} {...tech} />
+              ))}
+            </div>
+          </InfiniteMarquee>
+        </motion.div>
+
+        {/* Row 3 */}
+        <motion.div
+          initial={{ opacity: 0, x: isRTL ? 40 : -40 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.8, delay: 0.5 }}
+        >
+          <InfiniteMarquee speed={45} direction={isRTL ? "right" : "left"}>
+            <div className="flex gap-4">
+              {techRow3.map((tech) => (
+                <TechPill key={tech.name} {...tech} />
+              ))}
+            </div>
+          </InfiniteMarquee>
         </motion.div>
       </div>
     </section>

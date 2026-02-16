@@ -1,259 +1,321 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState } from "react";
 import { motion } from "framer-motion";
-import { fadeInUp, slideInLeft, slideInRight } from "@/lib/animations";
-import { Send, CheckCircle, MapPin, Mail, Phone } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { Send, CheckCircle, ArrowUpRight } from "lucide-react";
+import MagneticButton from "@/components/ui/MagneticButton";
+import GradientMesh from "@/components/ui/GradientMesh";
+import { useSlide } from "@/context/SlideContext";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function Contact() {
-  const [formState, setFormState] = useState({
+  const { goToSlide } = useSlide();
+  const { t, isRTL } = useLanguage();
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isSending, setIsSending] = useState(false);
+  const [formData, setFormData] = useState({
     name: "",
     email: "",
     message: "",
   });
-  const [submitted, setSubmitted] = useState(false);
-  const [focused, setFocused] = useState<string | null>(null);
-  const formRef = useRef<HTMLFormElement>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      setFormState({ name: "", email: "", message: "" });
-    }, 3000);
+    setIsSending(true);
+    await new Promise((resolve) => setTimeout(resolve, 1500));
+    setIsSending(false);
+    setIsSubmitted(true);
   };
 
-  const handleRipple = (e: React.MouseEvent<HTMLButtonElement>) => {
-    const button = e.currentTarget;
-    const rect = button.getBoundingClientRect();
-    const ripple = document.createElement("span");
-    const size = Math.max(rect.width, rect.height);
-    ripple.style.width = ripple.style.height = `${size}px`;
-    ripple.style.left = `${e.clientX - rect.left - size / 2}px`;
-    ripple.style.top = `${e.clientY - rect.top - size / 2}px`;
-    ripple.className = "ripple";
-    button.appendChild(ripple);
-    setTimeout(() => ripple.remove(), 600);
+  const handleChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
+
+  const footerCompanyLinks = [
+    { label: t.footer.company.about, slideIndex: 3 },
+    { label: t.footer.company.services, slideIndex: 4 },
+    { label: t.footer.company.projects, slideIndex: 2 },
+  ];
+
+  const footerConnectLinks = [
+    { label: t.footer.connect.linkedin, href: "#" },
+    { label: t.footer.connect.twitter, href: "#" },
+    { label: t.footer.connect.github, href: "#" },
+  ];
 
   return (
-    <section id="contact" className="relative section-padding overflow-hidden">
-      <div className="absolute inset-0 bg-grid opacity-20" />
-      <div className="gradient-blob absolute -right-40 bottom-0 h-[500px] w-[500px] bg-primary/10" />
-      <div className="gradient-blob absolute -left-40 top-0 h-[400px] w-[400px] bg-accent/8" />
+    <section id="contact" className="relative h-screen flex flex-col justify-center overflow-hidden">
+      <GradientMesh className="opacity-40" />
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Header */}
-        <motion.div
-          variants={fadeInUp}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          className="mb-16 text-center"
-        >
-          <span className="mb-4 inline-block text-sm font-medium tracking-wider text-primary uppercase">
-            Get In Touch
-          </span>
-          <h2 className="text-3xl font-bold tracking-tight md:text-5xl">
-            Let&apos;s build something{" "}
-            <span className="gradient-text">extraordinary</span>
-          </h2>
-          <p className="mx-auto mt-4 max-w-xl text-lg text-muted">
-            Ready to transform your vision into reality? We&apos;d love to hear
-            from you.
-          </p>
-        </motion.div>
+      {/* Accent glow */}
+      <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-brand-green/[0.03] blur-[80px]" />
 
-        <div className="grid gap-12 lg:grid-cols-5">
-          {/* Info */}
+      <div className="max-w-5xl mx-auto px-6 relative z-10 w-full">
+        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-10 items-start ${isRTL ? "direction-rtl" : ""}`}>
+          {/* Left — CTA Copy */}
           <motion.div
-            variants={slideInLeft}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            className="lg:col-span-2"
+            initial={{ opacity: 0, x: isRTL ? 40 : -40, filter: "blur(8px)" }}
+            animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+            transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
+            className={isRTL ? "text-right" : ""}
           >
-            <div className="space-y-8">
-              <div>
-                <h3 className="mb-4 text-xl font-semibold">
-                  Start a conversation
-                </h3>
-                <p className="text-sm leading-relaxed text-muted">
-                  Whether you have a project in mind, need technical
-                  consultation, or want to explore a partnership — our team is
-                  ready to help.
-                </p>
-              </div>
+            <span className="text-small font-mono text-brand-green uppercase tracking-widest mb-4 block">
+              &mdash; {t.contact.label}
+            </span>
+            <h2 className="text-display mb-4" style={{ color: "var(--text-primary)" }}>
+              {t.contact.heading}{" "}
+              <span className="text-gradient">{t.contact.headingAccent}</span>
+            </h2>
+            <p className="text-body-lg mb-8 leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+              {t.contact.description}
+            </p>
 
-              <div className="space-y-4">
-                {[
-                  {
-                    icon: Mail,
-                    label: "Email",
-                    value: "hello@inst.tech",
-                  },
-                  {
-                    icon: Phone,
-                    label: "Phone",
-                    value: "+1 (555) 000-0000",
-                  },
-                  {
-                    icon: MapPin,
-                    label: "Location",
-                    value: "San Francisco, CA",
-                  },
-                ].map((item) => (
-                  <div key={item.label} className="flex items-center gap-4">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-lg border border-white/10 bg-surface">
-                      <item.icon className="h-4 w-4 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-xs text-muted">{item.label}</p>
-                      <p className="text-sm font-medium">{item.value}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
+            <div className="space-y-4">
+              {t.contact.features.map((item, i) => (
+                <motion.div
+                  key={item}
+                  initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: 0.3 + i * 0.1, duration: 0.5 }}
+                  className={`flex items-center gap-3 group ${isRTL ? "flex-row-reverse" : ""}`}
+                >
+                  <div className="w-8 h-[1px] bg-gradient-accent group-hover:w-12 transition-all duration-300" />
+                  <span className="text-body" style={{ color: "var(--text-muted-light)" }}>{item}</span>
+                </motion.div>
+              ))}
             </div>
           </motion.div>
 
-          {/* Form */}
+          {/* Right — Form */}
           <motion.div
-            variants={slideInRight}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-            className="lg:col-span-3"
+            initial={{ opacity: 0, x: isRTL ? -40 : 40, filter: "blur(8px)" }}
+            animate={{ opacity: 1, x: 0, filter: "blur(0px)" }}
+            transition={{
+              duration: 0.8,
+              delay: 0.2,
+              ease: [0.19, 1, 0.22, 1],
+            }}
           >
-            <div className="relative rounded-2xl border border-white/[0.06] bg-surface/50 p-8 backdrop-blur-sm">
-              {/* Success overlay */}
-              {submitted && (
+            <div className="glass rounded-3xl p-6 md:p-8 glow-border relative overflow-hidden">
+              {/* Subtle top accent */}
+              <div
+                className="absolute top-0 left-0 right-0 h-[1px]"
+                style={{
+                  background: "linear-gradient(90deg, transparent, rgba(0, 200, 150, 0.3), transparent)",
+                }}
+              />
+
+              {isSubmitted ? (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.9 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="absolute inset-0 z-10 flex flex-col items-center justify-center rounded-2xl bg-surface/95 backdrop-blur-sm"
+                  transition={{ duration: 0.5 }}
+                  className="text-center py-12"
                 >
                   <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
+                    initial={{ scale: 0, rotate: -180 }}
+                    animate={{ scale: 1, rotate: 0 }}
                     transition={{
                       type: "spring",
                       stiffness: 200,
                       damping: 15,
+                      delay: 0.2,
                     }}
+                    className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-brand-green/10 mb-4 relative"
                   >
-                    <CheckCircle className="h-16 w-16 text-primary" />
+                    <div className="absolute inset-0 rounded-full bg-brand-green/5 animate-ping" />
+                    <CheckCircle size={30} className="text-brand-green" />
                   </motion.div>
-                  <p className="mt-4 text-lg font-semibold">Message Sent!</p>
-                  <p className="mt-1 text-sm text-muted">
-                    We&apos;ll get back to you within 24 hours.
+                  <h3 className="text-heading mb-2" style={{ color: "var(--text-primary)" }}>
+                    {t.contact.form.successTitle}
+                  </h3>
+                  <p className="text-body" style={{ color: "var(--text-secondary)" }}>
+                    {t.contact.form.successMessage}
                   </p>
                 </motion.div>
+              ) : (
+                <form onSubmit={handleSubmit} className={`space-y-4 ${isRTL ? "text-right" : ""}`} dir={isRTL ? "rtl" : "ltr"}>
+                  {/* Name & Email row */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="group">
+                      <label
+                        htmlFor="name"
+                        className="block text-xs font-medium mb-1.5 group-focus-within:text-brand-green transition-colors duration-300"
+                        style={{ color: "var(--text-muted-light)" }}
+                      >
+                        {t.contact.form.name}
+                      </label>
+                      <input
+                        type="text"
+                        id="name"
+                        name="name"
+                        required
+                        value={formData.name}
+                        onChange={handleChange}
+                        placeholder={t.contact.form.namePlaceholder}
+                        className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-brand-green/40 focus:ring-2 focus:ring-brand-green/10 transition-all duration-300"
+                        style={{
+                          backgroundColor: "var(--input-bg)",
+                          border: "1px solid var(--input-border)",
+                          color: "var(--text-primary)",
+                        }}
+                      />
+                    </div>
+                    <div className="group">
+                      <label
+                        htmlFor="email"
+                        className="block text-xs font-medium mb-1.5 group-focus-within:text-brand-green transition-colors duration-300"
+                        style={{ color: "var(--text-muted-light)" }}
+                      >
+                        {t.contact.form.email}
+                      </label>
+                      <input
+                        type="email"
+                        id="email"
+                        name="email"
+                        required
+                        value={formData.email}
+                        onChange={handleChange}
+                        placeholder={t.contact.form.emailPlaceholder}
+                        className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-brand-green/40 focus:ring-2 focus:ring-brand-green/10 transition-all duration-300"
+                        style={{
+                          backgroundColor: "var(--input-bg)",
+                          border: "1px solid var(--input-border)",
+                          color: "var(--text-primary)",
+                        }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Message */}
+                  <div className="group">
+                    <label
+                      htmlFor="message"
+                      className="block text-xs font-medium mb-1.5 group-focus-within:text-brand-green transition-colors duration-300"
+                      style={{ color: "var(--text-muted-light)" }}
+                    >
+                      {t.contact.form.message}
+                    </label>
+                    <textarea
+                      id="message"
+                      name="message"
+                      required
+                      rows={3}
+                      value={formData.message}
+                      onChange={handleChange}
+                      placeholder={t.contact.form.messagePlaceholder}
+                      className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-brand-green/40 focus:ring-2 focus:ring-brand-green/10 transition-all duration-300 resize-none"
+                      style={{
+                        backgroundColor: "var(--input-bg)",
+                        border: "1px solid var(--input-border)",
+                        color: "var(--text-primary)",
+                      }}
+                    />
+                  </div>
+
+                  {/* Submit */}
+                  <MagneticButton
+                    className="w-full py-3.5 rounded-xl bg-gradient-accent text-white font-medium text-sm flex items-center justify-center gap-2.5 hover:shadow-glow-lg transition-all duration-500 disabled:opacity-50 relative overflow-hidden"
+                    strength={0.15}
+                  >
+                    <motion.div
+                      className="absolute inset-0"
+                      animate={{ translateX: ["-100%", "200%"] }}
+                      transition={{ duration: 3, repeat: Infinity, repeatDelay: 3, ease: "easeInOut" }}
+                      style={{
+                        background: "linear-gradient(90deg, transparent, rgba(255,255,255,0.08), transparent)",
+                      }}
+                    />
+                    <span className="relative z-10 flex items-center gap-2.5">
+                      {isSending ? (
+                        <motion.div
+                          animate={{ rotate: 360 }}
+                          transition={{
+                            duration: 1,
+                            repeat: Infinity,
+                            ease: "linear",
+                          }}
+                          className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full"
+                        />
+                      ) : (
+                        <>
+                          {t.contact.form.send}
+                          <Send size={14} />
+                        </>
+                      )}
+                    </span>
+                  </MagneticButton>
+                </form>
               )}
-
-              <form
-                ref={formRef}
-                onSubmit={handleSubmit}
-                className="space-y-5"
-              >
-                {/* Name */}
-                <div className="relative">
-                  <label
-                    htmlFor="name"
-                    className={cn(
-                      "absolute left-4 transition-all duration-300 pointer-events-none",
-                      focused === "name" || formState.name
-                        ? "-top-2.5 text-xs text-primary bg-surface/50 px-1"
-                        : "top-3.5 text-sm text-muted"
-                    )}
-                  >
-                    Your Name
-                  </label>
-                  <input
-                    id="name"
-                    type="text"
-                    required
-                    value={formState.name}
-                    onChange={(e) =>
-                      setFormState({ ...formState, name: e.target.value })
-                    }
-                    onFocus={() => setFocused("name")}
-                    onBlur={() => setFocused(null)}
-                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3.5 text-sm text-foreground transition-all duration-300 hover:border-white/20 focus:border-primary/50"
-                  />
-                </div>
-
-                {/* Email */}
-                <div className="relative">
-                  <label
-                    htmlFor="email"
-                    className={cn(
-                      "absolute left-4 transition-all duration-300 pointer-events-none",
-                      focused === "email" || formState.email
-                        ? "-top-2.5 text-xs text-primary bg-surface/50 px-1"
-                        : "top-3.5 text-sm text-muted"
-                    )}
-                  >
-                    Email Address
-                  </label>
-                  <input
-                    id="email"
-                    type="email"
-                    required
-                    value={formState.email}
-                    onChange={(e) =>
-                      setFormState({ ...formState, email: e.target.value })
-                    }
-                    onFocus={() => setFocused("email")}
-                    onBlur={() => setFocused(null)}
-                    className="w-full rounded-xl border border-white/10 bg-background/50 px-4 py-3.5 text-sm text-foreground transition-all duration-300 hover:border-white/20 focus:border-primary/50"
-                  />
-                </div>
-
-                {/* Message */}
-                <div className="relative">
-                  <label
-                    htmlFor="message"
-                    className={cn(
-                      "absolute left-4 transition-all duration-300 pointer-events-none",
-                      focused === "message" || formState.message
-                        ? "-top-2.5 text-xs text-primary bg-surface/50 px-1"
-                        : "top-3.5 text-sm text-muted"
-                    )}
-                  >
-                    Your Message
-                  </label>
-                  <textarea
-                    id="message"
-                    required
-                    rows={5}
-                    value={formState.message}
-                    onChange={(e) =>
-                      setFormState({ ...formState, message: e.target.value })
-                    }
-                    onFocus={() => setFocused("message")}
-                    onBlur={() => setFocused(null)}
-                    className="w-full resize-none rounded-xl border border-white/10 bg-background/50 px-4 py-3.5 text-sm text-foreground transition-all duration-300 hover:border-white/20 focus:border-primary/50"
-                  />
-                </div>
-
-                {/* Submit */}
-                <button
-                  type="submit"
-                  onClick={handleRipple}
-                  className="group relative w-full overflow-hidden rounded-xl bg-gradient-to-r from-primary to-accent py-3.5 text-sm font-medium text-white transition-shadow hover:shadow-[0_0_30px_rgba(0,200,150,0.3)]"
-                >
-                  <span className="relative z-10 flex items-center justify-center gap-2">
-                    Send Message
-                    <Send className="h-4 w-4 transition-transform group-hover:translate-x-1" />
-                  </span>
-                </button>
-              </form>
             </div>
           </motion.div>
         </div>
+
+        {/* Footer section merged */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ delay: 0.6, duration: 0.8 }}
+          className="mt-10 pt-8"
+          style={{ borderTop: "1px solid var(--border-color)" }}
+        >
+          <div className={`flex flex-col md:flex-row items-start md:items-center justify-between gap-6 ${isRTL ? "md:flex-row-reverse" : ""}`}>
+            {/* Brand */}
+            <div className={`flex items-center gap-6 ${isRTL ? "flex-row-reverse" : ""}`}>
+              <button
+                onClick={() => goToSlide(0)}
+                className="flex items-center gap-2 group"
+                data-cursor-hover
+              >
+                <div className="w-8 h-8 rounded-lg bg-gradient-accent flex items-center justify-center font-bold text-xs text-white">
+                  In
+                </div>
+                <span
+                  className="text-base font-semibold tracking-tight group-hover:text-brand-green transition-colors duration-300"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  InST
+                </span>
+              </button>
+              <span className="text-xs hidden sm:block" style={{ color: "var(--text-muted)" }}>
+                &copy; {new Date().getFullYear()} {t.footer.copyright}
+              </span>
+            </div>
+
+            {/* Quick Links */}
+            <div className={`flex items-center gap-6 ${isRTL ? "flex-row-reverse" : ""}`}>
+              {footerCompanyLinks.map((link) => (
+                <button
+                  key={link.label}
+                  onClick={() => goToSlide(link.slideIndex)}
+                  data-cursor-hover
+                  className="text-xs transition-colors duration-300"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  {link.label}
+                </button>
+              ))}
+              <span className="w-px h-3" style={{ backgroundColor: "var(--border-color)" }} />
+              {footerConnectLinks.map((link) => (
+                <a
+                  key={link.label}
+                  href={link.href}
+                  data-cursor-hover
+                  className="text-xs transition-colors duration-300 flex items-center gap-1 group"
+                  style={{ color: "var(--text-secondary)" }}
+                >
+                  {link.label}
+                  <ArrowUpRight
+                    size={10}
+                    className="opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                  />
+                </a>
+              ))}
+            </div>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

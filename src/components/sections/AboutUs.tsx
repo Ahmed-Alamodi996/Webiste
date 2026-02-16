@@ -1,81 +1,97 @@
 "use client";
 
 import { motion } from "framer-motion";
-import {
-  fadeInUp,
-  slideInLeft,
-  slideInRight,
-  staggerContainer,
-} from "@/lib/animations";
 import AnimatedCounter from "@/components/ui/AnimatedCounter";
-
-const stats = [
-  { target: 12, suffix: "+", label: "Years of Excellence" },
-  { target: 200, suffix: "+", label: "Projects Delivered" },
-  { target: 85, suffix: "+", label: "Global Clients" },
-  { target: 99, suffix: "%", label: "Client Satisfaction" },
-];
+import AuroraBeam from "@/components/ui/AuroraBeam";
+import TextReveal from "@/components/ui/TextReveal";
+import { useLanguage } from "@/context/LanguageContext";
 
 export default function AboutUs() {
+  const { t, isRTL } = useLanguage();
+
   return (
-    <section id="about" className="relative section-padding overflow-hidden">
-      {/* Background */}
-      <div className="absolute inset-0 bg-grid opacity-30" />
-      <div className="gradient-blob absolute right-0 top-1/2 h-[500px] w-[500px] -translate-y-1/2 bg-accent/10" />
+    <section id="about" className="relative h-screen flex flex-col justify-center overflow-hidden">
+      {/* Background grid with perspective fade */}
+      <div className="absolute inset-0 bg-grid opacity-20" />
+      <AuroraBeam className="opacity-50" />
 
-      <div className="mx-auto max-w-7xl px-6 lg:px-8">
-        {/* Split Layout */}
-        <div className="grid items-center gap-16 lg:grid-cols-2">
-          {/* Left - Typography */}
-          <motion.div
-            variants={slideInLeft}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-          >
-            <span className="mb-4 inline-block text-sm font-medium tracking-wider text-primary uppercase">
-              About Us
-            </span>
-            <h2 className="text-4xl font-bold leading-[1.1] tracking-tight md:text-5xl lg:text-6xl">
-              We build what{" "}
-              <span className="gradient-text">others imagine</span>
+      {/* Top gradient separator */}
+      <div
+        className="absolute top-0 left-0 right-0 h-px"
+        style={{
+          background: "linear-gradient(90deg, transparent, rgba(0, 200, 150, 0.15), transparent)",
+        }}
+      />
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center ${isRTL ? "direction-rtl" : ""}`}>
+          {/* Left — Big Typography with text reveal */}
+          <div className={isRTL ? "text-right" : ""}>
+            <motion.span
+              initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
+              className="text-small font-mono text-brand-green uppercase tracking-widest mb-6 block"
+            >
+              &mdash; {t.about.label}
+            </motion.span>
+
+            <h2 className="text-display-lg mb-6" style={{ color: "var(--text-primary)" }}>
+              <TextReveal delay={0.1}>{t.about.headingLine1}</TextReveal>{" "}
+              <TextReveal delay={0.3} gradient>{t.about.headingWord1}</TextReveal>
+              <br />
+              <TextReveal delay={0.5}>{t.about.headingLine2}</TextReveal>{" "}
+              <TextReveal delay={0.7} gradient>{t.about.headingWord2}</TextReveal>
             </h2>
-          </motion.div>
 
-          {/* Right - Description */}
-          <motion.div
-            variants={slideInRight}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true, amount: 0.3 }}
-          >
-            <p className="text-lg leading-relaxed text-muted">
-              Innovative Solutions Tech was founded with a singular vision: to
-              bridge the gap between cutting-edge research and real-world
-              application. Our team of elite engineers, architects, and
-              strategists partner with forward-thinking organizations to build
-              technology that doesn&apos;t just solve today&apos;s
-              problems — it anticipates tomorrow&apos;s opportunities.
-            </p>
-            <p className="mt-4 text-lg leading-relaxed text-muted">
-              From stealth startups to Fortune 500 enterprises, we deliver
-              solutions with the precision of a research lab and the speed of a
-              startup. Every line of code, every architecture decision, every
-              deployment is engineered for impact.
-            </p>
-          </motion.div>
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.8, delay: 0.9, ease: [0.19, 1, 0.22, 1] }}
+              className={`w-20 h-[2px] bg-gradient-accent mb-8 ${isRTL ? "origin-right" : "origin-left"}`}
+            />
+          </div>
+
+          {/* Right — Description with staggered paragraphs */}
+          <div className={isRTL ? "text-right" : ""}>
+            <motion.p
+              initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.7, delay: 0.3, ease: [0.19, 1, 0.22, 1] }}
+              className="text-body-lg mb-6 leading-relaxed"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              {t.about.paragraph1}
+            </motion.p>
+            <motion.p
+              initial={{ opacity: 0, y: 20, filter: "blur(6px)" }}
+              animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+              transition={{ duration: 0.7, delay: 0.5, ease: [0.19, 1, 0.22, 1] }}
+              className="text-body-lg leading-relaxed"
+              style={{ color: "var(--text-secondary)" }}
+            >
+              {t.about.paragraph2}
+            </motion.p>
+          </div>
         </div>
 
-        {/* Counters */}
+        {/* Counters — enhanced with glass cards */}
         <motion.div
-          variants={staggerContainer}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, amount: 0.3 }}
-          className="mt-20 grid grid-cols-2 gap-8 rounded-2xl border border-white/[0.06] bg-surface/50 p-10 backdrop-blur-sm md:grid-cols-4"
+          initial={{ opacity: 0, y: 40 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.6, ease: [0.19, 1, 0.22, 1] }}
+          className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16"
         >
-          {stats.map((stat) => (
-            <AnimatedCounter key={stat.label} {...stat} />
+          {t.about.stats.map((counter, i) => (
+            <motion.div
+              key={`stat-${i}`}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.7 + i * 0.1, duration: 0.5 }}
+              className="glass rounded-2xl p-6 md:p-8 glow-border"
+            >
+              <AnimatedCounter {...counter} />
+            </motion.div>
           ))}
         </motion.div>
       </div>

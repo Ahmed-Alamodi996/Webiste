@@ -2,55 +2,66 @@ import type { Variants } from "framer-motion";
 
 export const fadeInUp: Variants = {
   hidden: { opacity: 0, y: 40 },
-  visible: {
+  visible: (delay: number = 0) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
-};
-
-export const fadeInDown: Variants = {
-  hidden: { opacity: 0, y: -30 },
-  visible: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
+    transition: {
+      duration: 0.8,
+      delay,
+      ease: [0.19, 1, 0.22, 1],
+    },
+  }),
 };
 
 export const fadeIn: Variants = {
   hidden: { opacity: 0 },
-  visible: {
+  visible: (delay: number = 0) => ({
     opacity: 1,
-    transition: { duration: 0.6, ease: "easeOut" },
-  },
+    transition: {
+      duration: 0.6,
+      delay,
+      ease: "easeOut",
+    },
+  }),
 };
 
 export const scaleIn: Variants = {
-  hidden: { opacity: 0, scale: 0.9 },
-  visible: {
+  hidden: { opacity: 0, scale: 0.92 },
+  visible: (delay: number = 0) => ({
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
+    transition: {
+      duration: 0.7,
+      delay,
+      ease: [0.19, 1, 0.22, 1],
+    },
+  }),
 };
 
 export const slideInLeft: Variants = {
   hidden: { opacity: 0, x: -60 },
-  visible: {
+  visible: (delay: number = 0) => ({
     opacity: 1,
     x: 0,
-    transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
+    transition: {
+      duration: 0.8,
+      delay,
+      ease: [0.19, 1, 0.22, 1],
+    },
+  }),
 };
 
 export const slideInRight: Variants = {
   hidden: { opacity: 0, x: 60 },
-  visible: {
+  visible: (delay: number = 0) => ({
     opacity: 1,
     x: 0,
-    transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
+    transition: {
+      duration: 0.8,
+      delay,
+      ease: [0.19, 1, 0.22, 1],
+    },
+  }),
 };
 
 export const staggerContainer: Variants = {
@@ -69,25 +80,22 @@ export const staggerItem: Variants = {
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] },
+    transition: {
+      duration: 0.6,
+      ease: [0.19, 1, 0.22, 1],
+    },
   },
 };
 
-export const heroTextReveal: Variants = {
-  hidden: { opacity: 0, y: 80, rotateX: -20 },
-  visible: {
+export const letterReveal: Variants = {
+  hidden: { opacity: 0, y: 50 },
+  visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    rotateX: 0,
-    transition: { duration: 1.0, ease: [0.25, 0.46, 0.45, 0.94] },
-  },
-};
-
-export const counterReveal: Variants = {
-  hidden: { opacity: 0, scale: 0.5 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.8, ease: [0.34, 1.56, 0.64, 1] },
-  },
+    transition: {
+      duration: 0.5,
+      delay: i * 0.03,
+      ease: [0.19, 1, 0.22, 1],
+    },
+  }),
 };

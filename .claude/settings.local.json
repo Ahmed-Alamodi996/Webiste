@@ -1,0 +1,22 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx create-next-app:*)",
+      "Bash(npx create-next-app@latest:*)",
+      "Bash(npx next build:*)",
+      "Bash(npx tsc:*)",
+      "Bash(mongod:*)",
+      "Bash(mongosh:*)",
+      "Bash(docker:*)",
+      "Bash(python3:*)",
+      "Bash(openssl rand:*)",
+      "Bash(npx payload generate:importmap)",
+      "Bash(git stash:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)",
+      "Bash(git -c user.name=\"Alamo\" -c user.email=\"alamo@inst.com\" add -A)",
+      "Bash(git -c user.name=\"Alamo\" -c user.email=\"alamo@inst.com\" commit -m \"backup: pre-visual-enhancements snapshot\" --no-verify)"
+    ]
+  }
+}
