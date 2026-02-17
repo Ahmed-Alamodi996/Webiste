@@ -1,0 +1,192 @@
+{% extends "base.html" %}
+{% block title %}Logs - RA Platform{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h1><i class="bi bi-journal-text me-2"></i>Logs & Audit</h1>
+    <button class="btn btn-outline-primary btn-sm" onclick="loadCurrentTab()">
+        <i class="bi bi-arrow-clockwise"></i> Refresh
+    </button>
+</div>
+
+<ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#tab-audit" onclick="currentTab='audit'; loadAudit()">
+            <i class="bi bi-clock-history me-1"></i>Audit Trail
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#tab-errors" onclick="currentTab='errors'; loadErrors()">
+            <i class="bi bi-exclamation-triangle me-1"></i>Errors
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#tab-sla" onclick="currentTab='sla'; loadSlaBreaches()">
+            <i class="bi bi-shield-exclamation me-1"></i>SLA Breaches
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- Audit Trail -->
+    <div class="tab-pane fade show active" id="tab-audit">
+        <div class="d-flex gap-2 mb-3">
+            <input type="text" class="form-control form-control-sm w-auto" id="audit-action-filter"
+                   placeholder="Filter by action..." onchange="loadAudit()">
+            <select class="form-select form-select-sm w-auto" id="audit-resource-filter" onchange="loadAudit()">
+                <option value="">All Resources</option>
+                <option value="job">Jobs</option>
+                <option value="config">Config</option>
+                <option value="user">Users</option>
+            </select>
+            <select class="form-select form-select-sm w-auto" id="audit-limit" onchange="loadAudit()">
+                <option value="50">50 entries</option>
+                <option value="100">100 entries</option>
+                <option value="250">250 entries</option>
+                <option value="500">500 entries</option>
+            </select>
+        </div>
+        <div class="table-container">
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr><th>Time</th><th>User</th><th>Action</th><th>Resource</th><th>Resource ID</th><th>IP</th></tr>
+                </thead>
+                <tbody id="audit-table">
+                    <tr><td colspan="6" class="text-center text-muted py-4">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Errors -->
+    <div class="tab-pane fade" id="tab-errors">
+        <div class="table-container">
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr><th>Severity</th><th>Code</th><th>Service</th><th>Message</th><th>Time</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="errors-table">
+                    <tr><td colspan="6" class="text-center text-muted py-4">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- SLA Breaches -->
+    <div class="tab-pane fade" id="tab-sla">
+        <div class="table-container">
+            <table class="table table-sm table-hover">
+                <thead>
+                    <tr><th>Run ID</th><th>Expected</th><th>Actual</th><th>Reason</th><th>Time</th></tr>
+                </thead>
+                <tbody id="sla-table">
+                    <tr><td colspan="5" class="text-center text-muted py-4">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+let currentTab = 'audit';
+
+function loadCurrentTab() {
+    if (currentTab === 'audit') loadAudit();
+    else if (currentTab === 'errors') loadErrors();
+    else loadSlaBreaches();
+}
+
+async function loadAudit() {
+    const params = new URLSearchParams({
+        limit: document.getElementById('audit-limit').value,
+    });
+    const action = document.getElementById('audit-action-filter').value;
+    const resource = document.getElementById('audit-resource-filter').value;
+    if (action) params.set('action', action);
+    if (resource) params.set('resource_type', resource);
+
+    const data = await apiFetch('/admin/audit?' + params);
+    if (!data) return;
+
+    const items = Array.isArray(data) ? data : data.items || [];
+    const tbody = document.getElementById('audit-table');
+
+    if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted">No audit entries</td></tr>';
+        return;
+    }
+    tbody.innerHTML = items.map(log => `
+        <tr>
+            <td class="text-muted" style="font-size:0.85rem">${formatDate(log.timestamp)}</td>
+            <td><strong>${log.username || '-'}</strong></td>
+            <td><span class="badge bg-primary">${log.action}</span></td>
+            <td>${log.resource_type || '-'}</td>
+            <td><small class="text-muted">${(log.resource_id || '-').substring(0, 8)}</small></td>
+            <td class="text-muted">${log.ip_address || '-'}</td>
+        </tr>
+    `).join('');
+}
+
+async function loadErrors() {
+    const data = await apiFetch('/admin/errors?limit=100');
+    if (!data) return;
+
+    const items = Array.isArray(data) ? data : data.items || [];
+    const tbody = document.getElementById('errors-table');
+
+    if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="text-center text-muted"><i class="bi bi-check-circle text-success"></i> No unresolved errors</td></tr>';
+        return;
+    }
+    const sevMap = {critical: 'danger', error: 'danger', warning: 'warning', info: 'info'};
+    tbody.innerHTML = items.map(e => `
+        <tr>
+            <td><span class="badge bg-${sevMap[e.severity] || 'secondary'}">${e.severity}</span></td>
+            <td><code>${e.error_code || '-'}</code></td>
+            <td>${e.source_service || '-'}</td>
+            <td>${(e.message || '').substring(0, 80)}</td>
+            <td class="text-muted" style="font-size:0.85rem">${formatDate(e.timestamp)}</td>
+            <td>
+                <button class="btn btn-outline-success btn-action" onclick="resolveError('${e.id}')" title="Resolve">
+                    <i class="bi bi-check-lg"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+async function resolveError(id) {
+    const result = await apiFetch(`/admin/errors/${id}/resolve`, {method: 'POST'});
+    if (result) {
+        showToast('Error resolved', 'success');
+        loadErrors();
+    }
+}
+
+async function loadSlaBreaches() {
+    const data = await apiFetch('/admin/sla/breaches?limit=100');
+    if (!data) return;
+
+    const items = Array.isArray(data) ? data : data.items || [];
+    const tbody = document.getElementById('sla-table');
+
+    if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="text-center text-muted"><i class="bi bi-check-circle text-success"></i> No SLA breaches</td></tr>';
+        return;
+    }
+    tbody.innerHTML = items.map(b => `
+        <tr>
+            <td><small class="text-muted">${(b.job_run_id || '').substring(0, 8)}</small></td>
+            <td>${b.expected_minutes || '-'}m</td>
+            <td>${b.actual_minutes ? b.actual_minutes.toFixed(1) + 'm' : '-'}</td>
+            <td>${b.breach_reason || '-'}</td>
+            <td class="text-muted" style="font-size:0.85rem">${formatDate(b.evaluated_at)}</td>
+        </tr>
+    `).join('');
+}
+
+loadAudit();
+</script>
+{% endblock %}

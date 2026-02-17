@@ -19,6 +19,8 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from prometheus_fastapi_instrumentator import Instrumentator
 
+from fastapi.staticfiles import StaticFiles
+
 from src.api.v1.router import api_router
 from src.config.logging import setup_logging
 from src.config.settings import get_settings
@@ -28,6 +30,7 @@ from src.core.middleware import (
     SecurityHeadersMiddleware,
     register_exception_handlers,
 )
+from src.dashboard.router import router as dashboard_router
 
 
 @asynccontextmanager
@@ -84,6 +87,15 @@ def create_app() -> FastAPI:
 
     # --- Routes ---
     app.include_router(api_router)
+
+    # --- Web Dashboard (non-production or when ENABLE_DASHBOARD=true) ---
+    if not settings.is_production or getattr(settings, "enable_dashboard", False):
+        from pathlib import Path
+
+        static_dir = Path(__file__).parent / "dashboard" / "static"
+        if static_dir.exists():
+            app.mount("/static", StaticFiles(directory=str(static_dir)), name="static")
+        app.include_router(dashboard_router, prefix="/ui", tags=["Dashboard"])
 
     return app
 

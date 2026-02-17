@@ -15,6 +15,7 @@ from src.api.v1.endpoints import (
     loader,
     metrics,
     refresh,
+    reports,
 )
 
 api_router = APIRouter(prefix="/api/v1")
@@ -32,3 +33,4 @@ api_router.include_router(loader.router, prefix="/loader", tags=["ETL Loader"])
 api_router.include_router(refresh.router, prefix="/refresh", tags=["MV Refresh"])
 api_router.include_router(dependencies.router, prefix="/dependencies", tags=["Dependency Graph"])
 api_router.include_router(admin.router, prefix="/admin", tags=["Administration"])
+api_router.include_router(reports.router, prefix="/reports", tags=["Reports"])

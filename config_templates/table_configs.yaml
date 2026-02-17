@@ -1,0 +1,29 @@
+# =============================================================================
+# RA Platform - Table Configurations
+# =============================================================================
+# Define ETL mappings: source -> destination table configurations.
+# Import with: ra yaml import config_templates/table_configs.yaml --type tables
+# Validate:    ra yaml validate config_templates/table_configs.yaml --type tables
+# =============================================================================
+
+- name: "daily_subscriber_load"
+  source_type: "csv"
+  source_table_name: "subscribers.csv"
+  source_columns: "ID, NAME, PHONE, PLAN_TYPE, START_DATE"
+  destination_table_name: "SUBSCRIBERS"
+  destination_columns: "SUB_ID, SUB_NAME, PHONE_NUM, PLAN, ACTIVATION_DATE"
+  date_format: "YYYY-MM-DD"
+  date_column: "START_DATE"
+  schedule_day: 1
+  skip_rows: 1
+  file_name_pattern: "subscribers_*.csv"
+
+- name: "cdr_sync"
+  source_type: "oracle"
+  source_table_name: "CDR_RAW"
+  source_columns: "CALL_ID, CALLER, CALLEE, DURATION, CALL_DATE"
+  destination_table_name: "CDR_ARCHIVE"
+  destination_columns: "CALL_ID, CALLER, CALLEE, DURATION, CALL_DATE"
+  where_condition: "CALL_DATE >= TRUNC(SYSDATE) - 1"
+  date_format: "YYYY-MM-DD HH24:MI:SS"
+  date_column: "CALL_DATE"

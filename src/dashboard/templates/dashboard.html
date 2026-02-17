@@ -1,0 +1,139 @@
+{% extends "base.html" %}
+{% block title %}Dashboard - RA Platform{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h1><i class="bi bi-speedometer2 me-2"></i>Dashboard</h1>
+    <button class="btn btn-outline-primary btn-sm" onclick="loadDashboard()">
+        <i class="bi bi-arrow-clockwise"></i> Refresh
+    </button>
+</div>
+
+<!-- Stat Cards -->
+<div class="row g-3 mb-4" id="stat-cards">
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #4caf50, #2e7d32);">
+                    <i class="bi bi-play-circle"></i>
+                </div>
+                <div>
+                    <div class="stat-value" id="active-runs">-</div>
+                    <div class="stat-label">Active Runs</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #1a73e8, #0d47a1);">
+                    <i class="bi bi-check-circle"></i>
+                </div>
+                <div>
+                    <div class="stat-value" id="success-24h">-</div>
+                    <div class="stat-label">Success (24h)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #f44336, #c62828);">
+                    <i class="bi bi-x-circle"></i>
+                </div>
+                <div>
+                    <div class="stat-value" id="failed-24h">-</div>
+                    <div class="stat-label">Failed (24h)</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card stat-card">
+            <div class="card-body d-flex align-items-center gap-3">
+                <div class="stat-icon" style="background: linear-gradient(135deg, #ff9800, #e65100);">
+                    <i class="bi bi-exclamation-triangle"></i>
+                </div>
+                <div>
+                    <div class="stat-value" id="error-count">-</div>
+                    <div class="stat-label">Unresolved Errors</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- SLA & Recent Errors -->
+<div class="row g-3">
+    <div class="col-md-6">
+        <div class="table-container">
+            <h5 class="mb-3"><i class="bi bi-shield-check me-2"></i>SLA Compliance</h5>
+            <table class="table table-sm">
+                <thead><tr><th>Job Type</th><th>Compliance</th><th>Status</th></tr></thead>
+                <tbody id="sla-table"><tr><td colspan="3" class="text-center text-muted">Loading...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="table-container">
+            <h5 class="mb-3"><i class="bi bi-exclamation-circle me-2"></i>Recent Errors</h5>
+            <table class="table table-sm">
+                <thead><tr><th>Severity</th><th>Message</th><th>Time</th></tr></thead>
+                <tbody id="errors-table"><tr><td colspan="3" class="text-center text-muted">Loading...</td></tr></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+async function loadDashboard() {
+    const data = await apiFetch('/admin/dashboard');
+    if (!data) return;
+
+    // Stats
+    const jobs = data.jobs || {};
+    const stats = jobs.stats_24h || {};
+    document.getElementById('active-runs').textContent = jobs.active_runs || 0;
+    document.getElementById('success-24h').textContent = stats.success || 0;
+    document.getElementById('failed-24h').textContent = stats.failed || 0;
+    document.getElementById('error-count').textContent = data.errors?.unresolved_count || 0;
+
+    // SLA
+    const slaBody = document.getElementById('sla-table');
+    const sla = data.sla || {};
+    let slaHtml = '';
+    for (const [type, info] of Object.entries(sla)) {
+        if (typeof info !== 'object') continue;
+        const pct = info.compliance_pct || 100;
+        const color = pct >= 95 ? 'success' : pct >= 80 ? 'warning' : 'danger';
+        slaHtml += `<tr>
+            <td>${type}</td>
+            <td><strong>${pct.toFixed(1)}%</strong></td>
+            <td>${statusBadge(pct >= 95 ? 'success' : pct >= 80 ? 'pending' : 'failed')}</td>
+        </tr>`;
+    }
+    slaBody.innerHTML = slaHtml || '<tr><td colspan="3" class="text-muted text-center">No SLA data</td></tr>';
+
+    // Errors
+    const errBody = document.getElementById('errors-table');
+    const errors = data.errors?.recent || [];
+    let errHtml = '';
+    for (const e of errors.slice(0, 5)) {
+        const sevMap = {critical: 'danger', error: 'danger', warning: 'warning'};
+        errHtml += `<tr>
+            <td><span class="badge bg-${sevMap[e.severity] || 'secondary'}">${e.severity}</span></td>
+            <td>${e.message?.substring(0, 60) || '-'}</td>
+            <td class="text-muted" style="font-size:0.8rem">${formatDate(e.timestamp)}</td>
+        </tr>`;
+    }
+    errBody.innerHTML = errHtml || '<tr><td colspan="3" class="text-muted text-center">No errors</td></tr>';
+}
+
+loadDashboard();
+setInterval(loadDashboard, 30000);
+</script>
+{% endblock %}

@@ -1,0 +1,477 @@
+{% extends "base.html" %}
+{% block title %}Configuration - RA Platform{% endblock %}
+
+{% block content %}
+<div class="page-header d-flex justify-content-between align-items-center">
+    <h1><i class="bi bi-gear me-2"></i>Configuration</h1>
+    <div>
+        <button class="btn btn-outline-primary btn-sm" onclick="loadAll()">
+            <i class="bi bi-arrow-clockwise"></i> Refresh
+        </button>
+    </div>
+</div>
+
+<!-- Tabs -->
+<ul class="nav nav-tabs mb-3" role="tablist">
+    <li class="nav-item">
+        <a class="nav-link active" data-bs-toggle="tab" href="#tab-tables" onclick="loadTableConfigs()">
+            <i class="bi bi-table me-1"></i>Table Configs
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#tab-connections" onclick="loadConnections()">
+            <i class="bi bi-plug me-1"></i>Connections
+        </a>
+    </li>
+    <li class="nav-item">
+        <a class="nav-link" data-bs-toggle="tab" href="#tab-yaml">
+            <i class="bi bi-file-code me-1"></i>YAML Import/Export
+        </a>
+    </li>
+</ul>
+
+<div class="tab-content">
+    <!-- Table Configs Tab -->
+    <div class="tab-pane fade show active" id="tab-tables">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+            <select class="form-select form-select-sm w-auto" id="source-type-filter" onchange="loadTableConfigs()">
+                <option value="">All Source Types</option>
+                <option value="oracle">Oracle</option>
+                <option value="postgres">PostgreSQL</option>
+                <option value="csv">CSV</option>
+                <option value="excel">Excel</option>
+            </select>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createConfigModal">
+                <i class="bi bi-plus-lg"></i> New Config
+            </button>
+        </div>
+        <div class="table-container">
+            <table class="table table-hover table-sm">
+                <thead>
+                    <tr><th>Name</th><th>Source</th><th>Source Table</th><th>Dest Table</th><th>Schedule</th><th>Enabled</th><th>Actions</th></tr>
+                </thead>
+                <tbody id="configs-table">
+                    <tr><td colspan="7" class="text-center text-muted py-4">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Connections Tab -->
+    <div class="tab-pane fade" id="tab-connections">
+        <div class="d-flex justify-content-end mb-3">
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#createConnModal">
+                <i class="bi bi-plus-lg"></i> New Connection
+            </button>
+        </div>
+        <div class="table-container">
+            <table class="table table-hover table-sm">
+                <thead>
+                    <tr><th>Name</th><th>Type</th><th>Host</th><th>Port</th><th>Database</th><th>User</th><th>Active</th></tr>
+                </thead>
+                <tbody id="connections-table">
+                    <tr><td colspan="7" class="text-center text-muted py-4">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- YAML Tab -->
+    <div class="tab-pane fade" id="tab-yaml">
+        <div class="row g-3">
+            <div class="col-md-6">
+                <div class="table-container">
+                    <h5><i class="bi bi-upload me-2"></i>Import Config</h5>
+                    <p class="text-muted">Upload a YAML or JSON file to bulk-import configurations.</p>
+                    <div class="mb-3">
+                        <select class="form-select" id="import-type">
+                            <option value="tables">Table Configs</option>
+                            <option value="connections">Connections</option>
+                            <option value="jobs">Jobs</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <textarea class="form-control font-monospace" id="yaml-input" rows="12"
+                            placeholder="Paste YAML or JSON here..."></textarea>
+                    </div>
+                    <button class="btn btn-primary" onclick="importYaml()">
+                        <i class="bi bi-upload"></i> Import
+                    </button>
+                    <button class="btn btn-outline-secondary" onclick="validateYaml()">
+                        <i class="bi bi-check-circle"></i> Validate Only
+                    </button>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="table-container">
+                    <h5><i class="bi bi-download me-2"></i>Export Config</h5>
+                    <p class="text-muted">Download current configurations as YAML or JSON files.</p>
+                    <div class="mb-3">
+                        <select class="form-select" id="export-type">
+                            <option value="tables">Table Configs</option>
+                            <option value="connections">Connections</option>
+                            <option value="jobs">Jobs</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <select class="form-select" id="export-format">
+                            <option value="yaml">YAML</option>
+                            <option value="json">JSON</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-primary" onclick="exportConfig()">
+                        <i class="bi bi-download"></i> Export
+                    </button>
+                </div>
+                <div class="table-container mt-3">
+                    <h5><i class="bi bi-file-earmark-text me-2"></i>Templates</h5>
+                    <p class="text-muted">Download YAML templates to get started.</p>
+                    <button class="btn btn-outline-primary btn-sm me-1" onclick="downloadTemplate('tables')">Table Config</button>
+                    <button class="btn btn-outline-primary btn-sm me-1" onclick="downloadTemplate('connections')">Connection</button>
+                    <button class="btn btn-outline-primary btn-sm" onclick="downloadTemplate('jobs')">Job</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Config Modal -->
+<div class="modal fade" id="createConfigModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Table Config</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" id="cfg-name" required>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Source Type</label>
+                        <select class="form-select" id="cfg-source-type">
+                            <option value="oracle">Oracle</option>
+                            <option value="postgres">PostgreSQL</option>
+                            <option value="csv">CSV</option>
+                            <option value="excel">Excel</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Source Table</label>
+                        <input type="text" class="form-control" id="cfg-src-table">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Destination Table</label>
+                        <input type="text" class="form-control" id="cfg-dest-table">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Source Columns</label>
+                        <input type="text" class="form-control" id="cfg-src-cols" placeholder="COL1, COL2, COL3">
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Destination Columns</label>
+                        <input type="text" class="form-control" id="cfg-dest-cols" placeholder="COL1, COL2, COL3">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">WHERE Condition</label>
+                        <input type="text" class="form-control" id="cfg-where" placeholder="DATE_COL >= SYSDATE - 30">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Schedule Day</label>
+                        <input type="number" class="form-control" id="cfg-schedule-day" min="1" max="31">
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Skip Rows</label>
+                        <input type="number" class="form-control" id="cfg-skip-rows" value="0" min="0">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createConfig()">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Create Connection Modal -->
+<div class="modal fade" id="createConnModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Create Connection</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label class="form-label">Name</label>
+                    <input type="text" class="form-control" id="conn-name" required>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Type</label>
+                    <select class="form-select" id="conn-type">
+                        <option value="oracle">Oracle</option>
+                        <option value="postgresql">PostgreSQL</option>
+                    </select>
+                </div>
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label class="form-label">Host</label>
+                        <input type="text" class="form-control" id="conn-host">
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label class="form-label">Port</label>
+                        <input type="number" class="form-control" id="conn-port" value="1521">
+                    </div>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Database/SID</label>
+                    <input type="text" class="form-control" id="conn-db">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-control" id="conn-user">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password Env Var</label>
+                    <input type="text" class="form-control" id="conn-pass-env" placeholder="ORACLE_PASSWORD">
+                    <div class="form-text">Name of the environment variable that holds the password</div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createConnection()">Create</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+async function loadTableConfigs() {
+    const filter = document.getElementById('source-type-filter').value;
+    const params = new URLSearchParams({page_size: '200'});
+    if (filter) params.set('source_type', filter);
+
+    const data = await apiFetch('/config/tables?' + params);
+    if (!data) return;
+
+    const items = data.items || data;
+    const tbody = document.getElementById('configs-table');
+
+    if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="bi bi-inbox"></i>No configurations</td></tr>';
+        return;
+    }
+    tbody.innerHTML = items.map(c => `
+        <tr>
+            <td><strong>${c.name}</strong><br><small class="text-muted">${c.id.substring(0, 8)}</small></td>
+            <td><span class="badge bg-info">${c.source_type || '-'}</span></td>
+            <td>${c.source_table_name || '-'}</td>
+            <td>${c.destination_table_name || '-'}</td>
+            <td>${c.schedule_day ? 'Day ' + c.schedule_day : '-'}</td>
+            <td>${c.is_enabled ? '<span class="badge bg-success">ON</span>' : '<span class="badge bg-secondary">OFF</span>'}</td>
+            <td>
+                <button class="btn btn-outline-danger btn-action" onclick="deleteConfig('${c.id}')" title="Delete">
+                    <i class="bi bi-trash"></i>
+                </button>
+            </td>
+        </tr>
+    `).join('');
+}
+
+async function loadConnections() {
+    const data = await apiFetch('/config/connections?page_size=100');
+    if (!data) return;
+
+    const items = data.items || data;
+    const tbody = document.getElementById('connections-table');
+
+    if (!items.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="text-center text-muted">No connections</td></tr>';
+        return;
+    }
+    tbody.innerHTML = items.map(c => `
+        <tr>
+            <td><strong>${c.name}</strong></td>
+            <td><span class="badge bg-${c.db_type === 'oracle' ? 'danger' : 'primary'}">${c.db_type}</span></td>
+            <td>${c.host}</td>
+            <td>${c.port}</td>
+            <td>${c.database_name}</td>
+            <td>${c.username}</td>
+            <td>${c.is_active ? '<span class="badge bg-success">YES</span>' : '<span class="badge bg-secondary">NO</span>'}</td>
+        </tr>
+    `).join('');
+}
+
+async function createConfig() {
+    const payload = {
+        name: document.getElementById('cfg-name').value,
+        source_type: document.getElementById('cfg-source-type').value,
+        source_table_name: document.getElementById('cfg-src-table').value,
+        source_columns: document.getElementById('cfg-src-cols').value,
+        destination_table_name: document.getElementById('cfg-dest-table').value,
+        destination_columns: document.getElementById('cfg-dest-cols').value,
+        where_condition: document.getElementById('cfg-where').value || null,
+        schedule_day: parseInt(document.getElementById('cfg-schedule-day').value) || null,
+        skip_rows: parseInt(document.getElementById('cfg-skip-rows').value) || 0,
+    };
+    const result = await apiFetch('/config/tables', {method: 'POST', body: JSON.stringify(payload)});
+    if (result) {
+        showToast('Config created!', 'success');
+        bootstrap.Modal.getInstance(document.getElementById('createConfigModal')).hide();
+        loadTableConfigs();
+    }
+}
+
+async function createConnection() {
+    const payload = {
+        name: document.getElementById('conn-name').value,
+        db_type: document.getElementById('conn-type').value,
+        host: document.getElementById('conn-host').value,
+        port: parseInt(document.getElementById('conn-port').value),
+        database_name: document.getElementById('conn-db').value,
+        username: document.getElementById('conn-user').value,
+        password_env_var: document.getElementById('conn-pass-env').value,
+    };
+    const result = await apiFetch('/config/connections', {method: 'POST', body: JSON.stringify(payload)});
+    if (result) {
+        showToast('Connection created!', 'success');
+        bootstrap.Modal.getInstance(document.getElementById('createConnModal')).hide();
+        loadConnections();
+    }
+}
+
+async function deleteConfig(id) {
+    if (!confirm('Delete this configuration?')) return;
+    const result = await apiFetch(`/config/tables/${id}`, {method: 'DELETE'});
+    if (result !== null) {
+        showToast('Config deleted', 'success');
+        loadTableConfigs();
+    }
+}
+
+async function exportConfig() {
+    const type = document.getElementById('export-type').value;
+    const endpointMap = {tables: '/config/tables', connections: '/config/connections', jobs: '/jobs'};
+    const data = await apiFetch(endpointMap[type] + '?page_size=1000');
+    if (!data) return;
+
+    const items = data.items || data;
+    const format = document.getElementById('export-format').value;
+    let content, filename, mimeType;
+
+    if (format === 'json') {
+        content = JSON.stringify(items, null, 2);
+        filename = `${type}_export.json`;
+        mimeType = 'application/json';
+    } else {
+        // Simple YAML-like output
+        content = items.map(item => {
+            return Object.entries(item).map(([k, v]) => `  ${k}: ${JSON.stringify(v)}`).join('\n');
+        }).join('\n---\n');
+        filename = `${type}_export.yaml`;
+        mimeType = 'text/yaml';
+    }
+
+    const blob = new Blob([content], {type: mimeType});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename; a.click();
+    URL.revokeObjectURL(url);
+    showToast(`Exported ${items.length} ${type}`, 'success');
+}
+
+function downloadTemplate(type) {
+    const templates = {
+        tables: `# Table Config Template
+- name: "my_etl_mapping"
+  source_type: "csv"          # csv | excel | oracle | postgres
+  source_table_name: "SOURCE_TABLE"
+  source_columns: "COL1, COL2, COL3"
+  destination_table_name: "DEST_TABLE"
+  destination_columns: "COL1, COL2, COL3"
+  where_condition: null       # optional WHERE clause
+  date_format: "YYYY-MM-DD"  # optional
+  schedule_day: 1             # optional: day of month (1-31)
+  skip_rows: 0
+  file_name_pattern: "*.csv"  # for CSV/Excel sources`,
+
+        connections: `# Connection Profile Template
+- name: "oracle_prod"
+  db_type: "oracle"           # oracle | postgresql
+  host: "db-host.example.com"
+  port: 1521
+  database_name: "ORCL"
+  username: "app_user"
+  password_env_var: "ORACLE_PASSWORD"  # env var name (not the password!)`,
+
+        jobs: `# Job Definition Template
+- name: "nightly_export"
+  job_type: "export"          # export | load | refresh | dependency_scan
+  schedule_cron: "0 2 * * *"  # optional cron expression
+  description: "Export tables nightly at 2 AM"
+  max_retries: 3
+  timeout_seconds: 3600
+  config:
+    table_name: "CUSTOMERS"
+    columns: ["ID", "NAME"]`,
+    };
+
+    const content = templates[type] || '';
+    const blob = new Blob([content], {type: 'text/yaml'});
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = `${type}_template.yaml`; a.click();
+    URL.revokeObjectURL(url);
+}
+
+async function importYaml() {
+    const yamlContent = document.getElementById('yaml-input').value.trim();
+    if (!yamlContent) { showToast('Paste YAML/JSON content first', 'warning'); return; }
+
+    let items;
+    try {
+        items = JSON.parse(yamlContent);
+    } catch(e) {
+        showToast('Invalid JSON. For YAML import, use the CLI: ra yaml import file.yaml', 'danger');
+        return;
+    }
+
+    if (!Array.isArray(items)) items = [items];
+    const type = document.getElementById('import-type').value;
+    const endpointMap = {tables: '/config/tables', connections: '/config/connections', jobs: '/jobs'};
+
+    let success = 0, failed = 0;
+    for (const item of items) {
+        const result = await apiFetch(endpointMap[type], {method: 'POST', body: JSON.stringify(item)});
+        if (result) success++; else failed++;
+    }
+    showToast(`Imported: ${success} created, ${failed} failed`, success > 0 ? 'success' : 'danger');
+    loadAll();
+}
+
+function validateYaml() {
+    const content = document.getElementById('yaml-input').value.trim();
+    try {
+        const data = JSON.parse(content);
+        const items = Array.isArray(data) ? data : [data];
+        showToast(`Valid JSON: ${items.length} items. For YAML validation, use CLI: ra yaml validate`, 'success');
+    } catch(e) {
+        showToast(`Invalid JSON: ${e.message}`, 'danger');
+    }
+}
+
+function loadAll() { loadTableConfigs(); loadConnections(); }
+loadTableConfigs();
+</script>
+{% endblock %}

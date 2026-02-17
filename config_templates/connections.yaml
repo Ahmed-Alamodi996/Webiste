@@ -1,0 +1,22 @@
+# =============================================================================
+# RA Platform - Connection Profiles
+# =============================================================================
+# Passwords are NEVER stored here - use environment variable references.
+# Import with: ra yaml import config_templates/connections.yaml --type connections
+# =============================================================================
+
+- name: "oracle_prod"
+  db_type: "oracle"
+  host: "oracle-prod.example.com"
+  port: 1521
+  database_name: "ORCL"
+  username: "recon_prd"
+  password_env_var: "ORACLE_PROD_PASSWORD"
+
+- name: "postgres_meta"
+  db_type: "postgresql"
+  host: "localhost"
+  port: 5432
+  database_name: "ra_metadata"
+  username: "ra_admin"
+  password_env_var: "POSTGRES_PASSWORD"

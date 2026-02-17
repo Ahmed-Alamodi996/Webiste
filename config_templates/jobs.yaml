@@ -1,0 +1,35 @@
+# =============================================================================
+# RA Platform - Job Definitions
+# =============================================================================
+# Define automated jobs with cron schedules.
+# Import with: ra yaml import config_templates/jobs.yaml --type jobs
+# =============================================================================
+
+- name: "nightly_cdr_export"
+  job_type: "export"
+  description: "Export CDR data nightly at 2 AM"
+  schedule_cron: "0 2 * * *"
+  max_retries: 3
+  timeout_seconds: 3600
+  config:
+    table_name: "CDR_RAW"
+    chunk_size: 100000
+
+- name: "daily_subscriber_load"
+  job_type: "load"
+  description: "Load subscriber CSV files daily"
+  schedule_cron: "30 3 * * *"
+  max_retries: 2
+  timeout_seconds: 1800
+  config:
+    config_name: "daily_subscriber_load"
+
+- name: "full_mv_refresh"
+  job_type: "refresh"
+  description: "Refresh all materialized views in dependency order"
+  schedule_cron: "0 5 * * *"
+  max_retries: 1
+  timeout_seconds: 7200
+  config:
+    parallel_workers: 4
+    refresh_type: "COMPLETE"
