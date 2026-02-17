@@ -124,6 +124,7 @@ services:
     volumes:
       - postgres-data:/var/lib/postgresql/data
       - ./migrations/001_initial_schema.sql:/docker-entrypoint-initdb.d/001_initial_schema.sql
+      - ./migrations/002_seed_legacy_data.sql:/docker-entrypoint-initdb.d/002_seed_legacy_data.sql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-ra_admin} -d ra_metadata"]
       interval: 10s
