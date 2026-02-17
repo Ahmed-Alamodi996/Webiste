@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ra-redis
+  namespace: ra-platform
+  labels:
+    app.kubernetes.io/name: ra-redis
+    app.kubernetes.io/component: cache
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ra-redis
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ra-redis
+        app.kubernetes.io/component: cache
+    spec:
+      containers:
+        - name: redis
+          image: redis:7-alpine
+          command: ["redis-server", "--maxmemory", "512mb", "--maxmemory-policy", "allkeys-lru", "--appendonly", "yes"]
+          ports:
+            - containerPort: 6379
+          resources:
+            requests:
+              memory: "256Mi"
+              cpu: "250m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+          livenessProbe:
+            exec:
+              command: ["redis-cli", "ping"]
+            initialDelaySeconds: 10
+            periodSeconds: 30
+          volumeMounts:
+            - name: redis-data
+              mountPath: /data
+      volumes:
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: ra-redis-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ra-redis-svc
+  namespace: ra-platform
+spec:
+  selector:
+    app.kubernetes.io/name: ra-redis
+  ports:
+    - port: 6379
+      targetPort: 6379
+  type: ClusterIP

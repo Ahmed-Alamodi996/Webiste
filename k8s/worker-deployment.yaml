@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ra-worker
+  namespace: ra-platform
+  labels:
+    app.kubernetes.io/name: ra-worker
+    app.kubernetes.io/component: worker
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ra-worker
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ra-worker
+        app.kubernetes.io/component: worker
+    spec:
+      serviceAccountName: ra-platform-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: worker
+          image: ra-platform:latest
+          command: ["python", "-m", "src.workers.queue"]
+          envFrom:
+            - configMapRef:
+                name: ra-platform-config
+            - secretRef:
+                name: ra-platform-secrets
+          resources:
+            requests:
+              memory: "1Gi"
+              cpu: "1000m"
+            limits:
+              memory: "4Gi"
+              cpu: "4000m"
+          livenessProbe:
+            exec:
+              command: ["python", "-c", "import redis; r=redis.Redis(); r.ping()"]
+            initialDelaySeconds: 15
+            periodSeconds: 60
+            timeoutSeconds: 10
+          volumeMounts:
+            - name: export-data
+              mountPath: /data/ra-exports
+            - name: backup-data
+              mountPath: /data/ra-backups
+            - name: ctl-data
+              mountPath: /data/ra-ctl
+      volumes:
+        - name: export-data
+          persistentVolumeClaim:
+            claimName: ra-export-pvc
+        - name: backup-data
+          persistentVolumeClaim:
+            claimName: ra-backup-pvc
+        - name: ctl-data
+          persistentVolumeClaim:
+            claimName: ra-ctl-pvc
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: ra-worker-hpa
+  namespace: ra-platform
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: ra-worker
+  minReplicas: 2
+  maxReplicas: 10
+  metrics:
+    - type: Resource
+      resource:
+        name: cpu
+        target:
+          type: Utilization
+          averageUtilization: 70
+    - type: Resource
+      resource:
+        name: memory
+        target:
+          type: Utilization
+          averageUtilization: 80

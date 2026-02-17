@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ra-api
+  namespace: ra-platform
+  labels:
+    app.kubernetes.io/name: ra-api
+    app.kubernetes.io/component: api
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: ra-api
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: ra-api
+        app.kubernetes.io/component: api
+    spec:
+      serviceAccountName: ra-platform-sa
+      securityContext:
+        runAsNonRoot: true
+        runAsUser: 1000
+        fsGroup: 1000
+      containers:
+        - name: api
+          image: ra-platform:latest
+          ports:
+            - containerPort: 8000
+              protocol: TCP
+          envFrom:
+            - configMapRef:
+                name: ra-platform-config
+            - secretRef:
+                name: ra-platform-secrets
+          resources:
+            requests:
+              memory: "512Mi"
+              cpu: "500m"
+            limits:
+              memory: "2Gi"
+              cpu: "2000m"
+          livenessProbe:
+            httpGet:
+              path: /api/v1/health
+              port: 8000
+            initialDelaySeconds: 15
+            periodSeconds: 30
+            timeoutSeconds: 10
+            failureThreshold: 3
+          readinessProbe:
+            httpGet:
+              path: /api/v1/health/ready
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+          volumeMounts:
+            - name: export-data
+              mountPath: /data/ra-exports
+            - name: backup-data
+              mountPath: /data/ra-backups
+      volumes:
+        - name: export-data
+          persistentVolumeClaim:
+            claimName: ra-export-pvc
+        - name: backup-data
+          persistentVolumeClaim:
+            claimName: ra-backup-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: ra-api-svc
+  namespace: ra-platform
+spec:
+  selector:
+    app.kubernetes.io/name: ra-api
+  ports:
+    - port: 8000
+      targetPort: 8000
+      protocol: TCP
+  type: ClusterIP
