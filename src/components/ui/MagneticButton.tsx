@@ -9,6 +9,9 @@ interface MagneticButtonProps {
   strength?: number;
   onClick?: () => void;
   style?: React.CSSProperties;
+  disabled?: boolean;
+  type?: "button" | "submit" | "reset";
+  "aria-label"?: string;
 }
 
 export default function MagneticButton({
@@ -17,9 +20,13 @@ export default function MagneticButton({
   strength = 0.3,
   onClick,
   style,
+  disabled,
+  type = "button",
+  "aria-label": ariaLabel,
 }: MagneticButtonProps) {
   const ref = useRef<HTMLButtonElement>(null);
   const [position, setPosition] = useState({ x: 0, y: 0 });
+  const [isPressed, setIsPressed] = useState(false);
 
   const handleMouseMove = (e: React.MouseEvent) => {
     if (!ref.current) return;
@@ -31,16 +38,30 @@ export default function MagneticButton({
 
   const handleMouseLeave = () => {
     setPosition({ x: 0, y: 0 });
+    setIsPressed(false);
   };
 
   return (
     <motion.button
       ref={ref}
+      type={type}
+      disabled={disabled}
+      aria-label={ariaLabel}
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onMouseDown={() => setIsPressed(true)}
+      onMouseUp={() => setIsPressed(false)}
       onClick={onClick}
-      animate={{ x: position.x, y: position.y }}
-      transition={{ type: "spring", stiffness: 150, damping: 15, mass: 0.1 }}
+      animate={{
+        x: position.x,
+        y: position.y,
+        scale: isPressed ? 0.95 : 1,
+      }}
+      transition={{
+        x: { type: "spring", stiffness: 150, damping: 15, mass: 0.1 },
+        y: { type: "spring", stiffness: 150, damping: 15, mass: 0.1 },
+        scale: { type: "spring", stiffness: 400, damping: 10, mass: 0.3 },
+      }}
       data-cursor-hover
       className={className}
       style={style}

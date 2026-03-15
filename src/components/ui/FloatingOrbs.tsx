@@ -30,10 +30,10 @@ export default function FloatingOrbs() {
 
       {/* Large ambient orb — green */}
       <div
-        className="absolute top-[20%] left-[10%] w-[500px] h-[500px] rounded-full opacity-[0.025]"
+        className="absolute top-[20%] left-[10%] w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] rounded-full opacity-[0.06]"
         style={{
-          background: "radial-gradient(circle, #00C896 0%, transparent 70%)",
-          filter: "blur(80px)",
+          background: "radial-gradient(circle, #00C896 0%, #00E6AC 30%, transparent 70%)",
+          filter: "blur(90px)",
           animation: "orb1 25s ease-in-out infinite",
           willChange: "transform",
         }}
@@ -41,22 +41,33 @@ export default function FloatingOrbs() {
 
       {/* Medium orb — blue */}
       <div
-        className="absolute top-[50%] right-[5%] w-[400px] h-[400px] rounded-full opacity-[0.02]"
+        className="absolute top-[50%] right-[5%] w-[250px] sm:w-[500px] h-[250px] sm:h-[500px] rounded-full opacity-[0.05]"
         style={{
-          background: "radial-gradient(circle, #2563EB 0%, transparent 70%)",
-          filter: "blur(80px)",
+          background: "radial-gradient(circle, #2563EB 0%, #3B82F6 30%, transparent 70%)",
+          filter: "blur(90px)",
           animation: "orb2 30s ease-in-out infinite",
           willChange: "transform",
         }}
       />
 
-      {/* Small accent orb */}
+      {/* Small accent orb — purple */}
       <div
-        className="absolute top-[75%] left-[40%] w-[300px] h-[300px] rounded-full opacity-[0.02]"
+        className="absolute top-[75%] left-[40%] w-[200px] sm:w-[400px] h-[200px] sm:h-[400px] rounded-full opacity-[0.04]"
         style={{
-          background: "radial-gradient(circle, #00C896 0%, transparent 70%)",
-          filter: "blur(60px)",
+          background: "radial-gradient(circle, #7C3AED 0%, #A855F7 30%, transparent 70%)",
+          filter: "blur(70px)",
           animation: "orb3 20s ease-in-out infinite",
+          willChange: "transform",
+        }}
+      />
+
+      {/* Extra warm orb — subtle amber */}
+      <div
+        className="absolute top-[30%] right-[30%] w-[180px] sm:w-[350px] h-[180px] sm:h-[350px] rounded-full opacity-[0.025]"
+        style={{
+          background: "radial-gradient(circle, #F59E0B 0%, transparent 70%)",
+          filter: "blur(80px)",
+          animation: "orb1 35s ease-in-out infinite reverse",
           willChange: "transform",
         }}
       />

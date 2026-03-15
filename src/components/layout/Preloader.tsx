@@ -1,30 +1,47 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { useEffect, useState, useRef } from "react";
+import { motion, AnimatePresence, useSpring, useTransform } from "framer-motion";
 
 export default function Preloader({ onComplete }: { onComplete: () => void }) {
   const [progress, setProgress] = useState(0);
   const [phase, setPhase] = useState<"loading" | "reveal" | "done">("loading");
+  const completedRef = useRef(false);
+
+  // Spring-physics counter
+  const springProgress = useSpring(0, { stiffness: 60, damping: 20, mass: 0.5 });
+  const displayProgress = useTransform(springProgress, (v) => Math.round(v));
+  const [counterDisplay, setCounterDisplay] = useState(0);
 
   useEffect(() => {
-    // Simulate loading with eased progress
+    const unsub = displayProgress.on("change", (v) => setCounterDisplay(v));
+    return unsub;
+  }, [displayProgress]);
+
+  useEffect(() => {
+    springProgress.set(progress);
+  }, [progress, springProgress]);
+
+  useEffect(() => {
     let current = 0;
     const interval = setInterval(() => {
-      current += Math.random() * 12 + 3;
+      current += Math.random() * 15 + 4;
       if (current >= 100) {
         current = 100;
         clearInterval(interval);
         setProgress(100);
-        setTimeout(() => setPhase("reveal"), 300);
+        setTimeout(() => setPhase("reveal"), 400);
         setTimeout(() => {
-          setPhase("done");
-          onComplete();
-        }, 1200);
+          if (!completedRef.current) {
+            completedRef.current = true;
+            setPhase("done");
+            onComplete();
+          }
+        }, 1400);
       } else {
         setProgress(Math.floor(current));
       }
-    }, 80);
+    }, 90);
 
     return () => clearInterval(interval);
   }, [onComplete]);
@@ -34,9 +51,12 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
       {phase !== "done" && (
         <motion.div
           exit={{ opacity: 0 }}
-          transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
+          transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
           className="fixed inset-0 z-[10000] flex flex-col items-center justify-center"
           style={{ backgroundColor: "var(--bg-secondary)" }}
+          role="status"
+          aria-live="polite"
+          aria-label="Loading website"
         >
           {/* Background pulse */}
           <div className="absolute inset-0 overflow-hidden">
@@ -50,7 +70,7 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
             />
           </div>
 
-          {/* Logo reveal */}
+          {/* SVG Stroke-Draw Logo */}
           <motion.div
             initial={{ opacity: 0, scale: 0.8 }}
             animate={
@@ -61,20 +81,49 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
             transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
             className="relative mb-12"
           >
-            {/* Logo */}
             <div className="flex items-center gap-3">
               <motion.div
                 initial={{ width: 0, opacity: 0 }}
-                animate={{ width: 48, opacity: 1 }}
+                animate={{ width: 56, opacity: 1 }}
                 transition={{ duration: 0.6, delay: 0.2, ease: [0.19, 1, 0.22, 1] }}
-                className="h-12 rounded-xl bg-gradient-accent flex items-center justify-center overflow-hidden"
+                className="h-14 rounded-xl bg-gradient-accent flex items-center justify-center overflow-hidden"
               >
-                <span className="text-white font-bold text-lg">In</span>
+                {/* SVG stroke-draw "In" */}
+                <svg
+                  width="32"
+                  height="28"
+                  viewBox="0 0 32 28"
+                  fill="none"
+                  className="relative z-10"
+                >
+                  {/* "I" stroke */}
+                  <motion.path
+                    d="M5 4 L5 24"
+                    stroke="white"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 0.6, delay: 0.3, ease: [0.19, 1, 0.22, 1] }}
+                  />
+                  {/* "n" stroke */}
+                  <motion.path
+                    d="M13 24 L13 12 C13 7 18 5 22 5 C26 5 28 7 28 12 L28 24"
+                    stroke="white"
+                    strokeWidth="3.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    fill="none"
+                    initial={{ pathLength: 0 }}
+                    animate={{ pathLength: 1 }}
+                    transition={{ duration: 0.8, delay: 0.6, ease: [0.19, 1, 0.22, 1] }}
+                  />
+                </svg>
               </motion.div>
               <motion.span
                 initial={{ opacity: 0, x: -10 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.5 }}
+                transition={{ duration: 0.5, delay: 0.8 }}
                 className="text-2xl font-semibold tracking-tight"
                 style={{ color: "var(--text-primary)" }}
               >
@@ -90,40 +139,29 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
           >
             <motion.div
               className="h-full bg-gradient-accent rounded-full"
-              initial={{ width: "0%" }}
-              animate={{ width: `${progress}%` }}
-              transition={{ duration: 0.1 }}
+              style={{ width: `${progress}%` }}
             />
           </div>
 
-          {/* Counter */}
+          {/* Spring-physics Counter */}
           <motion.span
             initial={{ opacity: 0 }}
             animate={{ opacity: 0.4 }}
             className="text-xs font-mono tabular-nums"
             style={{ color: "var(--text-muted)" }}
           >
-            {progress}%
+            {counterDisplay}%
           </motion.span>
 
-          {/* Reveal curtains */}
+          {/* Radial mask reveal — expanding circle from center */}
           {phase === "reveal" && (
-            <>
-              <motion.div
-                initial={{ scaleY: 0 }}
-                animate={{ scaleY: 1 }}
-                transition={{ duration: 0.6, ease: [0.87, 0, 0.13, 1] }}
-                className="absolute top-0 left-0 right-0 h-1/2 origin-top"
-                style={{ backgroundColor: "var(--bg-primary)" }}
-              />
-              <motion.div
-                initial={{ scaleY: 0 }}
-                animate={{ scaleY: 1 }}
-                transition={{ duration: 0.6, ease: [0.87, 0, 0.13, 1] }}
-                className="absolute bottom-0 left-0 right-0 h-1/2 origin-bottom"
-                style={{ backgroundColor: "var(--bg-primary)" }}
-              />
-            </>
+            <motion.div
+              initial={{ clipPath: "circle(0% at 50% 50%)" }}
+              animate={{ clipPath: "circle(100% at 50% 50%)" }}
+              transition={{ duration: 0.8, ease: [0.87, 0, 0.13, 1] }}
+              className="absolute inset-0"
+              style={{ backgroundColor: "var(--bg-primary)" }}
+            />
           )}
         </motion.div>
       )}

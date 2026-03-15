@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ArrowRight } from "lucide-react";
 import GradientMesh from "@/components/ui/GradientMesh";
@@ -56,27 +56,70 @@ function ServiceItem({
   learnMore: string;
   isRTL: boolean;
 }) {
+  // Magnetic pull on hover
+  const itemRef = useRef<HTMLDivElement>(null);
+  const [pull, setPull] = useState({ x: 0, y: 0 });
+
+  const handleMouseMove = (e: React.MouseEvent) => {
+    if (!itemRef.current) return;
+    const rect = itemRef.current.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+    const dx = (e.clientX - centerX) * 0.02;
+    const dy = (e.clientY - centerY) * 0.015;
+    setPull({ x: dx, y: dy });
+  };
+
+  const handleMouseLeave = () => {
+    setPull({ x: 0, y: 0 });
+  };
+
   return (
     <motion.div
+      ref={itemRef}
       initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ delay: index * 0.1, duration: 0.6, ease: [0.19, 1, 0.22, 1] }}
-      className="relative"
+      animate={{
+        opacity: 1,
+        y: 0,
+        x: pull.x,
+        translateY: pull.y,
+      }}
+      transition={{
+        opacity: { delay: index * 0.1, duration: 0.6, ease: [0.19, 1, 0.22, 1] },
+        y: { delay: index * 0.1, duration: 0.6, ease: [0.19, 1, 0.22, 1] },
+        x: { type: "spring", stiffness: 150, damping: 20 },
+        translateY: { type: "spring", stiffness: 150, damping: 20 },
+      }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      className="relative group/service"
       style={{ borderBottom: "1px solid var(--border-color)" }}
     >
-      {/* Active indicator */}
+      {/* Active indicator with glow */}
       {isOpen && (
         <motion.div
           layoutId="service-indicator"
           className={`absolute top-0 bottom-0 w-[2px] ${isRTL ? "right-0" : "left-0"}`}
-          style={{ backgroundColor: accent }}
+          style={{
+            backgroundColor: accent,
+            boxShadow: `0 0 12px ${accent}60, 0 0 4px ${accent}40`,
+          }}
           transition={{ type: "spring", stiffness: 300, damping: 30 }}
         />
       )}
 
+      {/* Subtle hover background glow */}
+      <div
+        className="absolute inset-0 opacity-0 group-hover/service:opacity-100 transition-opacity duration-500 pointer-events-none"
+        style={{
+          background: `linear-gradient(${isRTL ? "270deg" : "90deg"}, ${accent}06 0%, transparent 50%)`,
+        }}
+      />
+
       <button
         onClick={onToggle}
         data-cursor-hover
+        aria-expanded={isOpen}
         className={`w-full flex items-center justify-between py-5 md:py-6 group ${isRTL ? "text-right pr-4 md:pr-6 flex-row-reverse" : "text-left pl-4 md:pl-6"}`}
       >
         <div className={`flex items-center gap-4 md:gap-6 ${isRTL ? "flex-row-reverse" : ""}`}>
@@ -177,19 +220,20 @@ function ServiceItem({
 
 interface OurServicesProps {
   services?: CMSService[];
+  className?: string;
 }
 
-export default function OurServices({ services }: OurServicesProps) {
+export default function OurServices({ services, className = "min-h-screen min-h-[100dvh]" }: OurServicesProps) {
   const [openIndex, setOpenIndex] = useState<number>(0);
   const { t, isRTL } = useLanguage();
 
   const useCMS = services && services.length > 0;
 
   return (
-    <section id="services" className="relative h-screen flex flex-col justify-center overflow-hidden">
+    <section id="services" className={`relative ${className} flex flex-col justify-center overflow-x-hidden py-12 sm:py-0`}>
       <GradientMesh className="opacity-50" />
 
-      <div className="max-w-5xl mx-auto px-6 relative z-10">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

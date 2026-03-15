@@ -1,10 +1,12 @@
 "use client";
 
 import { useState } from "react";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { Send, CheckCircle, ArrowUpRight } from "lucide-react";
 import MagneticButton from "@/components/ui/MagneticButton";
-import GradientMesh from "@/components/ui/GradientMesh";
+
+const GradientMesh = dynamic(() => import("@/components/ui/GradientMesh"), { ssr: false });
 import { useSlide } from "@/context/SlideContext";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -13,18 +15,38 @@ export default function Contact() {
   const { t, isRTL } = useLanguage();
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [isSending, setIsSending] = useState(false);
+  const [focusedField, setFocusedField] = useState<string | null>(null);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     message: "",
   });
 
+  const [submitError, setSubmitError] = useState<string | null>(null);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSending(true);
-    await new Promise((resolve) => setTimeout(resolve, 1500));
-    setIsSending(false);
-    setIsSubmitted(true);
+    setSubmitError(null);
+
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Submission failed");
+      }
+
+      setIsSubmitted(true);
+    } catch (err) {
+      setSubmitError(err instanceof Error ? err.message : "Something went wrong");
+    } finally {
+      setIsSending(false);
+    }
   };
 
   const handleChange = (
@@ -40,19 +62,19 @@ export default function Contact() {
   ];
 
   const footerConnectLinks = [
-    { label: t.footer.connect.linkedin, href: "#" },
-    { label: t.footer.connect.twitter, href: "#" },
-    { label: t.footer.connect.github, href: "#" },
+    { label: t.footer.connect.linkedin, href: "https://linkedin.com/company/inst-tech" },
+    { label: t.footer.connect.twitter, href: "https://x.com/inst_tech" },
+    { label: t.footer.connect.github, href: "https://github.com/inst-tech" },
   ];
 
   return (
-    <section id="contact" className="relative h-screen flex flex-col justify-center overflow-hidden">
+    <section id="contact" className="relative min-h-screen min-h-[100dvh] flex flex-col justify-center overflow-x-hidden py-12 sm:py-0">
       <GradientMesh className="opacity-40" />
 
       {/* Accent glow */}
       <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[600px] rounded-full bg-brand-green/[0.03] blur-[80px]" />
 
-      <div className="max-w-5xl mx-auto px-6 relative z-10 w-full">
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 relative z-10 w-full">
         <div className={`grid grid-cols-1 lg:grid-cols-2 gap-10 items-start ${isRTL ? "direction-rtl" : ""}`}>
           {/* Left — CTA Copy */}
           <motion.div
@@ -147,21 +169,33 @@ export default function Contact() {
                       >
                         {t.contact.form.name}
                       </label>
-                      <input
-                        type="text"
-                        id="name"
-                        name="name"
-                        required
-                        value={formData.name}
-                        onChange={handleChange}
-                        placeholder={t.contact.form.namePlaceholder}
-                        className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-brand-green/40 focus:ring-2 focus:ring-brand-green/10 transition-all duration-300"
-                        style={{
-                          backgroundColor: "var(--input-bg)",
-                          border: "1px solid var(--input-border)",
-                          color: "var(--text-primary)",
-                        }}
-                      />
+                      <div className="relative">
+                        <input
+                          type="text"
+                          id="name"
+                          name="name"
+                          required
+                          autoComplete="name"
+                          value={formData.name}
+                          onChange={handleChange}
+                          onFocus={() => setFocusedField("name")}
+                          onBlur={() => setFocusedField(null)}
+                          placeholder={t.contact.form.namePlaceholder}
+                          className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-brand-green/40 focus:ring-2 focus:ring-brand-green/10 transition-all duration-300"
+                          style={{
+                            backgroundColor: "var(--input-bg)",
+                            border: "1px solid var(--input-border)",
+                            color: "var(--text-primary)",
+                          }}
+                        />
+                        {/* Expanding underline */}
+                        <motion.div
+                          className="absolute bottom-0 left-1/2 h-[2px] rounded-full"
+                          style={{ background: "var(--gradient-accent)", x: "-50%" }}
+                          animate={{ width: focusedField === "name" ? "100%" : "0%" }}
+                          transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
+                        />
+                      </div>
                     </div>
                     <div className="group">
                       <label
@@ -171,21 +205,33 @@ export default function Contact() {
                       >
                         {t.contact.form.email}
                       </label>
-                      <input
-                        type="email"
-                        id="email"
-                        name="email"
-                        required
-                        value={formData.email}
-                        onChange={handleChange}
-                        placeholder={t.contact.form.emailPlaceholder}
-                        className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-brand-green/40 focus:ring-2 focus:ring-brand-green/10 transition-all duration-300"
-                        style={{
-                          backgroundColor: "var(--input-bg)",
-                          border: "1px solid var(--input-border)",
-                          color: "var(--text-primary)",
-                        }}
-                      />
+                      <div className="relative">
+                        <input
+                          type="email"
+                          id="email"
+                          name="email"
+                          required
+                          autoComplete="email"
+                          value={formData.email}
+                          onChange={handleChange}
+                          onFocus={() => setFocusedField("email")}
+                          onBlur={() => setFocusedField(null)}
+                          placeholder={t.contact.form.emailPlaceholder}
+                          className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-brand-green/40 focus:ring-2 focus:ring-brand-green/10 transition-all duration-300"
+                          style={{
+                            backgroundColor: "var(--input-bg)",
+                            border: "1px solid var(--input-border)",
+                            color: "var(--text-primary)",
+                          }}
+                        />
+                        {/* Expanding underline */}
+                        <motion.div
+                          className="absolute bottom-0 left-1/2 h-[2px] rounded-full"
+                          style={{ background: "var(--gradient-accent)", x: "-50%" }}
+                          animate={{ width: focusedField === "email" ? "100%" : "0%" }}
+                          transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
+                        />
+                      </div>
                     </div>
                   </div>
 
@@ -198,26 +244,39 @@ export default function Contact() {
                     >
                       {t.contact.form.message}
                     </label>
-                    <textarea
-                      id="message"
-                      name="message"
-                      required
-                      rows={3}
-                      value={formData.message}
-                      onChange={handleChange}
-                      placeholder={t.contact.form.messagePlaceholder}
-                      className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-brand-green/40 focus:ring-2 focus:ring-brand-green/10 transition-all duration-300 resize-none"
-                      style={{
-                        backgroundColor: "var(--input-bg)",
-                        border: "1px solid var(--input-border)",
-                        color: "var(--text-primary)",
-                      }}
-                    />
+                    <div className="relative">
+                      <textarea
+                        id="message"
+                        name="message"
+                        required
+                        rows={3}
+                        value={formData.message}
+                        onChange={handleChange}
+                        onFocus={() => setFocusedField("message")}
+                        onBlur={() => setFocusedField(null)}
+                        placeholder={t.contact.form.messagePlaceholder}
+                        className="w-full px-4 py-3 rounded-xl text-sm focus:outline-none focus:border-brand-green/40 focus:ring-2 focus:ring-brand-green/10 transition-all duration-300 resize-none"
+                        style={{
+                          backgroundColor: "var(--input-bg)",
+                          border: "1px solid var(--input-border)",
+                          color: "var(--text-primary)",
+                        }}
+                      />
+                      {/* Expanding underline */}
+                      <motion.div
+                        className="absolute bottom-0 left-1/2 h-[2px] rounded-full"
+                        style={{ background: "var(--gradient-accent)", x: "-50%" }}
+                        animate={{ width: focusedField === "message" ? "100%" : "0%" }}
+                        transition={{ duration: 0.4, ease: [0.19, 1, 0.22, 1] }}
+                      />
+                    </div>
                   </div>
 
                   {/* Submit */}
                   <MagneticButton
-                    className="w-full py-3.5 rounded-xl bg-gradient-accent text-white font-medium text-sm flex items-center justify-center gap-2.5 hover:shadow-glow-lg transition-all duration-500 disabled:opacity-50 relative overflow-hidden"
+                    type="submit"
+                    disabled={isSending}
+                    className="w-full py-3.5 rounded-xl bg-gradient-accent text-white font-medium text-sm flex items-center justify-center gap-2.5 hover:shadow-glow-lg transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed relative overflow-hidden"
                     strength={0.15}
                   >
                     <motion.div
@@ -247,6 +306,16 @@ export default function Contact() {
                       )}
                     </span>
                   </MagneticButton>
+
+                  {submitError && (
+                    <motion.p
+                      initial={{ opacity: 0, y: -8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      className="text-xs text-red-400 mt-2 text-center"
+                    >
+                      {submitError}
+                    </motion.p>
+                  )}
                 </form>
               )}
             </div>
@@ -254,11 +323,12 @@ export default function Contact() {
         </div>
 
         {/* Footer section merged */}
-        <motion.div
+        <motion.footer
+          role="contentinfo"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 0.6, duration: 0.8 }}
-          className="mt-10 pt-8"
+          className="mt-8 sm:mt-10 pt-6 sm:pt-8"
           style={{ borderTop: "1px solid var(--border-color)" }}
         >
           <div className={`flex flex-col md:flex-row items-start md:items-center justify-between gap-6 ${isRTL ? "md:flex-row-reverse" : ""}`}>
@@ -285,7 +355,7 @@ export default function Contact() {
             </div>
 
             {/* Quick Links */}
-            <div className={`flex items-center gap-6 ${isRTL ? "flex-row-reverse" : ""}`}>
+            <div className={`flex flex-wrap items-center gap-x-6 gap-y-2 ${isRTL ? "flex-row-reverse" : ""}`}>
               {footerCompanyLinks.map((link) => (
                 <button
                   key={link.label}
@@ -297,11 +367,13 @@ export default function Contact() {
                   {link.label}
                 </button>
               ))}
-              <span className="w-px h-3" style={{ backgroundColor: "var(--border-color)" }} />
+              <span className="w-px h-3 hidden sm:block" style={{ backgroundColor: "var(--border-color)" }} />
               {footerConnectLinks.map((link) => (
                 <a
                   key={link.label}
                   href={link.href}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   data-cursor-hover
                   className="text-xs transition-colors duration-300 flex items-center gap-1 group"
                   style={{ color: "var(--text-secondary)" }}
@@ -315,7 +387,7 @@ export default function Contact() {
               ))}
             </div>
           </div>
-        </motion.div>
+        </motion.footer>
       </div>
     </section>
   );

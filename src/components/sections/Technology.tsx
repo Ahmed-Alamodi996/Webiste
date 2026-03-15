@@ -48,28 +48,42 @@ function TechPill({
   return (
     <div
       data-cursor-hover
-      className="group flex items-center gap-3 px-6 py-3.5 rounded-full glass transition-all duration-300 hover:scale-105 flex-shrink-0"
+      className="group relative flex items-center gap-3 px-6 py-3.5 rounded-full glass transition-all duration-400 hover:scale-105 hover:-translate-y-0.5 flex-shrink-0"
+      style={{
+        transition: "transform 0.4s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.4s ease, border-color 0.4s ease",
+      }}
     >
-      {/* Glow dot */}
-      <div
-        className="w-2.5 h-2.5 rounded-full transition-all duration-300 group-hover:shadow-lg"
-        style={{
-          backgroundColor: color,
-          boxShadow: `0 0 0px ${color}00`,
-        }}
-      />
+      {/* Glow dot with pulse */}
+      <div className="relative">
+        <div
+          className="w-2.5 h-2.5 rounded-full transition-all duration-400 group-hover:scale-125"
+          style={{
+            backgroundColor: color,
+            boxShadow: `0 0 8px ${color}50`,
+            transition: "transform 0.4s ease, box-shadow 0.4s ease",
+          }}
+        />
+        <div
+          className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 animate-ping"
+          style={{
+            backgroundColor: color,
+            animationDuration: "2s",
+          }}
+        />
+      </div>
       <span
-        className="text-small font-medium transition-colors duration-300 whitespace-nowrap"
+        className="text-small font-medium transition-colors duration-300 whitespace-nowrap group-hover:text-white"
         style={{ color: "var(--text-secondary)" }}
       >
         {name}
       </span>
 
-      {/* Hover glow */}
+      {/* Hover glow — stronger */}
       <div
         className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
         style={{
-          background: `radial-gradient(circle at center, ${color}06 0%, transparent 70%)`,
+          background: `radial-gradient(circle at center, ${color}12 0%, transparent 70%)`,
+          boxShadow: `inset 0 0 20px ${color}08`,
         }}
       />
     </div>
@@ -78,9 +92,10 @@ function TechPill({
 
 interface TechnologyProps {
   technologies?: CMSTechnology[];
+  className?: string;
 }
 
-export default function Technology({ technologies }: TechnologyProps) {
+export default function Technology({ technologies, className = "min-h-screen min-h-[100dvh]" }: TechnologyProps) {
   const { t, isRTL } = useLanguage();
 
   // Group CMS technologies by row, or fall back to hardcoded data
@@ -110,8 +125,8 @@ export default function Technology({ technologies }: TechnologyProps) {
   }
 
   return (
-    <section id="technology" className="relative h-screen flex flex-col justify-center overflow-hidden">
-      <div className="max-w-6xl mx-auto px-6 mb-16">
+    <section id="technology" className={`relative ${className} flex flex-col justify-center overflow-hidden py-12 sm:py-0`}>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 mb-8 md:mb-16">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}

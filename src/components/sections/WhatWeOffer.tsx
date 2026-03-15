@@ -40,31 +40,50 @@ function OfferCard({
         intensity={8}
         glare
       >
-        <div className="group relative h-full p-6 rounded-3xl glass transition-all duration-500 overflow-hidden">
+        <div className="group relative h-full p-6 rounded-3xl glass transition-all duration-500 overflow-hidden hover:-translate-y-2 hover:shadow-2xl"
+          style={{
+            transition: "transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.5s cubic-bezier(0.19, 1, 0.22, 1), background 0.4s ease, border-color 0.4s ease",
+          }}
+        >
           {/* Top accent line */}
           <div
-            className="absolute top-0 left-0 right-0 h-[1px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+            className="absolute top-0 left-0 right-0 h-[2px] opacity-0 group-hover:opacity-100 transition-opacity duration-500"
             style={{
               background: `linear-gradient(90deg, transparent, ${accent}, transparent)`,
             }}
           />
 
-          {/* Hover background glow */}
+          {/* Hover background glow — stronger */}
           <div
-            className="absolute -top-20 -right-20 w-40 h-40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-[80px]"
+            className="absolute -top-10 -right-10 w-60 h-60 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-[100px]"
+            style={{ backgroundColor: accent + "20" }}
+          />
+
+          {/* Bottom corner glow */}
+          <div
+            className="absolute -bottom-20 -left-20 w-40 h-40 rounded-full opacity-0 group-hover:opacity-60 transition-opacity duration-700 blur-[80px]"
             style={{ backgroundColor: accent + "15" }}
           />
 
           <div className="relative z-10">
             {/* Icon with glow */}
             <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-all duration-500 group-hover:shadow-lg"
+              className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-all duration-500 group-hover:scale-110"
               style={{
                 backgroundColor: accent + "12",
                 boxShadow: `0 0 0px ${accent}00`,
+                transition: "transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.5s ease",
               }}
             >
-              <Icon size={22} style={{ color: accent }} />
+              <Icon
+                size={22}
+                style={{
+                  color: accent,
+                  transition: "filter 0.5s ease",
+                  filter: "drop-shadow(0 0 0px transparent)",
+                }}
+                className="group-hover:drop-shadow-lg"
+              />
             </div>
 
             <h3
@@ -80,11 +99,20 @@ function OfferCard({
 
           {/* Card index */}
           <span
-            className="absolute top-4 right-4 text-xs font-mono text-4xl font-bold"
-            style={{ opacity: "var(--card-index-opacity)", color: "var(--text-primary)" }}
+            className="absolute top-4 right-4 font-mono text-2xl sm:text-4xl font-bold transition-opacity duration-500"
+            style={{ opacity: "var(--card-index-opacity)", color: accent }}
           >
             {String(index + 1).padStart(2, "0")}
           </span>
+
+          {/* Bottom glow line on hover */}
+          <div
+            className="absolute bottom-0 left-[10%] right-[10%] h-[1px] opacity-0 group-hover:opacity-100 transition-all duration-700"
+            style={{
+              background: `linear-gradient(90deg, transparent, ${accent}40, transparent)`,
+              boxShadow: `0 0 15px ${accent}20`,
+            }}
+          />
         </div>
       </TiltCard>
     </motion.div>
@@ -93,25 +121,26 @@ function OfferCard({
 
 interface WhatWeOfferProps {
   offerings?: CMSOffering[];
+  className?: string;
 }
 
-export default function WhatWeOffer({ offerings }: WhatWeOfferProps) {
+export default function WhatWeOffer({ offerings, className = "min-h-screen min-h-[100dvh]" }: WhatWeOfferProps) {
   const { t, isRTL } = useLanguage();
 
   const useCMS = offerings && offerings.length > 0;
 
   return (
-    <section id="offer" className="relative h-screen flex flex-col justify-center overflow-hidden">
+    <section id="offer" className={`relative ${className} flex flex-col justify-center overflow-hidden py-12 sm:py-0`}>
       {/* Background mesh */}
       <GradientMesh />
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         {/* Section Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
-          className={`max-w-2xl mb-12 ${isRTL ? "text-right ml-auto" : ""}`}
+          className={`max-w-2xl mb-6 md:mb-12 ${isRTL ? "text-right ml-auto" : ""}`}
         >
           <span className="text-small font-mono text-brand-green uppercase tracking-widest mb-4 block">
             &mdash; {t.offer.label}
@@ -130,7 +159,7 @@ export default function WhatWeOffer({ offerings }: WhatWeOfferProps) {
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4"
         >
           {useCMS
             ? offerings.map((offering, i) => (

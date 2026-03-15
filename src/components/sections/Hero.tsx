@@ -1,11 +1,14 @@
 "use client";
 
 import { useRef } from "react";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { ArrowRight, ChevronDown } from "lucide-react";
 import MagneticButton from "@/components/ui/MagneticButton";
-import ParticleGrid from "@/components/ui/ParticleGrid";
-import AuroraBeam from "@/components/ui/AuroraBeam";
+import TextScramble from "@/components/ui/TextScramble";
+
+const ParticleGrid = dynamic(() => import("@/components/ui/ParticleGrid"), { ssr: false });
+const AuroraBeam = dynamic(() => import("@/components/ui/AuroraBeam"), { ssr: false });
 import { useSlide } from "@/context/SlideContext";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -17,7 +20,7 @@ export default function Hero() {
   return (
     <section
       ref={containerRef}
-      className="relative h-screen flex items-center justify-center overflow-hidden"
+      className="relative min-h-screen min-h-[100dvh] flex items-center justify-center overflow-hidden"
     >
       {/* Interactive Particle Grid */}
       <ParticleGrid />
@@ -41,15 +44,15 @@ export default function Hero() {
         }
       `}</style>
       <div
-        className="absolute top-[15%] left-[15%] w-[600px] h-[600px] rounded-full bg-brand-green/[0.04] blur-[100px]"
+        className="absolute top-[15%] left-[15%] w-[300px] sm:w-[600px] h-[300px] sm:h-[600px] rounded-full bg-brand-green/[0.07] blur-[100px]"
         style={{ animation: "blob1 8s ease-in-out infinite", willChange: "transform" }}
       />
       <div
-        className="absolute bottom-[15%] right-[15%] w-[500px] h-[500px] rounded-full bg-blue-600/[0.04] blur-[100px]"
+        className="absolute bottom-[15%] right-[15%] w-[250px] sm:w-[500px] h-[250px] sm:h-[500px] rounded-full bg-blue-600/[0.06] blur-[100px]"
         style={{ animation: "blob2 11s ease-in-out infinite", willChange: "transform" }}
       />
       <div
-        className="absolute top-[40%] left-[50%] w-[700px] h-[700px] rounded-full bg-brand-green/[0.02] blur-[120px]"
+        className="absolute top-[40%] left-[50%] w-[350px] sm:w-[700px] h-[350px] sm:h-[700px] rounded-full bg-brand-green/[0.04] blur-[120px]"
         style={{ animation: "blob3 14s ease-in-out infinite", willChange: "transform" }}
       />
 
@@ -70,21 +73,26 @@ export default function Hero() {
       />
 
       {/* Content */}
-      <div className="relative z-10 max-w-6xl mx-auto px-6 text-center">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 text-center">
         {/* Tag */}
         <motion.div
           initial={{ opacity: 0, y: 20, filter: "blur(10px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.8, delay: 0.3 }}
-          className="inline-flex items-center gap-2.5 px-5 py-2.5 rounded-full glass mb-10"
+          className="inline-flex items-center gap-2 sm:gap-2.5 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full glass mb-6 sm:mb-10"
         >
           <span className="relative w-2 h-2">
             <span className="absolute inset-0 rounded-full bg-brand-green animate-ping opacity-75" />
             <span className="relative block w-2 h-2 rounded-full bg-brand-green" />
           </span>
-          <span className="text-small tracking-wide" style={{ color: "var(--text-muted-light)" }}>
+          <TextScramble
+            className="text-small tracking-wide font-mono"
+            style={{ color: "var(--text-muted-light)" }}
+            delay={500}
+            speed={30}
+          >
             {t.hero.tagline}
-          </span>
+          </TextScramble>
         </motion.div>
 
         {/* Headline */}
@@ -140,7 +148,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 20, filter: "blur(8px)" }}
           animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
           transition={{ duration: 0.8, delay: 1.1 }}
-          className="text-body-lg max-w-2xl mx-auto mb-14 leading-relaxed"
+          className="text-body-lg max-w-2xl mx-auto mb-8 sm:mb-14 leading-relaxed"
           style={{ color: "var(--text-secondary)" }}
         >
           {t.hero.description}
@@ -155,7 +163,7 @@ export default function Hero() {
         >
           <MagneticButton
             onClick={() => goToSlide(1)}
-            className="group relative px-8 py-4 rounded-full bg-gradient-accent text-white font-medium text-body flex items-center gap-2.5 hover:shadow-glow-lg transition-all duration-500 overflow-hidden"
+            className="group relative px-6 sm:px-8 py-4 rounded-full bg-gradient-accent text-white font-medium text-body flex items-center gap-2.5 hover:shadow-glow-lg transition-all duration-500 overflow-hidden"
           >
             {/* Shimmer effect */}
             <motion.div
@@ -177,30 +185,32 @@ export default function Hero() {
 
           <MagneticButton
             onClick={() => goToSlide(6)}
-            className="group px-8 py-4 rounded-full glass glow-border glow-border-hover font-medium text-body flex items-center gap-2 transition-all duration-500"
+            className="group px-6 sm:px-8 py-4 rounded-full glass glow-border glow-border-hover font-medium text-body flex items-center gap-2 transition-all duration-500"
             style={{ color: "var(--text-primary)" }}
           >
             {t.hero.getInTouch}
           </MagneticButton>
         </motion.div>
 
-        {/* Trusted by strip */}
+        {/* Stats strip */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ delay: 1.8, duration: 1 }}
-          className="mt-20 flex flex-col items-center gap-4"
+          className="mt-10 sm:mt-20 flex flex-wrap items-center justify-center gap-6 sm:gap-10"
         >
-          <span className="text-xs uppercase tracking-[0.2em]" style={{ color: "var(--text-muted)" }}>
-            {t.hero.trustedBy}
-          </span>
-          <div className="flex items-center gap-8 opacity-20">
-            {["NVIDIA", "Stripe", "Vercel", "Figma", "Linear"].map((name) => (
-              <span key={name} className="text-small font-semibold tracking-wide" style={{ color: "var(--text-primary)" }}>
-                {name}
+          {[
+            { value: "50+", label: t.hero.statsProjects || "Projects Delivered" },
+            { value: "99.9%", label: t.hero.statsUptime || "Uptime SLA" },
+            { value: "24/7", label: t.hero.statsSupport || "Support" },
+          ].map((stat) => (
+            <div key={stat.label} className="flex flex-col items-center gap-1">
+              <span className="text-lg sm:text-xl font-bold text-brand-green">{stat.value}</span>
+              <span className="text-[10px] sm:text-xs uppercase tracking-[0.15em]" style={{ color: "var(--text-muted)" }}>
+                {stat.label}
               </span>
-            ))}
-          </div>
+            </div>
+          ))}
         </motion.div>
       </div>
 
@@ -212,6 +222,7 @@ export default function Hero() {
         onClick={() => goToSlide(1)}
         className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
         data-cursor-hover
+        aria-label={t.hero.next || "Next section"}
       >
         <span className="text-[10px] uppercase tracking-[0.3em]" style={{ color: "var(--text-muted)" }}>
           {t.hero.next}

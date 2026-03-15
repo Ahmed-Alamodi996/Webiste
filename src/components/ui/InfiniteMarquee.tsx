@@ -19,7 +19,7 @@ export default function InfiniteMarquee({
 
   return (
     <div
-      className={`overflow-hidden ${pauseOnHover ? "[&:hover_.marquee-track]:pause" : ""} ${className}`}
+      className={`overflow-hidden ${pauseOnHover ? "pause-on-hover" : ""} ${className} marquee-container`}
     >
       <style jsx>{`
         @keyframes marquee-left {

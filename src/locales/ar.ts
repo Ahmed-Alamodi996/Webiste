@@ -21,6 +21,9 @@ const ar: Translations = {
     exploreSolutions: "استكشف الحلول",
     getInTouch: "تواصل معنا",
     trustedBy: "موثوق من قادة الصناعة",
+    statsProjects: "مشاريع منجزة",
+    statsUptime: "وقت تشغيل مضمون",
+    statsSupport: "دعم فني",
     next: "التالي",
   },
 

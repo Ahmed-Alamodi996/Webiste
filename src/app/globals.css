@@ -34,8 +34,8 @@
   --border-color-strong: rgba(255, 255, 255, 0.08);
   --border-glow: rgba(0, 200, 150, 0.2);
   --border-glow-hover: rgba(0, 200, 150, 0.4);
-  --glass-shadow: 0 0 20px rgba(0, 200, 150, 0.05), inset 0 0 20px rgba(0, 200, 150, 0.02);
-  --glass-shadow-hover: 0 0 30px rgba(0, 200, 150, 0.1), inset 0 0 30px rgba(0, 200, 150, 0.03);
+  --glass-shadow: 0 0 20px rgba(0, 200, 150, 0.08), 0 0 40px rgba(0, 200, 150, 0.02), inset 0 0 20px rgba(0, 200, 150, 0.02);
+  --glass-shadow-hover: 0 0 30px rgba(0, 200, 150, 0.15), 0 0 60px rgba(0, 200, 150, 0.05), inset 0 0 30px rgba(0, 200, 150, 0.04);
   --input-bg: rgba(255, 255, 255, 0.03);
   --input-bg-focus: rgba(255, 255, 255, 0.05);
   --input-border: rgba(255, 255, 255, 0.06);
@@ -47,6 +47,11 @@
   --card-index-opacity: 0.04;
   --vignette-color: 11, 15, 25;
   --mobile-menu-bg: rgba(11, 15, 19, 0.95);
+  --project-card-gradient-opacity: 0.3;
+  --project-card-watermark-opacity: 0.06;
+  --project-card-overlay: rgba(11, 15, 25, 0.4);
+  --project-card-text: #F9FAFB;
+  --project-card-text-secondary: #D1D5DB;
 
   --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
   --ease-in-out-expo: cubic-bezier(0.87, 0, 0.13, 1);
@@ -94,6 +99,11 @@
   --card-index-opacity: 0.06;
   --vignette-color: 248, 250, 251;
   --mobile-menu-bg: rgba(248, 250, 251, 0.97);
+  --project-card-gradient-opacity: 0.5;
+  --project-card-watermark-opacity: 0.1;
+  --project-card-overlay: rgba(0, 0, 0, 0.55);
+  --project-card-text: #F9FAFB;
+  --project-card-text-secondary: #E5E7EB;
 }
 
 /* ========================================
@@ -110,17 +120,14 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
-    overflow: hidden;
   }
 
   body {
     background-color: var(--bg-primary);
     color: var(--text-primary);
     font-family: "Inter", "SF Pro Display", -apple-system, BlinkMacSystemFont, system-ui, sans-serif;
-    overflow: hidden;
-    cursor: none;
-    height: 100vh;
-    height: 100dvh;
+    min-height: 100vh;
+    min-height: 100dvh;
     transition: background-color 0.4s ease, color 0.4s ease;
   }
 
@@ -237,10 +244,7 @@
     background-size: 30px 30px;
   }
 
-  /* Hide default cursor on interactive elements */
-  a, button, [role="button"], input, textarea, select {
-    cursor: none;
-  }
+  /* Cursor hiding is handled by the @media (hover: hover) block below */
 }
 
 /* ========================================
@@ -279,6 +283,11 @@
    CUSTOM CURSOR (shows on non-touch only)
    ======================================== */
 @media (hover: hover) and (pointer: fine) {
+  body,
+  a, button, [role="button"], input, textarea, select {
+    cursor: none;
+  }
+
   .custom-cursor {
     width: var(--cursor-size);
     height: var(--cursor-size);
@@ -287,18 +296,21 @@
     position: fixed;
     pointer-events: none;
     z-index: 99999;
+    box-shadow: 0 0 8px rgba(0, 200, 150, 0.2), inset 0 0 4px rgba(0, 200, 150, 0.1);
     transition: width 0.3s var(--ease-out-expo),
                 height 0.3s var(--ease-out-expo),
                 background-color 0.3s var(--ease-out-expo),
-                border-color 0.3s var(--ease-out-expo);
+                border-color 0.3s var(--ease-out-expo),
+                box-shadow 0.3s var(--ease-out-expo);
     will-change: transform;
   }
 
   .custom-cursor.hovering {
     width: var(--cursor-size-hover);
     height: var(--cursor-size-hover);
-    background-color: rgba(0, 200, 150, 0.1);
+    background-color: rgba(0, 200, 150, 0.08);
     border-color: rgba(0, 200, 150, 0.5);
+    box-shadow: 0 0 20px rgba(0, 200, 150, 0.15), 0 0 40px rgba(0, 200, 150, 0.05), inset 0 0 10px rgba(0, 200, 150, 0.05);
   }
 }
 
@@ -313,16 +325,118 @@
 
 
 /* ========================================
-   MARQUEE PAUSE ON HOVER
+   MARQUEE PAUSE ON HOVER + FADE EDGES
    ======================================== */
 .marquee-track {
   animation-play-state: running !important;
 }
-.marquee-track.pause,
-*:hover > .marquee-track.pause {
+.pause-on-hover:hover .marquee-track {
   animation-play-state: paused !important;
 }
 
+/* Gradient fade edges for depth */
+.marquee-container {
+  position: relative;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    black 8%,
+    black 92%,
+    transparent 100%
+  );
+}
+
+
+/* ========================================
+   FOCUS INDICATORS (keyboard accessibility)
+   ======================================== */
+*:focus-visible {
+  outline: 2px solid rgba(0, 200, 150, 0.6);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  outline: 2px solid rgba(0, 200, 150, 0.6);
+  outline-offset: 2px;
+}
+
+/* Restore normal cursor for keyboard users */
+:focus-visible {
+  cursor: auto;
+}
+
+/* ========================================
+   REDUCED MOTION — accessibility
+   ======================================== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .marquee-track {
+    animation: none !important;
+  }
+
+  /* Keep opacity transitions for graceful content appearance */
+  [style*="will-change"] {
+    will-change: auto !important;
+  }
+}
+
+/* ========================================
+   DISPLAY FONT (Syne for headings)
+   ======================================== */
+.text-display-xl,
+.text-display,
+.text-heading,
+.text-subheading {
+  font-family: var(--font-display), var(--font-inter), system-ui, sans-serif;
+}
+
+/* Arabic headings keep Tajawal */
+[dir="rtl"] .text-display-xl,
+[dir="rtl"] .text-display,
+[dir="rtl"] .text-heading,
+[dir="rtl"] .text-subheading {
+  font-family: var(--font-tajawal), var(--font-display), system-ui, sans-serif;
+}
+
+/* ========================================
+   FORM INPUT GLOW ON FOCUS
+   ======================================== */
+input:focus,
+textarea:focus {
+  box-shadow: 0 0 15px rgba(0, 200, 150, 0.08), 0 0 30px rgba(0, 200, 150, 0.03) !important;
+}
+
+/* ========================================
+   ENHANCED HOVER LIFT UTILITY
+   ======================================== */
+.hover-lift {
+  transition: transform 0.5s cubic-bezier(0.19, 1, 0.22, 1),
+              box-shadow 0.5s cubic-bezier(0.19, 1, 0.22, 1);
+}
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 200, 150, 0.06), 0 4px 12px rgba(0, 0, 0, 0.1);
+}
 
 /* ========================================
    FONTS (loaded via next/font in layout)

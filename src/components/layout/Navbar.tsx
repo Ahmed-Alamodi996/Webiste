@@ -2,14 +2,17 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Menu, X, Sun, Moon, Globe } from "lucide-react";
+import { Menu, X, Sun, Moon, Globe, Layers, ScrollText } from "lucide-react";
 import { useSlide } from "@/context/SlideContext";
 import { useLanguage } from "@/context/LanguageContext";
 import { useTheme } from "@/context/ThemeContext";
 
+const sectionIds = ["hero", "offer", "projects", "about", "services", "technology", "contact"];
+
 export default function Navbar() {
   const [isMobileOpen, setIsMobileOpen] = useState(false);
-  const { goToSlide } = useSlide();
+  const [hoveredLink, setHoveredLink] = useState<number | null>(null);
+  const { goToSlide, viewMode, setViewMode } = useSlide();
   const { t, locale, setLocale, isRTL } = useLanguage();
   const { theme, toggleTheme } = useTheme();
 
@@ -21,7 +24,8 @@ export default function Navbar() {
     { label: t.nav.contact, slideIndex: 6 },
   ];
 
-  const handleNav = (slideIndex: number) => {
+  const handleNav = (e: React.MouseEvent, slideIndex: number) => {
+    e.preventDefault();
     setIsMobileOpen(false);
     goToSlide(slideIndex);
   };
@@ -32,122 +36,174 @@ export default function Navbar() {
 
   return (
     <>
-      <motion.nav
-        initial={{ y: -100 }}
-        animate={{ y: 0 }}
-        transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
-        className="fixed top-0 left-0 right-0 z-[100] glass-strong py-3"
-      >
-        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between">
-          {/* Logo */}
-          <button
-            onClick={() => goToSlide(0)}
-            className="flex items-center gap-2 group"
-            data-cursor-hover
-          >
-            <div className="w-9 h-9 rounded-xl bg-gradient-accent flex items-center justify-center font-bold text-sm text-white">
-              In
-            </div>
-            <span
-              className="text-lg font-semibold tracking-tight group-hover:text-brand-green transition-colors duration-300"
-              style={{ color: "var(--text-primary)" }}
+      <header>
+        <motion.nav
+          aria-label="Main navigation"
+          initial={{ y: -100 }}
+          animate={{ y: 0 }}
+          transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
+          className="fixed top-0 left-0 right-0 z-[100] glass-strong py-3"
+        >
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between">
+            {/* Logo */}
+            <a
+              href="#hero"
+              onClick={(e) => handleNav(e, 0)}
+              className="flex items-center gap-2 group"
+              data-cursor-hover
+              aria-label="Go to homepage"
             >
-              InST
-            </span>
-          </button>
-
-          {/* Desktop Links */}
-          <div className={`hidden md:flex items-center gap-8 ${isRTL ? "flex-row-reverse" : ""}`}>
-            {navLinks.map((link) => (
-              <button
-                key={link.label}
-                onClick={() => handleNav(link.slideIndex)}
-                data-cursor-hover
-                className="relative text-sm transition-colors duration-300 group"
-                style={{ color: "var(--text-secondary)" }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = "var(--text-primary)")}
-                onMouseLeave={(e) => (e.currentTarget.style.color = "var(--text-secondary)")}
+              <div className="w-9 h-9 rounded-xl bg-gradient-accent flex items-center justify-center font-bold text-sm text-white">
+                In
+              </div>
+              <span
+                className="text-lg font-semibold tracking-tight group-hover:text-brand-green transition-colors duration-300"
+                style={{ color: "var(--text-primary)" }}
               >
-                {link.label}
-                <span className="absolute -bottom-1 left-0 w-0 h-[1.5px] bg-gradient-accent group-hover:w-full transition-all duration-300 ease-out-expo" />
+                InST
+              </span>
+            </a>
+
+            {/* Desktop Links with morphing underline */}
+            <div
+              className={`hidden md:flex items-center gap-8 ${isRTL ? "flex-row-reverse" : ""}`}
+              onMouseLeave={() => setHoveredLink(null)}
+            >
+              {navLinks.map((link, i) => (
+                <a
+                  key={link.label}
+                  href={`#${sectionIds[link.slideIndex]}`}
+                  onClick={(e) => handleNav(e, link.slideIndex)}
+                  onMouseEnter={() => setHoveredLink(i)}
+                  data-cursor-hover
+                  className="relative text-sm transition-colors duration-300 py-1"
+                  style={{
+                    color: hoveredLink === i ? "var(--text-primary)" : "var(--text-secondary)",
+                  }}
+                >
+                  {link.label}
+                  {hoveredLink === i && (
+                    <motion.div
+                      layoutId="nav-underline"
+                      className="absolute -bottom-0.5 left-0 right-0 h-[2px] rounded-full"
+                      style={{ background: "var(--gradient-accent)" }}
+                      transition={{
+                        type: "spring",
+                        stiffness: 350,
+                        damping: 25,
+                        mass: 0.5,
+                      }}
+                    />
+                  )}
+                </a>
+              ))}
+            </div>
+
+            {/* Right controls */}
+            <div className="hidden md:flex items-center gap-3">
+              {/* Language toggle */}
+              <button
+                onClick={toggleLanguage}
+                data-cursor-hover
+                className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition-all duration-300"
+                style={{
+                  color: "var(--text-secondary)",
+                  border: "1px solid var(--border-color)",
+                }}
+                aria-label={locale === "en" ? "Switch to Arabic" : "Switch to English"}
+              >
+                <Globe size={14} />
+                <span>{locale === "en" ? "AR" : "EN"}</span>
               </button>
-            ))}
+
+              {/* Theme toggle */}
+              <button
+                onClick={toggleTheme}
+                data-cursor-hover
+                className="flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300"
+                style={{
+                  color: "var(--text-secondary)",
+                  border: "1px solid var(--border-color)",
+                }}
+                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
+              </button>
+
+              {/* View mode toggle */}
+              <button
+                onClick={() => setViewMode(viewMode === "slides" ? "scroll" : "slides")}
+                data-cursor-hover
+                className="flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300"
+                style={{
+                  color: viewMode === "scroll" ? "var(--brand-green)" : "var(--text-secondary)",
+                  border: `1px solid ${viewMode === "scroll" ? "var(--border-glow)" : "var(--border-color)"}`,
+                }}
+                aria-label={viewMode === "slides" ? "Switch to scroll mode" : "Switch to slide mode"}
+              >
+                {viewMode === "slides" ? <ScrollText size={16} /> : <Layers size={16} />}
+              </button>
+
+              {/* CTA Button */}
+              <a
+                href="#contact"
+                onClick={(e) => handleNav(e, 6)}
+                data-cursor-hover
+                className="px-5 py-2.5 rounded-full text-sm font-medium bg-gradient-accent text-white hover:shadow-glow transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
+              >
+                {t.nav.getInTouch}
+              </a>
+            </div>
+
+            {/* Mobile Menu Button */}
+            <div className="flex md:hidden items-center gap-0 sm:gap-1">
+              {/* Mobile language toggle */}
+              <button
+                onClick={toggleLanguage}
+                data-cursor-hover
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center text-sm font-medium"
+                style={{ color: "var(--text-secondary)" }}
+                aria-label={locale === "en" ? "Switch to Arabic" : "Switch to English"}
+              >
+                {locale === "en" ? "AR" : "EN"}
+              </button>
+
+              {/* Mobile theme toggle */}
+              <button
+                onClick={toggleTheme}
+                data-cursor-hover
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center"
+                style={{ color: "var(--text-secondary)" }}
+                aria-label={theme === "dark" ? "Switch to light mode" : "Switch to dark mode"}
+              >
+                {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
+              </button>
+
+              {/* Mobile view mode toggle */}
+              <button
+                onClick={() => setViewMode(viewMode === "slides" ? "scroll" : "slides")}
+                data-cursor-hover
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center"
+                style={{ color: viewMode === "scroll" ? "var(--brand-green)" : "var(--text-secondary)" }}
+                aria-label={viewMode === "slides" ? "Switch to scroll mode" : "Switch to slide mode"}
+              >
+                {viewMode === "slides" ? <ScrollText size={18} /> : <Layers size={18} />}
+              </button>
+
+              <button
+                className="min-w-[44px] min-h-[44px] flex items-center justify-center"
+                style={{ color: "var(--text-primary)" }}
+                onClick={() => setIsMobileOpen(!isMobileOpen)}
+                data-cursor-hover
+                aria-label={isMobileOpen ? "Close menu" : "Open menu"}
+                aria-expanded={isMobileOpen}
+              >
+                {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
+              </button>
+            </div>
           </div>
-
-          {/* Right controls */}
-          <div className="hidden md:flex items-center gap-3">
-            {/* Language toggle */}
-            <button
-              onClick={toggleLanguage}
-              data-cursor-hover
-              className="flex items-center gap-1.5 px-3 py-2 rounded-full text-xs font-medium transition-all duration-300"
-              style={{
-                color: "var(--text-secondary)",
-                border: "1px solid var(--border-color)",
-              }}
-              title={locale === "en" ? "العربية" : "English"}
-            >
-              <Globe size={14} />
-              <span>{locale === "en" ? "AR" : "EN"}</span>
-            </button>
-
-            {/* Theme toggle */}
-            <button
-              onClick={toggleTheme}
-              data-cursor-hover
-              className="flex items-center justify-center w-9 h-9 rounded-full transition-all duration-300"
-              style={{
-                color: "var(--text-secondary)",
-                border: "1px solid var(--border-color)",
-              }}
-              title={theme === "dark" ? "Light mode" : "Dark mode"}
-            >
-              {theme === "dark" ? <Sun size={16} /> : <Moon size={16} />}
-            </button>
-
-            {/* CTA Button */}
-            <button
-              onClick={() => handleNav(6)}
-              data-cursor-hover
-              className="px-5 py-2.5 rounded-full text-sm font-medium bg-gradient-accent text-white hover:shadow-glow transition-all duration-300 hover:scale-[1.02] active:scale-[0.98]"
-            >
-              {t.nav.getInTouch}
-            </button>
-          </div>
-
-          {/* Mobile Menu Button */}
-          <div className="flex md:hidden items-center gap-2">
-            {/* Mobile language toggle */}
-            <button
-              onClick={toggleLanguage}
-              data-cursor-hover
-              className="p-2 text-sm font-medium"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              {locale === "en" ? "AR" : "EN"}
-            </button>
-
-            {/* Mobile theme toggle */}
-            <button
-              onClick={toggleTheme}
-              data-cursor-hover
-              className="p-2"
-              style={{ color: "var(--text-secondary)" }}
-            >
-              {theme === "dark" ? <Sun size={18} /> : <Moon size={18} />}
-            </button>
-
-            <button
-              className="p-2"
-              style={{ color: "var(--text-primary)" }}
-              onClick={() => setIsMobileOpen(!isMobileOpen)}
-              data-cursor-hover
-            >
-              {isMobileOpen ? <X size={24} /> : <Menu size={24} />}
-            </button>
-          </div>
-        </div>
-      </motion.nav>
+        </motion.nav>
+      </header>
 
       {/* Mobile Menu */}
       <AnimatePresence>
@@ -157,32 +213,36 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
             transition={{ duration: 0.3 }}
-            className="fixed inset-0 z-[99] backdrop-blur-xl pt-24 px-6 md:hidden"
+            className="fixed inset-0 z-[99] backdrop-blur-xl pt-24 px-6 md:hidden overflow-y-auto"
             style={{ backgroundColor: "var(--mobile-menu-bg)" }}
+            role="dialog"
+            aria-label="Navigation menu"
           >
             <div className={`flex flex-col gap-6 ${isRTL ? "items-end" : "items-start"}`}>
               {navLinks.map((link, i) => (
-                <motion.button
+                <motion.a
                   key={link.label}
+                  href={`#${sectionIds[link.slideIndex]}`}
                   initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.08, duration: 0.4 }}
-                  onClick={() => handleNav(link.slideIndex)}
+                  onClick={(e) => handleNav(e, link.slideIndex)}
                   className="text-2xl font-semibold hover:text-brand-green transition-colors"
                   style={{ color: "var(--text-primary)" }}
                 >
                   {link.label}
-                </motion.button>
+                </motion.a>
               ))}
-              <motion.button
+              <motion.a
+                href="#contact"
                 initial={{ opacity: 0, x: isRTL ? 20 : -20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: navLinks.length * 0.08, duration: 0.4 }}
-                onClick={() => handleNav(6)}
+                onClick={(e) => handleNav(e, 6)}
                 className="mt-4 px-6 py-3 rounded-full text-lg font-medium bg-gradient-accent text-white w-fit"
               >
                 {t.nav.getInTouch}
-              </motion.button>
+              </motion.a>
             </div>
           </motion.div>
         )}

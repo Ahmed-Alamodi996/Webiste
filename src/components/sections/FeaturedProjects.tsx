@@ -1,10 +1,17 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
+import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
 import type { CMSProject } from "@/lib/cms-types";
+
+/** Sanitize a hex color value to prevent CSS injection */
+function sanitizeHexColor(color: string | undefined): string {
+  if (!color) return "#888888";
+  return /^#[0-9A-Fa-f]{6}$/.test(color) ? color : "#888888";
+}
 
 const fallbackProjectMeta = [
   {
@@ -31,7 +38,7 @@ const fallbackProjectMeta = [
 
 const cardVariants = {
   enter: (direction: number) => ({
-    x: direction > 0 ? 300 : -300,
+    x: direction > 0 ? "30%" : "-30%",
     opacity: 0,
     scale: 0.95,
   }),
@@ -41,7 +48,7 @@ const cardVariants = {
     scale: 1,
   },
   exit: (direction: number) => ({
-    x: direction > 0 ? -300 : 300,
+    x: direction > 0 ? "-30%" : "30%",
     opacity: 0,
     scale: 0.95,
   }),
@@ -49,13 +56,19 @@ const cardVariants = {
 
 interface FeaturedProjectsProps {
   projects?: CMSProject[];
+  className?: string;
 }
 
-export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
+export default function FeaturedProjects({ projects, className = "min-h-screen min-h-[100dvh]" }: FeaturedProjectsProps) {
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [isPaused, setIsPaused] = useState(false);
   const { t, isRTL } = useLanguage();
+
+  // Spotlight glow tracking
+  const cardRef = useRef<HTMLDivElement>(null);
+  const [spotlightPos, setSpotlightPos] = useState({ x: 0, y: 0 });
+  const [isHoveringCard, setIsHoveringCard] = useState(false);
 
   // Use CMS projects if available, otherwise fall back to static data
   const useCMS = projects && projects.length > 0;
@@ -86,11 +99,21 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
     return () => clearInterval(timer);
   }, [isPaused, next]);
 
+  // Spotlight mouse tracking
+  const handleCardMouseMove = useCallback((e: React.MouseEvent) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    setSpotlightPos({
+      x: e.clientX - rect.left,
+      y: e.clientY - rect.top,
+    });
+  }, []);
+
   // Get current item data
   const meta = useCMS
     ? {
         gradient: projects[activeIndex].gradient,
-        accentColor: projects[activeIndex].accentColor,
+        accentColor: sanitizeHexColor(projects[activeIndex].accentColor),
         stat: projects[activeIndex].stat,
       }
     : fallbackProjectMeta[activeIndex];
@@ -107,9 +130,9 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
   return (
     <section
       id="projects"
-      className="relative h-screen flex flex-col justify-center overflow-hidden"
+      className={`relative ${className} flex flex-col justify-center overflow-hidden py-12 sm:py-0`}
     >
-      <div className="max-w-7xl mx-auto px-6 w-full">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 w-full">
         {/* Header */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
@@ -137,8 +160,42 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          {/* Card */}
-          <div className="relative h-[400px] md:h-[420px] overflow-hidden rounded-3xl">
+          {/* Card with spotlight glow */}
+          <div
+            ref={cardRef}
+            className="relative h-[320px] sm:h-[350px] md:h-[420px] overflow-hidden rounded-2xl sm:rounded-3xl"
+            onMouseMove={handleCardMouseMove}
+            onMouseEnter={() => setIsHoveringCard(true)}
+            onMouseLeave={() => setIsHoveringCard(false)}
+            role="region"
+            aria-roledescription="carousel"
+            aria-label="Featured projects"
+            aria-live="polite"
+          >
+            {/* Spotlight glow overlay — enhanced with dual rings */}
+            <div
+              className="absolute z-[5] pointer-events-none transition-opacity duration-300 rounded-3xl"
+              style={{
+                left: spotlightPos.x - 250,
+                top: spotlightPos.y - 250,
+                width: 500,
+                height: 500,
+                background: `radial-gradient(circle, ${meta.accentColor}18 0%, ${meta.accentColor}08 30%, transparent 70%)`,
+                opacity: isHoveringCard ? 1 : 0,
+              }}
+            />
+            <div
+              className="absolute z-[5] pointer-events-none transition-opacity duration-500 rounded-3xl"
+              style={{
+                left: spotlightPos.x - 100,
+                top: spotlightPos.y - 100,
+                width: 200,
+                height: 200,
+                background: `radial-gradient(circle, ${meta.accentColor}20 0%, transparent 60%)`,
+                opacity: isHoveringCard ? 0.7 : 0,
+              }}
+            />
+
             <AnimatePresence mode="wait" custom={direction}>
               <motion.div
                 key={activeIndex}
@@ -150,12 +207,21 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                 transition={{ duration: 0.5, ease: [0.19, 1, 0.22, 1] }}
                 className="absolute inset-0"
               >
-                <div className="relative h-full rounded-3xl overflow-hidden glass">
-                  {/* Background gradient */}
+                <div className="relative h-full rounded-3xl overflow-hidden glass project-card-glass">
+                  {/* Background gradient — stronger for light mode visibility */}
                   <div
-                    className={`absolute inset-0 bg-gradient-to-br ${meta.gradient} opacity-30`}
+                    className={`absolute inset-0 bg-gradient-to-br ${meta.gradient}`}
+                    style={{ opacity: "var(--project-card-gradient-opacity, 0.3)" }}
                   />
                   <div className="absolute inset-0 bg-grid-dense opacity-20" />
+
+                  {/* Bottom content overlay for readability in light mode */}
+                  <div
+                    className="absolute bottom-0 left-0 right-0 h-[70%] pointer-events-none"
+                    style={{
+                      background: `linear-gradient(to top, var(--project-card-overlay, rgba(11,15,25,0.4)) 0%, transparent 100%)`,
+                    }}
+                  />
 
                   {/* Accent line */}
                   <div
@@ -166,25 +232,29 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                   />
 
                   {/* Large stat watermark */}
-                  <div className={`absolute top-8 ${isRTL ? "left-8 text-left" : "right-8 text-right"}`}>
+                  <div className={`absolute top-4 sm:top-8 ${isRTL ? "left-4 sm:left-8 text-left" : "right-4 sm:right-8 text-right"}`}>
                     <div
-                      className="text-[5rem] md:text-[7rem] font-bold leading-none opacity-[0.06]"
-                      style={{ color: meta.accentColor }}
+                      className="text-[3.5rem] sm:text-[5rem] md:text-[7rem] font-bold leading-none"
+                      style={{ color: meta.accentColor, opacity: "var(--project-card-watermark-opacity, 0.06)" }}
                     >
                       {meta.stat}
                     </div>
                   </div>
 
                   {/* Content */}
-                  <div className={`absolute inset-0 flex flex-col justify-end p-8 md:p-12 ${isRTL ? "text-right items-end" : ""}`}>
+                  <div className={`absolute inset-0 flex flex-col justify-end p-5 sm:p-8 md:p-12 ${isRTL ? "text-right items-end" : ""}`}>
                     <span
-                      className="inline-block w-fit px-3 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider mb-4 glass"
-                      style={{ color: meta.accentColor }}
+                      className="inline-block w-fit px-3 py-1.5 rounded-full text-xs font-mono uppercase tracking-wider mb-4"
+                      style={{
+                        color: meta.accentColor,
+                        backgroundColor: "rgba(0,0,0,0.3)",
+                        border: `1px solid ${meta.accentColor}30`,
+                      }}
                     >
                       {projectText.category}
                     </span>
 
-                    <h3 className="text-2xl md:text-3xl font-bold mb-3" style={{ color: "var(--text-primary)" }}>
+                    <h3 className="text-xl sm:text-2xl md:text-3xl font-bold mb-2 sm:mb-3" style={{ color: "var(--project-card-text)" }}>
                       {projectText.title}
                     </h3>
 
@@ -195,33 +265,55 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
                       >
                         {meta.stat}
                       </span>
-                      <span className="text-small" style={{ color: "var(--text-secondary)" }}>
+                      <span className="text-small" style={{ color: "var(--project-card-text-secondary)" }}>
                         {projectText.statLabel}
                       </span>
                     </div>
 
-                    <p className="text-body max-w-xl leading-relaxed mb-6" style={{ color: "var(--text-secondary)" }}>
+                    <p className="text-body max-w-xl leading-relaxed mb-4 sm:mb-6 line-clamp-2 sm:line-clamp-none" style={{ color: "var(--project-card-text-secondary)" }}>
                       {projectText.description}
                     </p>
 
-                    <button
-                      data-cursor-hover
-                      className={`flex items-center gap-2 text-small font-medium w-fit group/btn ${isRTL ? "flex-row-reverse" : ""}`}
-                      style={{ color: "var(--text-primary)" }}
-                    >
-                      <span className="relative">
-                        {t.projects.viewCaseStudy}
-                        <span
-                          className="absolute bottom-0 left-0 w-0 h-[1px] group-hover/btn:w-full transition-all duration-300"
-                          style={{ backgroundColor: meta.accentColor }}
+                    {useCMS && projects[activeIndex].slug ? (
+                      <Link
+                        href={`/projects/${projects[activeIndex].slug}`}
+                        data-cursor-hover
+                        className={`flex items-center gap-2 text-small font-medium w-fit group/btn ${isRTL ? "flex-row-reverse" : ""}`}
+                        style={{ color: "var(--project-card-text)" }}
+                      >
+                        <span className="relative">
+                          {t.projects.viewCaseStudy}
+                          <span
+                            className="absolute bottom-0 left-0 w-0 h-[1px] group-hover/btn:w-full transition-all duration-300"
+                            style={{ backgroundColor: meta.accentColor }}
+                          />
+                        </span>
+                        <ArrowUpRight
+                          size={14}
+                          className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform duration-300"
+                          style={{ color: meta.accentColor }}
                         />
-                      </span>
-                      <ArrowUpRight
-                        size={14}
-                        className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform duration-300"
-                        style={{ color: meta.accentColor }}
-                      />
-                    </button>
+                      </Link>
+                    ) : (
+                      <button
+                        data-cursor-hover
+                        className={`flex items-center gap-2 text-small font-medium w-fit group/btn ${isRTL ? "flex-row-reverse" : ""}`}
+                        style={{ color: "var(--project-card-text)" }}
+                      >
+                        <span className="relative">
+                          {t.projects.viewCaseStudy}
+                          <span
+                            className="absolute bottom-0 left-0 w-0 h-[1px] group-hover/btn:w-full transition-all duration-300"
+                            style={{ backgroundColor: meta.accentColor }}
+                          />
+                        </span>
+                        <ArrowUpRight
+                          size={14}
+                          className="group-hover/btn:translate-x-0.5 group-hover/btn:-translate-y-0.5 transition-transform duration-300"
+                          style={{ color: meta.accentColor }}
+                        />
+                      </button>
+                    )}
                   </div>
                 </div>
               </motion.div>
@@ -229,13 +321,14 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
           </div>
 
           {/* Controls */}
-          <div className={`flex items-center justify-between mt-6 ${isRTL ? "flex-row-reverse" : ""}`}>
+          <div className={`flex items-center justify-between mt-4 sm:mt-6 gap-2 ${isRTL ? "flex-row-reverse" : ""}`}>
             {/* Prev/Next buttons */}
             <div className={`flex items-center gap-3 ${isRTL ? "flex-row-reverse" : ""}`}>
               <button
                 onClick={prev}
                 data-cursor-hover
-                className="w-10 h-10 rounded-full glass flex items-center justify-center transition-all duration-300"
+                aria-label="Previous project"
+                className="w-11 h-11 rounded-full glass flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-brand-green/30 glow-border-hover"
                 style={{ color: "var(--text-secondary)" }}
               >
                 <ChevronLeft size={18} />
@@ -243,30 +336,36 @@ export default function FeaturedProjects({ projects }: FeaturedProjectsProps) {
               <button
                 onClick={next}
                 data-cursor-hover
-                className="w-10 h-10 rounded-full glass flex items-center justify-center transition-all duration-300"
+                aria-label="Next project"
+                className="w-11 h-11 rounded-full glass flex items-center justify-center transition-all duration-300 hover:scale-110 hover:border-brand-green/30 glow-border-hover"
                 style={{ color: "var(--text-secondary)" }}
               >
                 <ChevronRight size={18} />
               </button>
             </div>
 
-            {/* Dot indicators */}
+            {/* Dot indicators with spring overshoot */}
             <div className="flex items-center gap-2">
               {Array.from({ length: totalItems }).map((_, i) => (
                 <button
                   key={i}
                   onClick={() => goTo(i)}
                   data-cursor-hover
-                  className="relative h-2 rounded-full overflow-hidden transition-all duration-500"
-                  style={{ width: activeIndex === i ? 32 : 8 }}
+                  aria-label={`Go to project ${i + 1}`}
+                  className="relative h-2 rounded-full overflow-hidden py-5 flex items-center"
                 >
-                  <div
-                    className="absolute inset-0 rounded-full transition-colors duration-300"
-                    style={{
+                  <motion.div
+                    className="h-full rounded-full"
+                    animate={{
+                      width: activeIndex === i ? 32 : 8,
                       backgroundColor:
                         activeIndex === i
-                          ? (useCMS ? projects[i].accentColor : fallbackProjectMeta[i].accentColor)
+                          ? (useCMS ? sanitizeHexColor(projects[i].accentColor) : fallbackProjectMeta[i].accentColor)
                           : "rgba(156, 163, 175, 0.3)",
+                    }}
+                    transition={{
+                      width: { type: "spring", stiffness: 400, damping: 22, mass: 0.6 },
+                      backgroundColor: { duration: 0.3 },
                     }}
                   />
                   {activeIndex === i && !isPaused && (

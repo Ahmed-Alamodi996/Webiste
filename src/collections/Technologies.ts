@@ -2,6 +2,12 @@ import type { CollectionConfig } from 'payload'
 
 export const Technologies: CollectionConfig = {
   slug: 'technologies',
+  access: {
+    read: () => true,
+    create: ({ req: { user } }) => Boolean(user),
+    update: ({ req: { user } }) => Boolean(user),
+    delete: ({ req: { user } }) => Boolean(user),
+  },
   admin: {
     useAsTitle: 'name',
   },
@@ -15,6 +21,13 @@ export const Technologies: CollectionConfig = {
       name: 'color',
       type: 'text',
       required: true,
+      validate: (value: string | undefined | null) => {
+        if (!value) return 'Color is required'
+        if (!/^#[0-9A-Fa-f]{6}$/.test(value)) {
+          return 'Must be a valid hex color (e.g. #61DAFB)'
+        }
+        return true
+      },
       admin: {
         description: 'Hex color, e.g. "#61DAFB"',
       },

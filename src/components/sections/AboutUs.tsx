@@ -10,7 +10,7 @@ export default function AboutUs() {
   const { t, isRTL } = useLanguage();
 
   return (
-    <section id="about" className="relative h-screen flex flex-col justify-center overflow-hidden">
+    <section id="about" className="relative min-h-screen min-h-[100dvh] flex flex-col justify-center overflow-hidden py-12 sm:py-0">
       {/* Background grid with perspective fade */}
       <div className="absolute inset-0 bg-grid opacity-20" />
       <AuroraBeam className="opacity-50" />
@@ -23,7 +23,7 @@ export default function AboutUs() {
         }}
       />
 
-      <div className="max-w-7xl mx-auto px-6 relative z-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
         <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center ${isRTL ? "direction-rtl" : ""}`}>
           {/* Left — Big Typography with text reveal */}
           <div className={isRTL ? "text-right" : ""}>
@@ -80,7 +80,7 @@ export default function AboutUs() {
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 0.6, ease: [0.19, 1, 0.22, 1] }}
-          className="grid grid-cols-2 md:grid-cols-4 gap-6 mt-16"
+          className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-8 md:mt-16"
         >
           {t.about.stats.map((counter, i) => (
             <motion.div
@@ -88,7 +88,7 @@ export default function AboutUs() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.7 + i * 0.1, duration: 0.5 }}
-              className="glass rounded-2xl p-6 md:p-8 glow-border"
+              className="glass rounded-2xl p-4 sm:p-6 md:p-8 glow-border"
             >
               <AnimatedCounter {...counter} />
             </motion.div>

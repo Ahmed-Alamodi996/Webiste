@@ -1,6 +1,8 @@
 "use client";
 
-import { createContext, useContext, useState, useCallback, useRef, type ReactNode } from "react";
+import { createContext, useContext, useState, useCallback, useRef, useEffect, type ReactNode } from "react";
+
+type ViewMode = "slides" | "scroll";
 
 interface SlideContextType {
   currentSlide: number;
@@ -9,6 +11,8 @@ interface SlideContextType {
   nextSlide: () => void;
   prevSlide: () => void;
   isTransitioning: boolean;
+  viewMode: ViewMode;
+  setViewMode: (mode: ViewMode) => void;
 }
 
 const SlideContext = createContext<SlideContextType | null>(null);
@@ -22,10 +26,34 @@ export function useSlide() {
 const TOTAL_SLIDES = 7;
 const TRANSITION_COOLDOWN = 800;
 
+const HASH_TO_SLIDE: Record<string, number> = {
+  hero: 0,
+  offer: 1,
+  projects: 2,
+  about: 3,
+  services: 4,
+  technology: 5,
+  contact: 6,
+};
+
+function getInitialSlide(): number {
+  if (typeof window === "undefined") return 0;
+  const hash = window.location.hash.replace("#", "");
+  return HASH_TO_SLIDE[hash] ?? 0;
+}
+
 export function SlideProvider({ children }: { children: ReactNode }) {
-  const [currentSlide, setCurrentSlide] = useState(0);
+  const [currentSlide, setCurrentSlide] = useState(getInitialSlide);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [viewMode, setViewMode] = useState<ViewMode>("slides");
   const cooldownRef = useRef(false);
+
+  // Clear hash after initial read so it doesn't interfere with browser behavior
+  useEffect(() => {
+    if (window.location.hash) {
+      window.history.replaceState(null, "", window.location.pathname);
+    }
+  }, []);
 
   const goToSlide = useCallback((index: number) => {
     if (cooldownRef.current) return;
@@ -52,7 +80,7 @@ export function SlideProvider({ children }: { children: ReactNode }) {
 
   return (
     <SlideContext.Provider
-      value={{ currentSlide, totalSlides: TOTAL_SLIDES, goToSlide, nextSlide, prevSlide, isTransitioning }}
+      value={{ currentSlide, totalSlides: TOTAL_SLIDES, goToSlide, nextSlide, prevSlide, isTransitioning, viewMode, setViewMode }}
     >
       {children}
     </SlideContext.Provider>

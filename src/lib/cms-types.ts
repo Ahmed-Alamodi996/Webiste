@@ -1,8 +1,19 @@
 // Types for CMS data passed from server to client components
 
+export interface CMSMedia {
+  id: string
+  url: string
+  filename: string
+  mimeType: string
+  width?: number
+  height?: number
+  alt?: string
+}
+
 export interface CMSProject {
   id: string
   title: string
+  slug: string
   category: string
   description: string
   stat: string
@@ -10,6 +21,13 @@ export interface CMSProject {
   gradient: string
   accentColor: string
   order: number
+  // Rich detail fields (optional)
+  coverImage?: CMSMedia | string
+  gallery?: { image: CMSMedia | string }[]
+  content?: Record<string, unknown>
+  techStack?: { name: string; color?: string }[]
+  video?: { url?: string; provider?: 'youtube' | 'vimeo' | 'direct' }
+  liveUrl?: string
 }
 
 export interface CMSOffering {
@@ -55,6 +73,9 @@ export interface CMSSiteContent {
     exploreSolutions: string
     getInTouch: string
     trustedBy: string
+    statsProjects: string
+    statsUptime: string
+    statsSupport: string
     next: string
   }
   about: {
@@ -127,4 +148,121 @@ export interface CMSSiteContent {
   slides: {
     names: { name: string }[]
   }
+}
+
+// ──────────────────────────────────────────
+// Page Builder types
+// ──────────────────────────────────────────
+
+export interface HeroBlockData {
+  blockType: 'hero'
+  id?: string
+  heading: string
+  headingAccent?: string
+  description?: string
+  backgroundImage?: CMSMedia | string
+  ctas?: { label: string; href: string; variant?: 'primary' | 'secondary' }[]
+}
+
+export interface RichTextBlockData {
+  blockType: 'richText'
+  id?: string
+  content: Record<string, unknown>
+  maxWidth?: 'prose' | '3xl' | 'full'
+}
+
+export interface FeaturedProjectsBlockData {
+  blockType: 'featuredProjects'
+  id?: string
+  label?: string
+  heading?: string
+  headingAccent?: string
+  maxItems?: number
+}
+
+export interface ServicesBlockData {
+  blockType: 'services'
+  id?: string
+  label?: string
+  heading?: string
+  headingAccent?: string
+  description?: string
+}
+
+export interface OfferingsBlockData {
+  blockType: 'offerings'
+  id?: string
+  label?: string
+  heading?: string
+  headingAccent?: string
+  description?: string
+}
+
+export interface TechnologyBlockData {
+  blockType: 'technology'
+  id?: string
+  label?: string
+  heading?: string
+  headingAccent?: string
+  description?: string
+}
+
+export interface ContactFormBlockData {
+  blockType: 'contactForm'
+  id?: string
+  heading?: string
+  headingAccent?: string
+  description?: string
+}
+
+export interface CTABlockData {
+  blockType: 'cta'
+  id?: string
+  heading: string
+  description?: string
+  buttonLabel: string
+  buttonHref: string
+  style?: 'gradient' | 'glass'
+}
+
+export interface ImageBlockData {
+  blockType: 'image'
+  id?: string
+  image: CMSMedia | string
+  caption?: string
+  size?: 'small' | 'medium' | 'full'
+}
+
+export interface SpacerBlockData {
+  blockType: 'spacer'
+  id?: string
+  size: 'sm' | 'md' | 'lg' | 'xl'
+}
+
+export type PageBlock =
+  | HeroBlockData
+  | RichTextBlockData
+  | FeaturedProjectsBlockData
+  | ServicesBlockData
+  | OfferingsBlockData
+  | TechnologyBlockData
+  | ContactFormBlockData
+  | CTABlockData
+  | ImageBlockData
+  | SpacerBlockData
+
+export interface CMSPage {
+  id: string
+  title: string
+  slug: string
+  status: 'draft' | 'published'
+  layout: PageBlock[]
+  meta?: {
+    metaTitle?: string
+    metaDescription?: string
+    ogImage?: CMSMedia | string
+  }
+  publishedAt?: string
+  createdAt: string
+  updatedAt: string
 }

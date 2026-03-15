@@ -4,13 +4,25 @@ import { motion } from "framer-motion";
 import { useSlide } from "@/context/SlideContext";
 import { useLanguage } from "@/context/LanguageContext";
 
+const SECTION_ACCENTS = [
+  "#00C896",
+  "#00C896",
+  "#2563EB",
+  "#7C3AED",
+  "#F59E0B",
+  "#EC4899",
+  "#00C896",
+];
+
 export default function SlideIndicator() {
   const { currentSlide, totalSlides, goToSlide } = useSlide();
   const { t, isRTL } = useLanguage();
 
+  const accentColor = SECTION_ACCENTS[currentSlide] || "#00C896";
+
   return (
     <div
-      className={`fixed top-1/2 -translate-y-1/2 z-[101] flex flex-col gap-3 ${
+      className={`fixed top-1/2 -translate-y-1/2 z-[101] hidden md:flex flex-col gap-3 ${
         isRTL ? "left-6 items-start" : "right-6 items-end"
       }`}
     >
@@ -19,7 +31,7 @@ export default function SlideIndicator() {
           key={i}
           onClick={() => goToSlide(i)}
           data-cursor-hover
-          className={`group flex items-center gap-3 py-1 ${isRTL ? "flex-row-reverse" : ""}`}
+          className={`group flex items-center gap-3 py-2 min-h-[44px] ${isRTL ? "flex-row-reverse" : ""}`}
           aria-label={`Go to ${t.slides.names[i]}`}
         >
           {/* Label on hover */}
@@ -30,23 +42,36 @@ export default function SlideIndicator() {
             {t.slides.names[i]}
           </span>
 
-          {/* Dot */}
-          <div className="relative flex items-center justify-center w-3 h-3">
+          {/* Dot with spring overshoot */}
+          <div className="relative flex items-center justify-center w-4 h-4">
             {currentSlide === i && (
               <motion.div
                 layoutId="slide-dot-active"
-                className="absolute inset-0 rounded-full bg-brand-green/20"
-                transition={{ type: "spring", stiffness: 300, damping: 25 }}
+                className="absolute rounded-full"
+                style={{ backgroundColor: accentColor + "30" }}
+                initial={false}
+                animate={{ width: 16, height: 16 }}
+                transition={{
+                  type: "spring",
+                  stiffness: 400,
+                  damping: 15,
+                  mass: 0.8,
+                }}
               />
             )}
             <motion.div
-              className="rounded-full transition-colors duration-300"
+              className="rounded-full"
               animate={{
                 width: currentSlide === i ? 8 : 4,
                 height: currentSlide === i ? 8 : 4,
-                backgroundColor: currentSlide === i ? "#00C896" : "rgba(156, 163, 175, 0.4)",
+                backgroundColor: currentSlide === i ? accentColor : "rgba(156, 163, 175, 0.4)",
               }}
-              transition={{ duration: 0.3 }}
+              transition={{
+                type: "spring",
+                stiffness: 500,
+                damping: 18,
+                mass: 0.5,
+              }}
             />
           </div>
         </button>

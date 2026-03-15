@@ -4,6 +4,17 @@ out/
 .DS_Store
 *.tsbuildinfo
 next-env.d.ts
+
+# Environment files — NEVER commit these
 .env
 .env.local
 .env.production
+.env.*.local
+
+# Backups and media
+bkup/
+media/
+
+# Docker compose override
+docker-compose.initial.yml
+deploy/nginx-active.conf

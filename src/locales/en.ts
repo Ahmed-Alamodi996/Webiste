@@ -19,6 +19,9 @@ const en = {
     exploreSolutions: "Explore Solutions",
     getInTouch: "Get in Touch",
     trustedBy: "Trusted by industry leaders",
+    statsProjects: "Projects Delivered",
+    statsUptime: "Uptime SLA",
+    statsSupport: "Support",
     next: "Next",
   },
 
@@ -224,7 +227,7 @@ const en = {
 
 export type Translations = {
   nav: { services: string; projects: string; about: string; technology: string; contact: string; getInTouch: string };
-  hero: { tagline: string; headlineLine1: string[]; headlineLine2: string[]; description: string; exploreSolutions: string; getInTouch: string; trustedBy: string; next: string };
+  hero: { tagline: string; headlineLine1: string[]; headlineLine2: string[]; description: string; exploreSolutions: string; getInTouch: string; trustedBy: string; statsProjects: string; statsUptime: string; statsSupport: string; next: string };
   about: { label: string; headingLine1: string; headingWord1: string; headingLine2: string; headingWord2: string; paragraph1: string; paragraph2: string; stats: { target: number; suffix: string; label: string }[] };
   offer: { label: string; heading: string; headingAccent: string; description: string; items: { title: string; description: string }[] };
   services: { label: string; heading: string; headingAccent: string; description: string; learnMore: string; items: { title: string; overview: string }[] };

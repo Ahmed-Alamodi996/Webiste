@@ -58,6 +58,9 @@ function buildTranslations(
       exploreSolutions: cms.hero?.exploreSolutions ?? fallback.hero.exploreSolutions,
       getInTouch: cms.hero?.getInTouch ?? fallback.hero.getInTouch,
       trustedBy: cms.hero?.trustedBy ?? fallback.hero.trustedBy,
+      statsProjects: cms.hero?.statsProjects ?? fallback.hero.statsProjects,
+      statsUptime: cms.hero?.statsUptime ?? fallback.hero.statsUptime,
+      statsSupport: cms.hero?.statsSupport ?? fallback.hero.statsSupport,
       next: cms.hero?.next ?? fallback.hero.next,
     },
     about: {

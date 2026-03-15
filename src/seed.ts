@@ -20,6 +20,9 @@ const enData = {
     exploreSolutions: 'Explore Solutions',
     getInTouch: 'Get in Touch',
     trustedBy: 'Trusted by industry leaders',
+    statsProjects: 'Projects Delivered',
+    statsUptime: 'Uptime SLA',
+    statsSupport: 'Support',
     next: 'Next',
   },
   about: {
@@ -119,6 +122,9 @@ const arData = {
     exploreSolutions: 'استكشف الحلول',
     getInTouch: 'تواصل معنا',
     trustedBy: 'موثوق من قادة الصناعة',
+    statsProjects: 'مشاريع منجزة',
+    statsUptime: 'وقت تشغيل مضمون',
+    statsSupport: 'دعم فني',
     next: 'التالي',
   },
   about: {
@@ -435,16 +441,22 @@ async function seed() {
 
   console.log('Seeding database...')
 
-  // 1. Create admin user
+  // 1. Create admin user from environment variables
   try {
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@inst.com'
+    const adminPassword = process.env.ADMIN_PASSWORD
+    if (!adminPassword) {
+      console.error('ADMIN_PASSWORD environment variable is required for seeding.')
+      process.exit(1)
+    }
     await payload.create({
       collection: 'users',
       data: {
-        email: 'admin@inst.com',
-        password: 'changeme123',
+        email: adminEmail,
+        password: adminPassword,
       },
     })
-    console.log('Created admin user: admin@inst.com / changeme123')
+    console.log(`Created admin user: ${adminEmail}`)
   } catch {
     console.log('Admin user may already exist, skipping...')
   }
@@ -464,6 +476,9 @@ async function seed() {
         exploreSolutions: enData.hero.exploreSolutions,
         getInTouch: enData.hero.getInTouch,
         trustedBy: enData.hero.trustedBy,
+        statsProjects: enData.hero.statsProjects,
+        statsUptime: enData.hero.statsUptime,
+        statsSupport: enData.hero.statsSupport,
         next: enData.hero.next,
       },
       about: {
@@ -506,6 +521,9 @@ async function seed() {
         exploreSolutions: arData.hero.exploreSolutions,
         getInTouch: arData.hero.getInTouch,
         trustedBy: arData.hero.trustedBy,
+        statsProjects: arData.hero.statsProjects,
+        statsUptime: arData.hero.statsUptime,
+        statsSupport: arData.hero.statsSupport,
         next: arData.hero.next,
       },
       about: {
@@ -541,6 +559,7 @@ async function seed() {
       locale: 'en',
       data: {
         title: project.en.title,
+        slug: project.en.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
         category: project.en.category,
         description: project.en.description,
         statLabel: project.en.statLabel,

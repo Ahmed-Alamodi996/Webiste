@@ -16,6 +16,7 @@ import AboutUs from "@/components/sections/AboutUs";
 import OurServices from "@/components/sections/OurServices";
 import Technology from "@/components/sections/Technology";
 import Contact from "@/components/sections/Contact";
+import ErrorBoundary from "@/components/ErrorBoundary";
 import type {
   CMSProject,
   CMSOffering,
@@ -56,18 +57,24 @@ export default function HomeClient({
   ];
 
   return (
-    <ThemeProvider>
-      <LanguageProvider siteContent={siteContent}>
-        <AnimatePresence mode="wait">
-          {!isLoaded && <Preloader onComplete={handleLoadComplete} />}
-        </AnimatePresence>
+    <ErrorBoundary>
+      <ThemeProvider>
+        <LanguageProvider siteContent={siteContent}>
+          <AnimatePresence mode="wait">
+            {!isLoaded && <Preloader onComplete={handleLoadComplete} />}
+          </AnimatePresence>
 
-        <SlideProvider>
-          <CustomCursor />
-          <Navbar />
-          <SlideContainer slides={slides} />
-        </SlideProvider>
-      </LanguageProvider>
-    </ThemeProvider>
+          <SlideProvider>
+            <CustomCursor />
+            <Navbar />
+            <main id="main-content" aria-busy={!isLoaded}>
+              <div style={isLoaded ? undefined : { opacity: 0, position: 'fixed', pointerEvents: 'none' }}>
+                <SlideContainer slides={slides} />
+              </div>
+            </main>
+          </SlideProvider>
+        </LanguageProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }

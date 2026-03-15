@@ -2,6 +2,12 @@ import type { CollectionConfig } from 'payload'
 
 export const Offerings: CollectionConfig = {
   slug: 'offerings',
+  access: {
+    read: () => true,
+    create: ({ req: { user } }) => Boolean(user),
+    update: ({ req: { user } }) => Boolean(user),
+    delete: ({ req: { user } }) => Boolean(user),
+  },
   admin: {
     useAsTitle: 'title',
   },
@@ -35,6 +41,13 @@ export const Offerings: CollectionConfig = {
       name: 'accentColor',
       type: 'text',
       required: true,
+      validate: (value: string | undefined | null) => {
+        if (!value) return 'Accent color is required'
+        if (!/^#[0-9A-Fa-f]{6}$/.test(value)) {
+          return 'Must be a valid hex color (e.g. #00C896)'
+        }
+        return true
+      },
       admin: {
         description: 'Hex color, e.g. "#00C896"',
       },
