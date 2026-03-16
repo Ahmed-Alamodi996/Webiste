@@ -5,7 +5,7 @@ import type { Metadata } from "next";
 import ProjectDetail from "@/components/sections/ProjectDetail";
 import type { CMSProject, CMSMedia } from "@/lib/cms-types";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 interface ProjectPageProps {
   params: Promise<{ slug: string }>;
@@ -43,21 +43,6 @@ export async function generateMetadata({
     // CMS unavailable
   }
   return { title: "Project | InST" };
-}
-
-export async function generateStaticParams() {
-  try {
-    const payload = await getPayload({ config });
-    const projects = await payload.find({
-      collection: "projects",
-      limit: 100,
-    });
-    return projects.docs
-      .filter((p) => p.slug)
-      .map((p) => ({ slug: p.slug as string }));
-  } catch {
-    return [];
-  }
 }
 
 export default async function ProjectPage({ params }: ProjectPageProps) {

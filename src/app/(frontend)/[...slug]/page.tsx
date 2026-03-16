@@ -14,7 +14,7 @@ import type {
   PageBlock,
 } from "@/lib/cms-types";
 
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
