@@ -5,25 +5,23 @@
 # --- Stage 1: Install dependencies ---
 FROM node:20-alpine AS deps
 WORKDIR /app
+
+# Increase Node.js memory for heavy installs
+ENV NODE_OPTIONS="--max-old-space-size=2048"
+
 COPY package.json package-lock.json* ./
-RUN npm ci --ignore-scripts
+RUN npm ci
 
 # --- Stage 2: Build the app ---
 FROM node:20-alpine AS builder
 WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
 
-# Build args for build-time env vars
-ARG MONGODB_URI
-ARG PAYLOAD_SECRET
-ARG NEXT_PUBLIC_SITE_URL
-
-ENV MONGODB_URI=${MONGODB_URI}
-ENV PAYLOAD_SECRET=${PAYLOAD_SECRET}
-ENV NEXT_PUBLIC_SITE_URL=${NEXT_PUBLIC_SITE_URL}
+ENV NODE_OPTIONS="--max-old-space-size=2048"
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY . .
 
 RUN npm run build
 
