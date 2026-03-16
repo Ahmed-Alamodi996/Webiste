@@ -25,6 +25,10 @@ export default buildConfig({
   })(),
   db: mongooseAdapter({
     url: process.env.MONGODB_URI || 'mongodb://localhost:27017/inst-website',
+    connectOptions: {
+      serverSelectionTimeoutMS: 5000,
+      connectTimeoutMS: 5000,
+    },
   }),
   editor: lexicalEditor(),
   localization: {

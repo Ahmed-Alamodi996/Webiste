@@ -1,6 +1,8 @@
 import { getPayload } from "payload";
 import config from "@payload-config";
 import HomeClient from "@/components/HomeClient";
+
+export const dynamic = "force-dynamic";
 import type {
   CMSSiteContent,
   CMSProject,
