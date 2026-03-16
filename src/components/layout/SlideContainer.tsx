@@ -24,20 +24,17 @@ const slideVariants = {
   enter: (direction: number) => ({
     opacity: 0,
     y: direction > 0 ? 40 : -40,
-    scale: 0.97,
-    filter: "blur(4px)",
+    scale: 0.98,
   }),
   center: {
     opacity: 1,
     y: 0,
     scale: 1,
-    filter: "blur(0px)",
   },
   exit: (direction: number) => ({
     opacity: 0,
     y: direction > 0 ? -30 : 30,
-    scale: 1.02,
-    filter: "blur(3px)",
+    scale: 1.01,
   }),
 };
 
@@ -205,7 +202,7 @@ export default function SlideContainer({ slides }: SlideContainerProps) {
         </AnimatePresence>
       </div>
 
-      <AnimatePresence mode="wait" custom={directionRef.current}>
+      <AnimatePresence mode="popLayout" custom={directionRef.current}>
         <motion.div
           key={currentSlide}
           custom={directionRef.current}
@@ -214,12 +211,11 @@ export default function SlideContainer({ slides }: SlideContainerProps) {
           animate="center"
           exit="exit"
           transition={{
-            duration: 0.55,
+            duration: 0.5,
             ease: [0.25, 0.46, 0.45, 0.94],
-            filter: { duration: 0.4 },
           }}
           className="absolute inset-0 overflow-y-auto overflow-x-hidden"
-          style={{ willChange: "transform, opacity, filter" }}
+          style={{ willChange: "transform, opacity" }}
         >
           {slides[currentSlide]}
         </motion.div>
