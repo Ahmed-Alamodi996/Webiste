@@ -29,6 +29,25 @@ function isRateLimited(ip: string): boolean {
 
 export async function POST(request: Request) {
   try {
+    // Reject non-JSON requests
+    const contentType = request.headers.get("content-type");
+    if (!contentType?.includes("application/json")) {
+      return NextResponse.json(
+        { error: "Content-Type must be application/json" },
+        { status: 415 }
+      );
+    }
+
+    // Origin check — reject cross-origin form submissions
+    const origin = request.headers.get("origin");
+    const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
+    if (siteUrl && origin && !origin.startsWith(siteUrl)) {
+      return NextResponse.json(
+        { error: "Forbidden" },
+        { status: 403 }
+      );
+    }
+
     // Rate limiting
     const forwarded = request.headers.get("x-forwarded-for");
     const ip = forwarded?.split(",")[0]?.trim() || "unknown";
@@ -39,7 +58,15 @@ export async function POST(request: Request) {
       );
     }
 
-    const body = await request.json();
+    let body;
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON body" },
+        { status: 400 }
+      );
+    }
     const { name, email, message } = body;
 
     // Presence validation

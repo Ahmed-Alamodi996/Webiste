@@ -19,6 +19,19 @@ export const Media: CollectionConfig = {
       'video/mp4',
       'video/webm',
     ],
+    // Prevent excessively large uploads
+    filesRequiredOnCreate: false,
+  },
+  hooks: {
+    beforeChange: [
+      ({ data, req }) => {
+        // Reject files larger than 10MB
+        if (req.file && req.file.size > 10 * 1024 * 1024) {
+          throw new Error('File size must be under 10MB')
+        }
+        return data
+      },
+    ],
   },
   fields: [
     {
