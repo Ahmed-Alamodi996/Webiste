@@ -41,8 +41,8 @@ function OfferCard({
         glare
       >
         <div className="group relative h-full rounded-2xl sm:rounded-3xl glass transition-all duration-500 overflow-hidden hover:-translate-y-2 hover:shadow-2xl"
-          style={{ padding: "clamp(0.75rem, 2vw, 1.5rem)" }}
           style={{
+            padding: "clamp(0.75rem, 2vw, 1.5rem)",
             transition: "transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.5s cubic-bezier(0.19, 1, 0.22, 1), background 0.4s ease, border-color 0.4s ease",
           }}
         >
@@ -70,8 +70,10 @@ function OfferCard({
             {/* Icon with glow */}
             <div
               className="rounded-xl sm:rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110"
-              style={{ width: "clamp(2rem, 4vw, 3rem)", height: "clamp(2rem, 4vw, 3rem)", marginBottom: "clamp(0.5rem, 1.5vw, 1rem)" }}
               style={{
+                width: "clamp(2rem, 4vw, 3rem)",
+                height: "clamp(2rem, 4vw, 3rem)",
+                marginBottom: "clamp(0.5rem, 1.5vw, 1rem)",
                 backgroundColor: accent + "12",
                 boxShadow: `0 0 0px ${accent}00`,
                 transition: "transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.5s ease",
