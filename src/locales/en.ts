@@ -196,6 +196,22 @@ const en = {
     },
   },
 
+  // Branding
+  branding: {
+    siteName: "InST",
+    siteFullName: "Innovative Solutions Tech",
+    siteDescription: "Premium software engineering and AI solutions for forward-thinking companies.",
+    logoText: "In",
+    contactEmail: "info@inst-sa.com",
+  },
+
+  // Social Media
+  social: {
+    linkedinUrl: "https://linkedin.com/company/inst-tech",
+    twitterUrl: "https://x.com/inst_tech",
+    githubUrl: "https://github.com/inst-tech",
+  },
+
   // Footer (merged in Contact)
   footer: {
     copyright: "Innovative Solutions Tech",
@@ -234,6 +250,8 @@ export type Translations = {
   projects: { label: string; heading: string; headingAccent: string; description: string; viewCaseStudy: string; items: { title: string; category: string; description: string; statLabel: string }[] };
   technology: { label: string; heading: string; headingAccent: string; description: string };
   contact: { label: string; heading: string; headingAccent: string; description: string; features: string[]; form: { name: string; namePlaceholder: string; email: string; emailPlaceholder: string; message: string; messagePlaceholder: string; send: string; successTitle: string; successMessage: string } };
+  branding?: { siteName?: string; siteFullName?: string; siteDescription?: string; logoText?: string; contactEmail?: string };
+  social?: { linkedinUrl?: string; twitterUrl?: string; githubUrl?: string; instagramUrl?: string; youtubeUrl?: string };
   footer: { copyright: string; company: { about: string; services: string; projects: string }; connect: { linkedin: string; twitter: string; github: string } };
   slides: { names: string[] };
 };

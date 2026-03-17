@@ -157,6 +157,36 @@ export const SiteContent: GlobalConfig = {
       ],
     },
 
+    // ─── Branding ──────────────────────────────────────
+    {
+      name: 'branding',
+      type: 'group',
+      label: 'Branding & SEO',
+      fields: [
+        { name: 'siteName', type: 'text', required: true, defaultValue: 'InST', admin: { description: 'Short site name shown in navbar and footer' } },
+        { name: 'siteFullName', type: 'text', required: true, defaultValue: 'Innovative Solutions Tech', admin: { description: 'Full company name for SEO' } },
+        { name: 'siteDescription', type: 'textarea', required: true, localized: true, admin: { description: 'Meta description for SEO' } },
+        { name: 'logoText', type: 'text', required: true, defaultValue: 'In', admin: { description: 'Text inside the logo square (e.g. "In")' } },
+        { name: 'logo', type: 'upload', relationTo: 'media', admin: { description: 'Logo image (replaces text logo if set)' } },
+        { name: 'favicon', type: 'upload', relationTo: 'media', admin: { description: 'Favicon / browser tab icon' } },
+        { name: 'contactEmail', type: 'email', required: true, defaultValue: 'info@inst-sa.com', admin: { description: 'Email that receives contact form submissions' } },
+      ],
+    },
+
+    // ─── Social Media Links ───────────────────────────
+    {
+      name: 'social',
+      type: 'group',
+      label: 'Social Media',
+      fields: [
+        { name: 'linkedinUrl', type: 'text', defaultValue: 'https://linkedin.com/company/inst-tech', admin: { description: 'LinkedIn company page URL' } },
+        { name: 'twitterUrl', type: 'text', defaultValue: 'https://x.com/inst_tech', admin: { description: 'Twitter/X profile URL' } },
+        { name: 'githubUrl', type: 'text', defaultValue: 'https://github.com/inst-tech', admin: { description: 'GitHub organization URL' } },
+        { name: 'instagramUrl', type: 'text', admin: { description: 'Instagram profile URL (optional)' } },
+        { name: 'youtubeUrl', type: 'text', admin: { description: 'YouTube channel URL (optional)' } },
+      ],
+    },
+
     // ─── Footer ─────────────────────────────────────────
     {
       name: 'footer',

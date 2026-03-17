@@ -62,9 +62,9 @@ export default function Contact() {
   ];
 
   const footerConnectLinks = [
-    { label: t.footer.connect.linkedin, href: "https://linkedin.com/company/inst-tech" },
-    { label: t.footer.connect.twitter, href: "https://x.com/inst_tech" },
-    { label: t.footer.connect.github, href: "https://github.com/inst-tech" },
+    { label: t.footer.connect.linkedin, href: t.social?.linkedinUrl || "https://linkedin.com/company/inst-tech" },
+    { label: t.footer.connect.twitter, href: t.social?.twitterUrl || "https://x.com/inst_tech" },
+    { label: t.footer.connect.github, href: t.social?.githubUrl || "https://github.com/inst-tech" },
   ];
 
   return (
@@ -340,13 +340,13 @@ export default function Contact() {
                 data-cursor-hover
               >
                 <div className="w-8 h-8 rounded-lg bg-gradient-accent flex items-center justify-center font-bold text-xs text-white">
-                  In
+                  {t.branding?.logoText || "In"}
                 </div>
                 <span
                   className="text-base font-semibold tracking-tight group-hover:text-brand-green transition-colors duration-300"
                   style={{ color: "var(--text-primary)" }}
                 >
-                  InST
+                  {t.branding?.siteName || "InST"}
                 </span>
               </button>
               <span className="text-xs hidden sm:block" style={{ color: "var(--text-muted)" }}>

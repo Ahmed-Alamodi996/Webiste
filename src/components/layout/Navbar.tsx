@@ -54,13 +54,13 @@ export default function Navbar() {
               aria-label="Go to homepage"
             >
               <div className="w-9 h-9 rounded-xl bg-gradient-accent flex items-center justify-center font-bold text-sm text-white">
-                In
+                {t.branding?.logoText || "In"}
               </div>
               <span
                 className="text-lg font-semibold tracking-tight group-hover:text-brand-green transition-colors duration-300"
                 style={{ color: "var(--text-primary)" }}
               >
-                InST
+                {t.branding?.siteName || "InST"}
               </span>
             </a>
 

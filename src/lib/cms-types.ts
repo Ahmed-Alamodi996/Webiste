@@ -132,6 +132,22 @@ export interface CMSSiteContent {
       successMessage: string
     }
   }
+  branding?: {
+    siteName?: string
+    siteFullName?: string
+    siteDescription?: string
+    logoText?: string
+    logo?: CMSMedia | string
+    favicon?: CMSMedia | string
+    contactEmail?: string
+  }
+  social?: {
+    linkedinUrl?: string
+    twitterUrl?: string
+    githubUrl?: string
+    instagramUrl?: string
+    youtubeUrl?: string
+  }
   footer: {
     copyright: string
     company: {

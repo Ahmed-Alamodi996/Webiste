@@ -197,6 +197,22 @@ const ar: Translations = {
     },
   },
 
+  // Branding
+  branding: {
+    siteName: "InST",
+    siteFullName: "Innovative Solutions Tech",
+    siteDescription: "حلول هندسة البرمجيات والذكاء الاصطناعي المتميزة للشركات الطموحة.",
+    logoText: "In",
+    contactEmail: "info@inst-sa.com",
+  },
+
+  // Social Media
+  social: {
+    linkedinUrl: "https://linkedin.com/company/inst-tech",
+    twitterUrl: "https://x.com/inst_tech",
+    githubUrl: "https://github.com/inst-tech",
+  },
+
   // Footer (merged in Contact)
   footer: {
     copyright: "Innovative Solutions Tech",
