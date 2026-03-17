@@ -9,6 +9,7 @@ import TextScramble from "@/components/ui/TextScramble";
 
 const ParticleGrid = dynamic(() => import("@/components/ui/ParticleGrid"), { ssr: false });
 const AuroraBeam = dynamic(() => import("@/components/ui/AuroraBeam"), { ssr: false });
+const LottiePlayer = dynamic(() => import("@/components/ui/LottiePlayer"), { ssr: false, loading: () => null });
 import { useSlide } from "@/context/SlideContext";
 import { useLanguage } from "@/context/LanguageContext";
 
@@ -23,11 +24,18 @@ export default function Hero() {
       ref={containerRef}
       className="relative min-h-screen min-h-[100dvh] flex items-center justify-center overflow-hidden"
     >
-      {/* Interactive Particle Grid — CMS toggle */}
-      {themeSettings?.enableParticles !== false && <ParticleGrid />}
-
-      {/* Aurora Beams — CMS toggle */}
-      {themeSettings?.enableAurora !== false && <AuroraBeam />}
+      {/* Custom Lottie hero animation — or default particles/aurora */}
+      {themeSettings?.animations?.heroAnimation ? (
+        <LottiePlayer
+          animationData={themeSettings.animations.heroAnimation}
+          className="absolute inset-0 z-0 opacity-30"
+        />
+      ) : (
+        <>
+          {themeSettings?.enableParticles !== false && <ParticleGrid />}
+          {themeSettings?.enableAurora !== false && <AuroraBeam />}
+        </>
+      )}
 
       {/* Gradient Blobs — CSS animated, GPU composited */}
       <style jsx>{`

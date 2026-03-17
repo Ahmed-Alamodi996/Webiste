@@ -70,6 +70,13 @@ export interface CMSThemeSettings {
   enableCustomCursor?: boolean
   enableGradientMesh?: boolean
   sectionAccents?: { color: string }[]
+  preset?: 'default' | 'neon' | 'corporate' | 'minimal' | 'sunset' | 'ocean' | 'royal' | 'custom'
+  customCSS?: string
+  animations?: {
+    preloaderAnimation?: string
+    heroAnimation?: string
+    contactSuccessAnimation?: string
+  }
 }
 
 export interface CMSSiteContent {

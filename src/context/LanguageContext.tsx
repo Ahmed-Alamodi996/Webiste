@@ -149,6 +149,13 @@ function buildTranslations(
       sectionAccents: cms.theme?.sectionAccents?.length
         ? cms.theme.sectionAccents.map((s) => ({ color: s.color }))
         : fallback.theme?.sectionAccents ?? [],
+      preset: cms.theme?.preset ?? fallback.theme?.preset ?? "default",
+      customCSS: cms.theme?.customCSS ?? fallback.theme?.customCSS,
+      animations: {
+        preloaderAnimation: cms.theme?.animations?.preloaderAnimation ?? undefined,
+        heroAnimation: cms.theme?.animations?.heroAnimation ?? undefined,
+        contactSuccessAnimation: cms.theme?.animations?.contactSuccessAnimation ?? undefined,
+      },
     },
     branding: {
       siteName: cms.branding?.siteName ?? fallback.branding?.siteName ?? "InST",

@@ -2,8 +2,12 @@
 
 import { useEffect, useState, useRef } from "react";
 import { motion, AnimatePresence, useSpring, useTransform } from "framer-motion";
+import { useLanguage } from "@/context/LanguageContext";
+import LottiePlayer from "@/components/ui/LottiePlayer";
 
 export default function Preloader({ onComplete }: { onComplete: () => void }) {
+  const { t } = useLanguage();
+  const lottieData = t.theme?.animations?.preloaderAnimation;
   const [progress, setProgress] = useState(0);
   const [phase, setPhase] = useState<"loading" | "reveal" | "done">("loading");
   const completedRef = useRef(false);
@@ -81,55 +85,60 @@ export default function Preloader({ onComplete }: { onComplete: () => void }) {
             transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
             className="relative mb-12"
           >
-            <div className="flex items-center gap-3">
-              <motion.div
-                initial={{ width: 0, opacity: 0 }}
-                animate={{ width: 56, opacity: 1 }}
-                transition={{ duration: 0.6, delay: 0.2, ease: [0.19, 1, 0.22, 1] }}
-                className="h-14 rounded-xl bg-gradient-accent flex items-center justify-center overflow-hidden"
-              >
-                {/* SVG stroke-draw "In" */}
-                <svg
-                  width="32"
-                  height="28"
-                  viewBox="0 0 32 28"
-                  fill="none"
-                  className="relative z-10"
+            {lottieData ? (
+              <LottiePlayer
+                animationData={lottieData}
+                loop={false}
+                className="w-24 h-24"
+              />
+            ) : (
+              <div className="flex items-center gap-3">
+                <motion.div
+                  initial={{ width: 0, opacity: 0 }}
+                  animate={{ width: 56, opacity: 1 }}
+                  transition={{ duration: 0.6, delay: 0.2, ease: [0.19, 1, 0.22, 1] }}
+                  className="h-14 rounded-xl bg-gradient-accent flex items-center justify-center overflow-hidden"
                 >
-                  {/* "I" stroke */}
-                  <motion.path
-                    d="M5 4 L5 24"
-                    stroke="white"
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 0.6, delay: 0.3, ease: [0.19, 1, 0.22, 1] }}
-                  />
-                  {/* "n" stroke */}
-                  <motion.path
-                    d="M13 24 L13 12 C13 7 18 5 22 5 C26 5 28 7 28 12 L28 24"
-                    stroke="white"
-                    strokeWidth="3.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
+                  <svg
+                    width="32"
+                    height="28"
+                    viewBox="0 0 32 28"
                     fill="none"
-                    initial={{ pathLength: 0 }}
-                    animate={{ pathLength: 1 }}
-                    transition={{ duration: 0.8, delay: 0.6, ease: [0.19, 1, 0.22, 1] }}
-                  />
-                </svg>
-              </motion.div>
-              <motion.span
-                initial={{ opacity: 0, x: -10 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.5, delay: 0.8 }}
-                className="text-2xl font-semibold tracking-tight"
-                style={{ color: "var(--text-primary)" }}
-              >
-                ST
-              </motion.span>
-            </div>
+                    className="relative z-10"
+                  >
+                    <motion.path
+                      d="M5 4 L5 24"
+                      stroke="white"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.6, delay: 0.3, ease: [0.19, 1, 0.22, 1] }}
+                    />
+                    <motion.path
+                      d="M13 24 L13 12 C13 7 18 5 22 5 C26 5 28 7 28 12 L28 24"
+                      stroke="white"
+                      strokeWidth="3.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      fill="none"
+                      initial={{ pathLength: 0 }}
+                      animate={{ pathLength: 1 }}
+                      transition={{ duration: 0.8, delay: 0.6, ease: [0.19, 1, 0.22, 1] }}
+                    />
+                  </svg>
+                </motion.div>
+                <motion.span
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.5, delay: 0.8 }}
+                  className="text-2xl font-semibold tracking-tight"
+                  style={{ color: "var(--text-primary)" }}
+                >
+                  ST
+                </motion.span>
+              </div>
+            )}
           </motion.div>
 
           {/* Progress bar */}

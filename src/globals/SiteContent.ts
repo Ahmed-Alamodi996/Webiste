@@ -114,6 +114,62 @@ export const SiteContent: GlobalConfig = {
             { name: 'color', type: 'text', required: true, admin: { description: 'Hex color e.g. #00C896' } },
           ],
         },
+
+        // ─── Preset Themes ─────────────────────────────
+        {
+          name: 'preset',
+          type: 'select',
+          defaultValue: 'default',
+          admin: {
+            description: 'Quick-apply a preset theme. Individual settings above will override the preset.',
+          },
+          options: [
+            { label: 'Default (Green/Blue)', value: 'default' },
+            { label: 'Neon (Cyan/Pink)', value: 'neon' },
+            { label: 'Corporate (Blue/Slate)', value: 'corporate' },
+            { label: 'Minimal (Gray/Black)', value: 'minimal' },
+            { label: 'Sunset (Orange/Purple)', value: 'sunset' },
+            { label: 'Ocean (Teal/Navy)', value: 'ocean' },
+            { label: 'Royal (Gold/Deep Purple)', value: 'royal' },
+            { label: 'Custom (use settings above)', value: 'custom' },
+          ],
+        },
+
+        // ─── Custom CSS ────────────────────────────────
+        {
+          name: 'customCSS',
+          type: 'textarea',
+          admin: {
+            description: 'Paste custom CSS here to override any site styles. Applied after all other styles. Example: .text-gradient { background: linear-gradient(90deg, red, blue); }',
+          },
+        },
+
+        // ─── Lottie Animations ─────────────────────────
+        {
+          name: 'animations',
+          type: 'group',
+          label: 'Custom Animations',
+          admin: {
+            description: 'Upload Lottie JSON animations to replace default effects',
+          },
+          fields: [
+            {
+              name: 'preloaderAnimation',
+              type: 'textarea',
+              admin: { description: 'Paste Lottie JSON for the preloader/loading animation. Leave empty to use default.' },
+            },
+            {
+              name: 'heroAnimation',
+              type: 'textarea',
+              admin: { description: 'Paste Lottie JSON for the hero background effect. Leave empty to use default particles.' },
+            },
+            {
+              name: 'contactSuccessAnimation',
+              type: 'textarea',
+              admin: { description: 'Paste Lottie JSON for the contact form success state. Leave empty to use default checkmark.' },
+            },
+          ],
+        },
       ],
     },
 
