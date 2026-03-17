@@ -42,10 +42,15 @@ function getInitialSlide(): number {
   return HASH_TO_SLIDE[hash] ?? 0;
 }
 
-export function SlideProvider({ children }: { children: ReactNode }) {
+interface SlideProviderProps {
+  children: ReactNode;
+  defaultViewMode?: ViewMode;
+}
+
+export function SlideProvider({ children, defaultViewMode = "slides" }: SlideProviderProps) {
   const [currentSlide, setCurrentSlide] = useState(getInitialSlide);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [viewMode, setViewMode] = useState<ViewMode>("slides");
+  const [viewMode, setViewMode] = useState<ViewMode>(defaultViewMode);
   const cooldownRef = useRef(false);
 
   // Clear hash after initial read so it doesn't interfere with browser behavior

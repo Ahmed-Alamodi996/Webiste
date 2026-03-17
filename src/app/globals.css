@@ -58,6 +58,7 @@
 
   --cursor-size: 16px;
   --cursor-size-hover: 48px;
+  --animation-speed: 1;
 }
 
 /* ========================================
@@ -213,7 +214,11 @@
     background-color: var(--bg-secondary);
   }
 
-  /* Noise Texture Overlay */
+  /* Noise Texture Overlay (disabled via .no-noise on html) */
+  .no-noise .noise-overlay::before {
+    display: none;
+  }
+
   .noise-overlay::before {
     content: "";
     position: fixed;

@@ -10,7 +10,7 @@ interface SlideContainerProps {
   slides: ReactNode[];
 }
 
-const SECTION_ACCENTS = [
+const DEFAULT_ACCENTS = [
   "#00C896", // Hero
   "#00C896", // What We Offer
   "#2563EB", // Featured Projects
@@ -164,7 +164,9 @@ export default function SlideContainer({ slides }: SlideContainerProps) {
     };
   }, [nextSlide, prevSlide, viewMode]);
 
-  const accentColor = SECTION_ACCENTS[currentSlide] || "#00C896";
+  const cmsAccents = t.theme?.sectionAccents?.map((s) => s.color);
+  const accents = cmsAccents?.length ? cmsAccents : DEFAULT_ACCENTS;
+  const accentColor = accents[currentSlide] || "#00C896";
   const slideName = t.slides.names[currentSlide] || "";
 
   // ─── Scroll mode ─────────────────────────────────────

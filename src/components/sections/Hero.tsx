@@ -16,17 +16,18 @@ export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
   const { goToSlide } = useSlide();
   const { t, isRTL } = useLanguage();
+  const themeSettings = t.theme;
 
   return (
     <section
       ref={containerRef}
       className="relative min-h-screen min-h-[100dvh] flex items-center justify-center overflow-hidden"
     >
-      {/* Interactive Particle Grid */}
-      <ParticleGrid />
+      {/* Interactive Particle Grid — CMS toggle */}
+      {themeSettings?.enableParticles !== false && <ParticleGrid />}
 
-      {/* Aurora Beams */}
-      <AuroraBeam />
+      {/* Aurora Beams — CMS toggle */}
+      {themeSettings?.enableAurora !== false && <AuroraBeam />}
 
       {/* Gradient Blobs — CSS animated, GPU composited */}
       <style jsx>{`

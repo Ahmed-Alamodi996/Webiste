@@ -56,7 +56,24 @@ export interface CMSTechnology {
   order: number
 }
 
+export interface CMSThemeSettings {
+  brandPrimary?: string
+  brandSecondary?: string
+  gradientAngle?: number
+  defaultTheme?: 'dark' | 'light'
+  defaultViewMode?: 'slides' | 'scroll'
+  animationSpeed?: 'fast' | 'normal' | 'slow'
+  enableParticles?: boolean
+  enableAurora?: boolean
+  enableFloatingOrbs?: boolean
+  enableNoiseTexture?: boolean
+  enableCustomCursor?: boolean
+  enableGradientMesh?: boolean
+  sectionAccents?: { color: string }[]
+}
+
 export interface CMSSiteContent {
+  theme?: CMSThemeSettings
   nav: {
     services: string
     projects: string

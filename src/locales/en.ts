@@ -1,4 +1,29 @@
 const en = {
+  // Theme & Design defaults
+  theme: {
+    brandPrimary: "#00C896",
+    brandSecondary: "#2563EB",
+    gradientAngle: 135,
+    defaultTheme: "dark" as const,
+    defaultViewMode: "slides" as const,
+    animationSpeed: "normal" as const,
+    enableParticles: true,
+    enableAurora: true,
+    enableFloatingOrbs: true,
+    enableNoiseTexture: true,
+    enableCustomCursor: true,
+    enableGradientMesh: true,
+    sectionAccents: [
+      { color: "#00C896" }, // Hero
+      { color: "#00C896" }, // Offer
+      { color: "#2563EB" }, // Projects
+      { color: "#7C3AED" }, // About
+      { color: "#F59E0B" }, // Services
+      { color: "#EC4899" }, // Technology
+      { color: "#00C896" }, // Contact
+    ],
+  },
+
   // Navbar
   nav: {
     services: "Services",
@@ -250,6 +275,7 @@ export type Translations = {
   projects: { label: string; heading: string; headingAccent: string; description: string; viewCaseStudy: string; items: { title: string; category: string; description: string; statLabel: string }[] };
   technology: { label: string; heading: string; headingAccent: string; description: string };
   contact: { label: string; heading: string; headingAccent: string; description: string; features: string[]; form: { name: string; namePlaceholder: string; email: string; emailPlaceholder: string; message: string; messagePlaceholder: string; send: string; successTitle: string; successMessage: string } };
+  theme?: { brandPrimary?: string; brandSecondary?: string; gradientAngle?: number; defaultTheme?: 'dark' | 'light'; defaultViewMode?: 'slides' | 'scroll'; animationSpeed?: 'fast' | 'normal' | 'slow'; enableParticles?: boolean; enableAurora?: boolean; enableFloatingOrbs?: boolean; enableNoiseTexture?: boolean; enableCustomCursor?: boolean; enableGradientMesh?: boolean; sectionAccents?: { color: string }[] };
   branding?: { siteName?: string; siteFullName?: string; siteDescription?: string; logoText?: string; contactEmail?: string };
   social?: { linkedinUrl?: string; twitterUrl?: string; githubUrl?: string; instagramUrl?: string; youtubeUrl?: string };
   footer: { copyright: string; company: { about: string; services: string; projects: string }; connect: { linkedin: string; twitter: string; github: string } };

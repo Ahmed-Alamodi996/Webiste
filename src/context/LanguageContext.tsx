@@ -133,6 +133,37 @@ function buildTranslations(
         successMessage: cms.contact?.form?.successMessage ?? fallback.contact.form.successMessage,
       },
     },
+    theme: {
+      brandPrimary: cms.theme?.brandPrimary ?? fallback.theme?.brandPrimary ?? "#00C896",
+      brandSecondary: cms.theme?.brandSecondary ?? fallback.theme?.brandSecondary ?? "#2563EB",
+      gradientAngle: cms.theme?.gradientAngle ?? fallback.theme?.gradientAngle ?? 135,
+      defaultTheme: (cms.theme?.defaultTheme ?? fallback.theme?.defaultTheme ?? "dark") as "dark" | "light",
+      defaultViewMode: (cms.theme?.defaultViewMode ?? fallback.theme?.defaultViewMode ?? "slides") as "slides" | "scroll",
+      animationSpeed: (cms.theme?.animationSpeed ?? fallback.theme?.animationSpeed ?? "normal") as "fast" | "normal" | "slow",
+      enableParticles: cms.theme?.enableParticles ?? fallback.theme?.enableParticles ?? true,
+      enableAurora: cms.theme?.enableAurora ?? fallback.theme?.enableAurora ?? true,
+      enableFloatingOrbs: cms.theme?.enableFloatingOrbs ?? fallback.theme?.enableFloatingOrbs ?? true,
+      enableNoiseTexture: cms.theme?.enableNoiseTexture ?? fallback.theme?.enableNoiseTexture ?? true,
+      enableCustomCursor: cms.theme?.enableCustomCursor ?? fallback.theme?.enableCustomCursor ?? true,
+      enableGradientMesh: cms.theme?.enableGradientMesh ?? fallback.theme?.enableGradientMesh ?? true,
+      sectionAccents: cms.theme?.sectionAccents?.length
+        ? cms.theme.sectionAccents.map((s) => ({ color: s.color }))
+        : fallback.theme?.sectionAccents ?? [],
+    },
+    branding: {
+      siteName: cms.branding?.siteName ?? fallback.branding?.siteName ?? "InST",
+      siteFullName: cms.branding?.siteFullName ?? fallback.branding?.siteFullName ?? "Innovative Solutions Tech",
+      siteDescription: cms.branding?.siteDescription ?? fallback.branding?.siteDescription,
+      logoText: cms.branding?.logoText ?? fallback.branding?.logoText ?? "In",
+      contactEmail: cms.branding?.contactEmail ?? fallback.branding?.contactEmail,
+    },
+    social: {
+      linkedinUrl: cms.social?.linkedinUrl ?? fallback.social?.linkedinUrl,
+      twitterUrl: cms.social?.twitterUrl ?? fallback.social?.twitterUrl,
+      githubUrl: cms.social?.githubUrl ?? fallback.social?.githubUrl,
+      instagramUrl: cms.social?.instagramUrl ?? fallback.social?.instagramUrl,
+      youtubeUrl: cms.social?.youtubeUrl ?? fallback.social?.youtubeUrl,
+    },
     footer: {
       copyright: cms.footer?.copyright ?? fallback.footer.copyright,
       company: {

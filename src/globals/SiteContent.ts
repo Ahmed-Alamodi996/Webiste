@@ -7,6 +7,116 @@ export const SiteContent: GlobalConfig = {
     group: 'Content',
   },
   fields: [
+    // ─── Theme & Design ───────────────────────────────
+    {
+      name: 'theme',
+      type: 'group',
+      label: 'Theme & Design',
+      admin: {
+        description: 'Control colors, animations, and visual effects across the entire site',
+      },
+      fields: [
+        // Colors
+        {
+          name: 'brandPrimary',
+          type: 'text',
+          defaultValue: '#00C896',
+          admin: { description: 'Primary brand color (hex). Used for accents, buttons, glows. Default: #00C896' },
+        },
+        {
+          name: 'brandSecondary',
+          type: 'text',
+          defaultValue: '#2563EB',
+          admin: { description: 'Secondary brand color (hex). Used in gradients. Default: #2563EB' },
+        },
+        {
+          name: 'gradientAngle',
+          type: 'number',
+          defaultValue: 135,
+          admin: { description: 'Gradient angle in degrees. Default: 135' },
+        },
+        // Theme defaults
+        {
+          name: 'defaultTheme',
+          type: 'select',
+          defaultValue: 'dark',
+          options: [
+            { label: 'Dark', value: 'dark' },
+            { label: 'Light', value: 'light' },
+          ],
+          admin: { description: 'Default color theme for new visitors' },
+        },
+        {
+          name: 'defaultViewMode',
+          type: 'select',
+          defaultValue: 'slides',
+          options: [
+            { label: 'Slides (presentation)', value: 'slides' },
+            { label: 'Scroll (traditional)', value: 'scroll' },
+          ],
+          admin: { description: 'Default navigation mode' },
+        },
+        // Animation & transitions
+        {
+          name: 'animationSpeed',
+          type: 'select',
+          defaultValue: 'normal',
+          options: [
+            { label: 'Fast', value: 'fast' },
+            { label: 'Normal', value: 'normal' },
+            { label: 'Slow (cinematic)', value: 'slow' },
+          ],
+          admin: { description: 'Global animation speed for transitions' },
+        },
+        // Visual effects toggles
+        {
+          name: 'enableParticles',
+          type: 'checkbox',
+          defaultValue: true,
+          admin: { description: 'Show particle grid on hero section' },
+        },
+        {
+          name: 'enableAurora',
+          type: 'checkbox',
+          defaultValue: true,
+          admin: { description: 'Show aurora beam effects on hero' },
+        },
+        {
+          name: 'enableFloatingOrbs',
+          type: 'checkbox',
+          defaultValue: true,
+          admin: { description: 'Show animated background orbs' },
+        },
+        {
+          name: 'enableNoiseTexture',
+          type: 'checkbox',
+          defaultValue: true,
+          admin: { description: 'Show subtle noise texture overlay' },
+        },
+        {
+          name: 'enableCustomCursor',
+          type: 'checkbox',
+          defaultValue: true,
+          admin: { description: 'Show custom cursor with glow trail (desktop only)' },
+        },
+        {
+          name: 'enableGradientMesh',
+          type: 'checkbox',
+          defaultValue: true,
+          admin: { description: 'Show animated gradient mesh backgrounds on sections' },
+        },
+        // Section accent colors
+        {
+          name: 'sectionAccents',
+          type: 'array',
+          admin: { description: 'Accent color for each section (Hero, Offer, Projects, About, Services, Tech, Contact)' },
+          fields: [
+            { name: 'color', type: 'text', required: true, admin: { description: 'Hex color e.g. #00C896' } },
+          ],
+        },
+      ],
+    },
+
     // ─── Nav ────────────────────────────────────────────
     {
       name: 'nav',
