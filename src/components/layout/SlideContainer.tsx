@@ -115,15 +115,42 @@ export default function SlideContainer({ slides }: SlideContainerProps) {
       const elapsed = Date.now() - touchStartTime;
       const velocity = Math.abs(deltaY) / elapsed;
       const isValidSwipe = Math.abs(deltaY) > 50 || (Math.abs(deltaY) > 25 && velocity > 0.3);
-      if (isValidSwipe) {
-        if (deltaY > 0) nextSlide();
-        else prevSlide();
+
+      if (!isValidSwipe) return;
+
+      // Check if slide content is scrollable and not at edge
+      const target = e.target as HTMLElement;
+      const scrollable = target.closest("[data-scrollable]") as HTMLElement | null;
+      if (scrollable && scrollable.scrollHeight > scrollable.clientHeight) {
+        const atTop = scrollable.scrollTop <= 5;
+        const atBottom = scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight - 5;
+        // Only change slide if at scroll boundary
+        if (deltaY > 0 && !atBottom) return;
+        if (deltaY < 0 && !atTop) return;
       }
+
+      if (deltaY > 0) nextSlide();
+      else prevSlide();
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       const target = e.target as HTMLElement;
-      if (target.closest("input, textarea, select, [data-scrollable]")) return;
+      // Allow native scrolling within scrollable slide content
+      const scrollable = target.closest("[data-scrollable]") as HTMLElement | null;
+      if (target.closest("input, textarea, select")) return;
+      if (scrollable && scrollable.scrollHeight > scrollable.clientHeight) {
+        // Allow scroll if content overflows — don't prevent default
+        const atTop = scrollable.scrollTop <= 0;
+        const atBottom = scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight - 1;
+        const deltaY = touchStartY - e.touches[0].clientY;
+        // Only prevent default if at the edges (to trigger slide change)
+        if ((atTop && deltaY < 0) || (atBottom && deltaY > 0)) {
+          // At edge, let the touchEnd handler deal with slide navigation
+          return;
+        }
+        // Mid-scroll, allow native scrolling
+        return;
+      }
       e.preventDefault();
     };
 
@@ -214,8 +241,9 @@ export default function SlideContainer({ slides }: SlideContainerProps) {
             duration: 0.5,
             ease: [0.25, 0.46, 0.45, 0.94],
           }}
-          className="absolute inset-0 overflow-y-auto overflow-x-hidden"
-          style={{ willChange: "transform, opacity" }}
+          className="absolute inset-0 overflow-y-auto overflow-x-hidden overscroll-contain"
+          style={{ willChange: "transform, opacity", WebkitOverflowScrolling: "touch" }}
+          data-scrollable
         >
           {slides[currentSlide]}
         </motion.div>

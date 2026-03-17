@@ -40,7 +40,8 @@ function OfferCard({
         intensity={8}
         glare
       >
-        <div className="group relative h-full p-6 rounded-3xl glass transition-all duration-500 overflow-hidden hover:-translate-y-2 hover:shadow-2xl"
+        <div className="group relative h-full rounded-2xl sm:rounded-3xl glass transition-all duration-500 overflow-hidden hover:-translate-y-2 hover:shadow-2xl"
+          style={{ padding: "clamp(0.75rem, 2vw, 1.5rem)" }}
           style={{
             transition: "transform 0.5s cubic-bezier(0.19, 1, 0.22, 1), box-shadow 0.5s cubic-bezier(0.19, 1, 0.22, 1), background 0.4s ease, border-color 0.4s ease",
           }}
@@ -68,7 +69,8 @@ function OfferCard({
           <div className="relative z-10">
             {/* Icon with glow */}
             <div
-              className="w-12 h-12 rounded-2xl flex items-center justify-center mb-4 transition-all duration-500 group-hover:scale-110"
+              className="rounded-xl sm:rounded-2xl flex items-center justify-center transition-all duration-500 group-hover:scale-110"
+              style={{ width: "clamp(2rem, 4vw, 3rem)", height: "clamp(2rem, 4vw, 3rem)", marginBottom: "clamp(0.5rem, 1.5vw, 1rem)" }}
               style={{
                 backgroundColor: accent + "12",
                 boxShadow: `0 0 0px ${accent}00`,
@@ -76,7 +78,7 @@ function OfferCard({
               }}
             >
               <Icon
-                size={22}
+                size={20}
                 style={{
                   color: accent,
                   transition: "filter 0.5s ease",
@@ -87,12 +89,12 @@ function OfferCard({
             </div>
 
             <h3
-              className="text-base font-semibold mb-2 group-hover:text-brand-green-light transition-colors duration-300"
-              style={{ color: "var(--text-primary)" }}
+              className="font-semibold group-hover:text-brand-green-light transition-colors duration-300"
+              style={{ color: "var(--text-primary)", fontSize: "clamp(0.75rem, 1.8vw, 1rem)", marginBottom: "clamp(0.25rem, 0.8vw, 0.5rem)" }}
             >
               {title}
             </h3>
-            <p className="text-sm leading-relaxed" style={{ color: "var(--text-secondary)" }}>
+            <p className="leading-relaxed" style={{ color: "var(--text-secondary)", fontSize: "clamp(0.65rem, 1.5vw, 0.875rem)" }}>
               {description}
             </p>
           </div>
@@ -124,7 +126,7 @@ interface WhatWeOfferProps {
   className?: string;
 }
 
-export default function WhatWeOffer({ offerings, className = "min-h-screen min-h-[100dvh]" }: WhatWeOfferProps) {
+export default function WhatWeOffer({ offerings, className = "min-h-[100dvh]" }: WhatWeOfferProps) {
   const { t, isRTL } = useLanguage();
 
   const useCMS = offerings && offerings.length > 0;
@@ -140,7 +142,8 @@ export default function WhatWeOffer({ offerings, className = "min-h-screen min-h
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: [0.19, 1, 0.22, 1] }}
-          className={`max-w-2xl mb-6 md:mb-12 ${isRTL ? "text-right ml-auto" : ""}`}
+          className={`max-w-2xl ${isRTL ? "text-right ml-auto" : ""}`}
+          style={{ marginBottom: "clamp(1rem, 3vw, 3rem)" }}
         >
           <span className="text-small font-mono text-brand-green uppercase tracking-widest mb-4 block">
             &mdash; {t.offer.label}
@@ -159,7 +162,7 @@ export default function WhatWeOffer({ offerings, className = "min-h-screen min-h
           variants={staggerContainer}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4"
+          className="grid grid-cols-2 lg:grid-cols-3 gap-[clamp(0.5rem,1.5vw,1rem)]"
         >
           {useCMS
             ? offerings.map((offering, i) => (

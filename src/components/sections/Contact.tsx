@@ -68,7 +68,7 @@ export default function Contact() {
   ];
 
   return (
-    <section id="contact" className="relative min-h-screen min-h-[100dvh] flex flex-col justify-center overflow-x-hidden py-12 sm:py-0">
+    <section id="contact" className="relative min-h-[100dvh] flex flex-col justify-center overflow-x-hidden" style={{ padding: "clamp(1.5rem, 4vw, 0) 0" }}>
       <GradientMesh className="opacity-40" />
 
       {/* Accent glow */}
