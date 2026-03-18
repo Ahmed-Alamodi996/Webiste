@@ -9,7 +9,6 @@ import {
   type ReactNode,
 } from "react";
 import { locales, isRTL as checkRTL, type Locale, type Translations } from "@/locales";
-import type { CMSSiteContent } from "@/lib/cms-types";
 
 interface LanguageContextType {
   locale: Locale;
@@ -27,119 +26,32 @@ export function useLanguage() {
   return ctx;
 }
 
+/** Helper: pick EN or AR value from a bilingual CMS field */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function pick(obj: any, field: string, locale: Locale): string | undefined {
+  if (!obj) return undefined;
+  return obj[`${field}_${locale}`] ?? obj[`${field}_en`];
+}
+
 /**
- * Build a Translations object from CMS SiteContent data.
- * Falls back to static locale data for any missing fields.
+ * Build Translations from the new bilingual CMS format.
+ * CMS fields use _en/_ar suffixes instead of Payload's localization.
+ * Falls back to static locale data.
  */
-function buildTranslations(
-  cms: CMSSiteContent | undefined,
-  fallback: Translations
-): Translations {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+function buildTranslations(cms: any, locale: Locale, fallback: Translations): Translations {
   if (!cms) return fallback;
 
+  const l = locale;
+
   return {
-    nav: {
-      services: cms.nav?.services ?? fallback.nav.services,
-      projects: cms.nav?.projects ?? fallback.nav.projects,
-      about: cms.nav?.about ?? fallback.nav.about,
-      technology: cms.nav?.technology ?? fallback.nav.technology,
-      contact: cms.nav?.contact ?? fallback.nav.contact,
-      getInTouch: cms.nav?.getInTouch ?? fallback.nav.getInTouch,
-    },
-    hero: {
-      tagline: cms.hero?.tagline ?? fallback.hero.tagline,
-      headlineLine1: cms.hero?.headlineLine1?.length
-        ? cms.hero.headlineLine1.map((w) => w.word)
-        : fallback.hero.headlineLine1,
-      headlineLine2: cms.hero?.headlineLine2?.length
-        ? cms.hero.headlineLine2.map((w) => w.word)
-        : fallback.hero.headlineLine2,
-      description: cms.hero?.description ?? fallback.hero.description,
-      exploreSolutions: cms.hero?.exploreSolutions ?? fallback.hero.exploreSolutions,
-      getInTouch: cms.hero?.getInTouch ?? fallback.hero.getInTouch,
-      trustedBy: cms.hero?.trustedBy ?? fallback.hero.trustedBy,
-      statsProjects: cms.hero?.statsProjects ?? fallback.hero.statsProjects,
-      statsUptime: cms.hero?.statsUptime ?? fallback.hero.statsUptime,
-      statsSupport: cms.hero?.statsSupport ?? fallback.hero.statsSupport,
-      next: cms.hero?.next ?? fallback.hero.next,
-    },
-    about: {
-      label: cms.about?.label ?? fallback.about.label,
-      headingLine1: cms.about?.headingLine1 ?? fallback.about.headingLine1,
-      headingWord1: cms.about?.headingWord1 ?? fallback.about.headingWord1,
-      headingLine2: cms.about?.headingLine2 ?? fallback.about.headingLine2,
-      headingWord2: cms.about?.headingWord2 ?? fallback.about.headingWord2,
-      paragraph1: cms.about?.paragraph1 ?? fallback.about.paragraph1,
-      paragraph2: cms.about?.paragraph2 ?? fallback.about.paragraph2,
-      stats: cms.about?.stats?.length
-        ? cms.about.stats.map((s) => ({
-            target: s.target,
-            suffix: s.suffix,
-            label: s.label,
-          }))
-        : fallback.about.stats,
-    },
-    offer: {
-      label: cms.offer?.label ?? fallback.offer.label,
-      heading: cms.offer?.heading ?? fallback.offer.heading,
-      headingAccent: cms.offer?.headingAccent ?? fallback.offer.headingAccent,
-      description: cms.offer?.description ?? fallback.offer.description,
-      // Items come from the Offerings collection, not from SiteContent.
-      // We preserve the static items here as fallback — HomeClient passes
-      // offerings as a separate prop to WhatWeOffer.
-      items: fallback.offer.items,
-    },
-    services: {
-      label: cms.services?.label ?? fallback.services.label,
-      heading: cms.services?.heading ?? fallback.services.heading,
-      headingAccent: cms.services?.headingAccent ?? fallback.services.headingAccent,
-      description: cms.services?.description ?? fallback.services.description,
-      learnMore: cms.services?.learnMore ?? fallback.services.learnMore,
-      // Items come from Services collection
-      items: fallback.services.items,
-    },
-    projects: {
-      label: cms.projects?.label ?? fallback.projects.label,
-      heading: cms.projects?.heading ?? fallback.projects.heading,
-      headingAccent: cms.projects?.headingAccent ?? fallback.projects.headingAccent,
-      description: cms.projects?.description ?? fallback.projects.description,
-      viewCaseStudy: cms.projects?.viewCaseStudy ?? fallback.projects.viewCaseStudy,
-      // Items come from Projects collection
-      items: fallback.projects.items,
-    },
-    technology: {
-      label: cms.technology?.label ?? fallback.technology.label,
-      heading: cms.technology?.heading ?? fallback.technology.heading,
-      headingAccent: cms.technology?.headingAccent ?? fallback.technology.headingAccent,
-      description: cms.technology?.description ?? fallback.technology.description,
-    },
-    contact: {
-      label: cms.contact?.label ?? fallback.contact.label,
-      heading: cms.contact?.heading ?? fallback.contact.heading,
-      headingAccent: cms.contact?.headingAccent ?? fallback.contact.headingAccent,
-      description: cms.contact?.description ?? fallback.contact.description,
-      features: cms.contact?.features?.length
-        ? cms.contact.features.map((f) => f.text)
-        : fallback.contact.features,
-      form: {
-        name: cms.contact?.form?.name ?? fallback.contact.form.name,
-        namePlaceholder: cms.contact?.form?.namePlaceholder ?? fallback.contact.form.namePlaceholder,
-        email: cms.contact?.form?.email ?? fallback.contact.form.email,
-        emailPlaceholder: cms.contact?.form?.emailPlaceholder ?? fallback.contact.form.emailPlaceholder,
-        message: cms.contact?.form?.message ?? fallback.contact.form.message,
-        messagePlaceholder: cms.contact?.form?.messagePlaceholder ?? fallback.contact.form.messagePlaceholder,
-        send: cms.contact?.form?.send ?? fallback.contact.form.send,
-        successTitle: cms.contact?.form?.successTitle ?? fallback.contact.form.successTitle,
-        successMessage: cms.contact?.form?.successMessage ?? fallback.contact.form.successMessage,
-      },
-    },
     theme: {
       brandPrimary: cms.theme?.brandPrimary ?? fallback.theme?.brandPrimary ?? "#00C896",
       brandSecondary: cms.theme?.brandSecondary ?? fallback.theme?.brandSecondary ?? "#2563EB",
       gradientAngle: cms.theme?.gradientAngle ?? fallback.theme?.gradientAngle ?? 135,
-      defaultTheme: (cms.theme?.defaultTheme ?? fallback.theme?.defaultTheme ?? "dark") as "dark" | "light",
-      defaultViewMode: (cms.theme?.defaultViewMode ?? fallback.theme?.defaultViewMode ?? "slides") as "slides" | "scroll",
-      animationSpeed: (cms.theme?.animationSpeed ?? fallback.theme?.animationSpeed ?? "normal") as "fast" | "normal" | "slow",
+      defaultTheme: cms.theme?.defaultTheme ?? fallback.theme?.defaultTheme ?? "dark",
+      defaultViewMode: cms.theme?.defaultViewMode ?? fallback.theme?.defaultViewMode ?? "slides",
+      animationSpeed: cms.theme?.animationSpeed ?? fallback.theme?.animationSpeed ?? "normal",
       enableParticles: cms.theme?.enableParticles ?? fallback.theme?.enableParticles ?? true,
       enableAurora: cms.theme?.enableAurora ?? fallback.theme?.enableAurora ?? true,
       enableFloatingOrbs: cms.theme?.enableFloatingOrbs ?? fallback.theme?.enableFloatingOrbs ?? true,
@@ -147,7 +59,7 @@ function buildTranslations(
       enableCustomCursor: cms.theme?.enableCustomCursor ?? fallback.theme?.enableCustomCursor ?? true,
       enableGradientMesh: cms.theme?.enableGradientMesh ?? fallback.theme?.enableGradientMesh ?? true,
       sectionAccents: cms.theme?.sectionAccents?.length
-        ? cms.theme.sectionAccents.map((s) => ({ color: s.color }))
+        ? cms.theme.sectionAccents.map((s: { color: string }) => ({ color: s.color }))
         : fallback.theme?.sectionAccents ?? [],
       preset: cms.theme?.preset ?? fallback.theme?.preset ?? "default",
       customCSS: cms.theme?.customCSS ?? fallback.theme?.customCSS,
@@ -157,10 +69,102 @@ function buildTranslations(
         contactSuccessAnimation: cms.theme?.animations?.contactSuccessAnimation ?? undefined,
       },
     },
+    nav: {
+      services: pick(cms.nav, 'services', l) ?? fallback.nav.services,
+      projects: pick(cms.nav, 'projects', l) ?? fallback.nav.projects,
+      about: pick(cms.nav, 'about', l) ?? fallback.nav.about,
+      technology: pick(cms.nav, 'technology', l) ?? fallback.nav.technology,
+      contact: pick(cms.nav, 'contact', l) ?? fallback.nav.contact,
+      getInTouch: pick(cms.nav, 'getInTouch', l) ?? fallback.nav.getInTouch,
+    },
+    hero: {
+      tagline: pick(cms.hero, 'tagline', l) ?? fallback.hero.tagline,
+      headlineLine1: cms.hero?.[`headlineLine1_${l}`]
+        ? cms.hero[`headlineLine1_${l}`].split(' ').filter(Boolean)
+        : fallback.hero.headlineLine1,
+      headlineLine2: cms.hero?.[`headlineLine2_${l}`]
+        ? cms.hero[`headlineLine2_${l}`].split(' ').filter(Boolean)
+        : fallback.hero.headlineLine2,
+      description: pick(cms.hero, 'description', l) ?? fallback.hero.description,
+      exploreSolutions: pick(cms.hero, 'exploreSolutions', l) ?? fallback.hero.exploreSolutions,
+      getInTouch: pick(cms.hero, 'getInTouch', l) ?? fallback.hero.getInTouch,
+      trustedBy: pick(cms.hero, 'trustedBy', l) ?? fallback.hero.trustedBy,
+      statsProjects: pick(cms.hero, 'statsProjects', l) ?? fallback.hero.statsProjects,
+      statsUptime: pick(cms.hero, 'statsUptime', l) ?? fallback.hero.statsUptime,
+      statsSupport: pick(cms.hero, 'statsSupport', l) ?? fallback.hero.statsSupport,
+      next: pick(cms.hero, 'next', l) ?? fallback.hero.next,
+    },
+    about: {
+      label: pick(cms.about, 'label', l) ?? fallback.about.label,
+      headingLine1: pick(cms.about, 'headingLine1', l) ?? fallback.about.headingLine1,
+      headingWord1: pick(cms.about, 'headingWord1', l) ?? fallback.about.headingWord1,
+      headingLine2: pick(cms.about, 'headingLine2', l) ?? fallback.about.headingLine2,
+      headingWord2: pick(cms.about, 'headingWord2', l) ?? fallback.about.headingWord2,
+      paragraph1: pick(cms.about, 'paragraph1', l) ?? fallback.about.paragraph1,
+      paragraph2: pick(cms.about, 'paragraph2', l) ?? fallback.about.paragraph2,
+      stats: cms.about?.stats?.length
+        ? cms.about.stats.map((s: { target: number; suffix: string; label_en?: string; label_ar?: string }) => ({
+            target: s.target,
+            suffix: s.suffix,
+            label: (l === 'ar' ? s.label_ar : s.label_en) ?? s.label_en ?? '',
+          }))
+        : fallback.about.stats,
+    },
+    offer: {
+      label: pick(cms.offer, 'label', l) ?? fallback.offer.label,
+      heading: pick(cms.offer, 'heading', l) ?? fallback.offer.heading,
+      headingAccent: pick(cms.offer, 'headingAccent', l) ?? fallback.offer.headingAccent,
+      description: pick(cms.offer, 'description', l) ?? fallback.offer.description,
+      items: fallback.offer.items,
+    },
+    services: {
+      label: pick(cms.services, 'label', l) ?? fallback.services.label,
+      heading: pick(cms.services, 'heading', l) ?? fallback.services.heading,
+      headingAccent: pick(cms.services, 'headingAccent', l) ?? fallback.services.headingAccent,
+      description: pick(cms.services, 'description', l) ?? fallback.services.description,
+      learnMore: pick(cms.services, 'learnMore', l) ?? fallback.services.learnMore,
+      items: fallback.services.items,
+    },
+    projects: {
+      label: pick(cms.projects, 'label', l) ?? fallback.projects.label,
+      heading: pick(cms.projects, 'heading', l) ?? fallback.projects.heading,
+      headingAccent: pick(cms.projects, 'headingAccent', l) ?? fallback.projects.headingAccent,
+      description: pick(cms.projects, 'description', l) ?? fallback.projects.description,
+      viewCaseStudy: pick(cms.projects, 'viewCaseStudy', l) ?? fallback.projects.viewCaseStudy,
+      items: fallback.projects.items,
+    },
+    technology: {
+      label: pick(cms.technology, 'label', l) ?? fallback.technology.label,
+      heading: pick(cms.technology, 'heading', l) ?? fallback.technology.heading,
+      headingAccent: pick(cms.technology, 'headingAccent', l) ?? fallback.technology.headingAccent,
+      description: pick(cms.technology, 'description', l) ?? fallback.technology.description,
+    },
+    contact: {
+      label: pick(cms.contact, 'label', l) ?? fallback.contact.label,
+      heading: pick(cms.contact, 'heading', l) ?? fallback.contact.heading,
+      headingAccent: pick(cms.contact, 'headingAccent', l) ?? fallback.contact.headingAccent,
+      description: pick(cms.contact, 'description', l) ?? fallback.contact.description,
+      features: cms.contact?.features?.length
+        ? cms.contact.features.map((f: { text_en?: string; text_ar?: string }) =>
+            (l === 'ar' ? f.text_ar : f.text_en) ?? f.text_en ?? ''
+          )
+        : fallback.contact.features,
+      form: {
+        name: pick(cms.contact?.form, 'name', l) ?? fallback.contact.form.name,
+        namePlaceholder: pick(cms.contact?.form, 'namePlaceholder', l) ?? fallback.contact.form.namePlaceholder,
+        email: pick(cms.contact?.form, 'email', l) ?? fallback.contact.form.email,
+        emailPlaceholder: pick(cms.contact?.form, 'emailPlaceholder', l) ?? fallback.contact.form.emailPlaceholder,
+        message: pick(cms.contact?.form, 'message', l) ?? fallback.contact.form.message,
+        messagePlaceholder: pick(cms.contact?.form, 'messagePlaceholder', l) ?? fallback.contact.form.messagePlaceholder,
+        send: pick(cms.contact?.form, 'send', l) ?? fallback.contact.form.send,
+        successTitle: pick(cms.contact?.form, 'successTitle', l) ?? fallback.contact.form.successTitle,
+        successMessage: pick(cms.contact?.form, 'successMessage', l) ?? fallback.contact.form.successMessage,
+      },
+    },
     branding: {
       siteName: cms.branding?.siteName ?? fallback.branding?.siteName ?? "InST",
-      siteFullName: cms.branding?.siteFullName ?? fallback.branding?.siteFullName ?? "Innovative Solutions Tech",
-      siteDescription: cms.branding?.siteDescription ?? fallback.branding?.siteDescription,
+      siteFullName: cms.branding?.siteFullName ?? fallback.branding?.siteFullName,
+      siteDescription: pick(cms.branding, 'siteDescription', l) ?? fallback.branding?.siteDescription,
       logoText: cms.branding?.logoText ?? fallback.branding?.logoText ?? "In",
       contactEmail: cms.branding?.contactEmail ?? fallback.branding?.contactEmail,
     },
@@ -168,25 +172,27 @@ function buildTranslations(
       linkedinUrl: cms.social?.linkedinUrl ?? fallback.social?.linkedinUrl,
       twitterUrl: cms.social?.twitterUrl ?? fallback.social?.twitterUrl,
       githubUrl: cms.social?.githubUrl ?? fallback.social?.githubUrl,
-      instagramUrl: cms.social?.instagramUrl ?? fallback.social?.instagramUrl,
-      youtubeUrl: cms.social?.youtubeUrl ?? fallback.social?.youtubeUrl,
+      instagramUrl: cms.social?.instagramUrl,
+      youtubeUrl: cms.social?.youtubeUrl,
     },
     footer: {
-      copyright: cms.footer?.copyright ?? fallback.footer.copyright,
+      copyright: pick(cms.footer, 'copyright', l) ?? fallback.footer.copyright,
       company: {
-        about: cms.footer?.company?.about ?? fallback.footer.company.about,
-        services: cms.footer?.company?.services ?? fallback.footer.company.services,
-        projects: cms.footer?.company?.projects ?? fallback.footer.company.projects,
+        about: pick(cms.footer?.company, 'about', l) ?? fallback.footer.company.about,
+        services: pick(cms.footer?.company, 'services', l) ?? fallback.footer.company.services,
+        projects: pick(cms.footer?.company, 'projects', l) ?? fallback.footer.company.projects,
       },
       connect: {
-        linkedin: cms.footer?.connect?.linkedin ?? fallback.footer.connect.linkedin,
-        twitter: cms.footer?.connect?.twitter ?? fallback.footer.connect.twitter,
-        github: cms.footer?.connect?.github ?? fallback.footer.connect.github,
+        linkedin: pick(cms.footer?.connect, 'linkedin', l) ?? fallback.footer.connect.linkedin,
+        twitter: pick(cms.footer?.connect, 'twitter', l) ?? fallback.footer.connect.twitter,
+        github: pick(cms.footer?.connect, 'github', l) ?? fallback.footer.connect.github,
       },
     },
     slides: {
       names: cms.slides?.names?.length
-        ? cms.slides.names.map((n) => n.name)
+        ? cms.slides.names.map((n: { name_en?: string; name_ar?: string }) =>
+            (l === 'ar' ? n.name_ar : n.name_en) ?? n.name_en ?? ''
+          )
         : fallback.slides.names,
     },
   };
@@ -194,13 +200,14 @@ function buildTranslations(
 
 interface LanguageProviderProps {
   children: ReactNode;
-  siteContent?: { en: CMSSiteContent; ar: CMSSiteContent } | null;
+  // Now receives a single CMS object (not per-locale, since fields contain both languages)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  siteContent?: any;
 }
 
 export function LanguageProvider({ children, siteContent }: LanguageProviderProps) {
   const [locale, setLocaleState] = useState<Locale>("en");
 
-  // Load saved locale on mount
   useEffect(() => {
     const saved = localStorage.getItem("inst-locale") as Locale | null;
     if (saved && locales[saved]) {
@@ -208,7 +215,6 @@ export function LanguageProvider({ children, siteContent }: LanguageProviderProp
     }
   }, []);
 
-  // Apply dir and lang to <html> when locale changes
   useEffect(() => {
     const html = document.documentElement;
     html.lang = locale;
@@ -223,10 +229,10 @@ export function LanguageProvider({ children, siteContent }: LanguageProviderProp
   const dir = checkRTL(locale) ? "rtl" : "ltr";
   const isRTL = checkRTL(locale);
 
-  // Build translations from CMS data with static fallback
   const fallback = locales[locale];
-  const cmsData = siteContent?.[locale] ?? undefined;
-  const t = buildTranslations(cmsData, fallback);
+  // siteContent can be the old format { en, ar } or the new single object
+  const cmsData = siteContent?.en ? siteContent[locale] : siteContent;
+  const t = buildTranslations(cmsData, locale, fallback);
 
   return (
     <LanguageContext.Provider value={{ locale, t, setLocale, dir, isRTL }}>

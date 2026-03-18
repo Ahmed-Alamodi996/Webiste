@@ -1,4 +1,28 @@
-import type { GlobalConfig } from 'payload'
+import type { GlobalConfig, Field } from 'payload'
+
+// Helper: creates a row with EN and AR text fields side by side
+function bilingualText(name: string, label: string, opts?: { required?: boolean; type?: 'text' | 'textarea' }): Field {
+  const fieldType = opts?.type || 'text'
+  return {
+    type: 'row',
+    fields: [
+      {
+        name: `${name}_en`,
+        label: `${label} (EN)`,
+        type: fieldType,
+        required: opts?.required,
+        admin: { width: '50%' },
+      } as Field,
+      {
+        name: `${name}_ar`,
+        label: `${label} (AR)`,
+        type: fieldType,
+        required: opts?.required,
+        admin: { width: '50%' },
+      } as Field,
+    ],
+  }
+}
 
 export const SiteContent: GlobalConfig = {
   slug: 'site-content',
@@ -12,117 +36,13 @@ export const SiteContent: GlobalConfig = {
       name: 'theme',
       type: 'group',
       label: 'Theme & Design',
-      admin: {
-        description: 'Control colors, animations, and visual effects across the entire site',
-      },
+      admin: { description: 'Control colors, animations, and visual effects across the entire site' },
       fields: [
-        // Colors
-        {
-          name: 'brandPrimary',
-          type: 'text',
-          defaultValue: '#00C896',
-          admin: { description: 'Primary brand color (hex). Used for accents, buttons, glows. Default: #00C896' },
-        },
-        {
-          name: 'brandSecondary',
-          type: 'text',
-          defaultValue: '#2563EB',
-          admin: { description: 'Secondary brand color (hex). Used in gradients. Default: #2563EB' },
-        },
-        {
-          name: 'gradientAngle',
-          type: 'number',
-          defaultValue: 135,
-          admin: { description: 'Gradient angle in degrees. Default: 135' },
-        },
-        // Theme defaults
-        {
-          name: 'defaultTheme',
-          type: 'select',
-          defaultValue: 'dark',
-          options: [
-            { label: 'Dark', value: 'dark' },
-            { label: 'Light', value: 'light' },
-          ],
-          admin: { description: 'Default color theme for new visitors' },
-        },
-        {
-          name: 'defaultViewMode',
-          type: 'select',
-          defaultValue: 'slides',
-          options: [
-            { label: 'Slides (presentation)', value: 'slides' },
-            { label: 'Scroll (traditional)', value: 'scroll' },
-          ],
-          admin: { description: 'Default navigation mode' },
-        },
-        // Animation & transitions
-        {
-          name: 'animationSpeed',
-          type: 'select',
-          defaultValue: 'normal',
-          options: [
-            { label: 'Fast', value: 'fast' },
-            { label: 'Normal', value: 'normal' },
-            { label: 'Slow (cinematic)', value: 'slow' },
-          ],
-          admin: { description: 'Global animation speed for transitions' },
-        },
-        // Visual effects toggles
-        {
-          name: 'enableParticles',
-          type: 'checkbox',
-          defaultValue: true,
-          admin: { description: 'Show particle grid on hero section' },
-        },
-        {
-          name: 'enableAurora',
-          type: 'checkbox',
-          defaultValue: true,
-          admin: { description: 'Show aurora beam effects on hero' },
-        },
-        {
-          name: 'enableFloatingOrbs',
-          type: 'checkbox',
-          defaultValue: true,
-          admin: { description: 'Show animated background orbs' },
-        },
-        {
-          name: 'enableNoiseTexture',
-          type: 'checkbox',
-          defaultValue: true,
-          admin: { description: 'Show subtle noise texture overlay' },
-        },
-        {
-          name: 'enableCustomCursor',
-          type: 'checkbox',
-          defaultValue: true,
-          admin: { description: 'Show custom cursor with glow trail (desktop only)' },
-        },
-        {
-          name: 'enableGradientMesh',
-          type: 'checkbox',
-          defaultValue: true,
-          admin: { description: 'Show animated gradient mesh backgrounds on sections' },
-        },
-        // Section accent colors
-        {
-          name: 'sectionAccents',
-          type: 'array',
-          admin: { description: 'Accent color for each section (Hero, Offer, Projects, About, Services, Tech, Contact)' },
-          fields: [
-            { name: 'color', type: 'text', required: true, admin: { description: 'Hex color e.g. #00C896' } },
-          ],
-        },
-
-        // ─── Preset Themes ─────────────────────────────
         {
           name: 'preset',
           type: 'select',
           defaultValue: 'default',
-          admin: {
-            description: 'Quick-apply a preset theme. Individual settings above will override the preset.',
-          },
+          admin: { description: 'Quick-apply a preset theme' },
           options: [
             { label: 'Default (Green/Blue)', value: 'default' },
             { label: 'Neon (Cyan/Pink)', value: 'neon' },
@@ -131,43 +51,46 @@ export const SiteContent: GlobalConfig = {
             { label: 'Sunset (Orange/Purple)', value: 'sunset' },
             { label: 'Ocean (Teal/Navy)', value: 'ocean' },
             { label: 'Royal (Gold/Deep Purple)', value: 'royal' },
-            { label: 'Custom (use settings above)', value: 'custom' },
+            { label: 'Custom (use settings below)', value: 'custom' },
           ],
         },
-
-        // ─── Custom CSS ────────────────────────────────
         {
-          name: 'customCSS',
-          type: 'textarea',
-          admin: {
-            description: 'Paste custom CSS here to override any site styles. Applied after all other styles. Example: .text-gradient { background: linear-gradient(90deg, red, blue); }',
-          },
+          type: 'row',
+          fields: [
+            { name: 'brandPrimary', type: 'text', defaultValue: '#00C896', admin: { width: '33%', description: 'Primary color (hex)' } },
+            { name: 'brandSecondary', type: 'text', defaultValue: '#2563EB', admin: { width: '33%', description: 'Secondary color (hex)' } },
+            { name: 'gradientAngle', type: 'number', defaultValue: 135, admin: { width: '33%', description: 'Gradient angle (deg)' } },
+          ],
         },
-
-        // ─── Lottie Animations ─────────────────────────
+        {
+          type: 'row',
+          fields: [
+            { name: 'defaultTheme', type: 'select', defaultValue: 'dark', options: [{ label: 'Dark', value: 'dark' }, { label: 'Light', value: 'light' }], admin: { width: '33%', description: 'Default theme' } },
+            { name: 'defaultViewMode', type: 'select', defaultValue: 'slides', options: [{ label: 'Slides', value: 'slides' }, { label: 'Scroll', value: 'scroll' }], admin: { width: '33%', description: 'Default view mode' } },
+            { name: 'animationSpeed', type: 'select', defaultValue: 'normal', options: [{ label: 'Fast', value: 'fast' }, { label: 'Normal', value: 'normal' }, { label: 'Slow', value: 'slow' }], admin: { width: '33%', description: 'Animation speed' } },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            { name: 'enableParticles', type: 'checkbox', defaultValue: true, admin: { width: '16%' } },
+            { name: 'enableAurora', type: 'checkbox', defaultValue: true, admin: { width: '16%' } },
+            { name: 'enableFloatingOrbs', type: 'checkbox', defaultValue: true, admin: { width: '16%' } },
+            { name: 'enableNoiseTexture', type: 'checkbox', defaultValue: true, admin: { width: '16%' } },
+            { name: 'enableCustomCursor', type: 'checkbox', defaultValue: true, admin: { width: '16%' } },
+            { name: 'enableGradientMesh', type: 'checkbox', defaultValue: true, admin: { width: '16%' } },
+          ],
+        },
+        { name: 'sectionAccents', type: 'array', admin: { description: 'Accent color per section' }, fields: [{ name: 'color', type: 'text', required: true }] },
+        { name: 'customCSS', type: 'textarea', admin: { description: 'Custom CSS overrides' } },
         {
           name: 'animations',
           type: 'group',
-          label: 'Custom Animations',
-          admin: {
-            description: 'Upload Lottie JSON animations to replace default effects',
-          },
+          label: 'Lottie Animations',
           fields: [
-            {
-              name: 'preloaderAnimation',
-              type: 'textarea',
-              admin: { description: 'Paste Lottie JSON for the preloader/loading animation. Leave empty to use default.' },
-            },
-            {
-              name: 'heroAnimation',
-              type: 'textarea',
-              admin: { description: 'Paste Lottie JSON for the hero background effect. Leave empty to use default particles.' },
-            },
-            {
-              name: 'contactSuccessAnimation',
-              type: 'textarea',
-              admin: { description: 'Paste Lottie JSON for the contact form success state. Leave empty to use default checkmark.' },
-            },
+            { name: 'preloaderAnimation', type: 'textarea', admin: { description: 'Lottie JSON for preloader' } },
+            { name: 'heroAnimation', type: 'textarea', admin: { description: 'Lottie JSON for hero background' } },
+            { name: 'contactSuccessAnimation', type: 'textarea', admin: { description: 'Lottie JSON for form success' } },
           ],
         },
       ],
@@ -177,13 +100,14 @@ export const SiteContent: GlobalConfig = {
     {
       name: 'nav',
       type: 'group',
+      label: 'Navigation',
       fields: [
-        { name: 'services', type: 'text', required: true, localized: true },
-        { name: 'projects', type: 'text', required: true, localized: true },
-        { name: 'about', type: 'text', required: true, localized: true },
-        { name: 'technology', type: 'text', required: true, localized: true },
-        { name: 'contact', type: 'text', required: true, localized: true },
-        { name: 'getInTouch', type: 'text', required: true, localized: true },
+        bilingualText('services', 'Services', { required: true }),
+        bilingualText('projects', 'Projects', { required: true }),
+        bilingualText('about', 'About', { required: true }),
+        bilingualText('technology', 'Technology', { required: true }),
+        bilingualText('contact', 'Contact', { required: true }),
+        bilingualText('getInTouch', 'Get in Touch', { required: true }),
       ],
     },
 
@@ -191,28 +115,31 @@ export const SiteContent: GlobalConfig = {
     {
       name: 'hero',
       type: 'group',
+      label: 'Hero Section',
       fields: [
-        { name: 'tagline', type: 'text', required: true, localized: true },
+        bilingualText('tagline', 'Tagline', { required: true }),
         {
-          name: 'headlineLine1',
-          type: 'array',
-          localized: true,
-          fields: [{ name: 'word', type: 'text', required: true }],
+          type: 'row',
+          fields: [
+            { name: 'headlineLine1_en', label: 'Headline Line 1 (EN)', type: 'text', required: true, admin: { width: '50%', description: 'Words separated by spaces' } },
+            { name: 'headlineLine1_ar', label: 'Headline Line 1 (AR)', type: 'text', required: true, admin: { width: '50%', description: 'Words separated by spaces' } },
+          ],
         },
         {
-          name: 'headlineLine2',
-          type: 'array',
-          localized: true,
-          fields: [{ name: 'word', type: 'text', required: true }],
+          type: 'row',
+          fields: [
+            { name: 'headlineLine2_en', label: 'Headline Line 2 — gradient (EN)', type: 'text', required: true, admin: { width: '50%' } },
+            { name: 'headlineLine2_ar', label: 'Headline Line 2 — gradient (AR)', type: 'text', required: true, admin: { width: '50%' } },
+          ],
         },
-        { name: 'description', type: 'textarea', required: true, localized: true },
-        { name: 'exploreSolutions', type: 'text', required: true, localized: true },
-        { name: 'getInTouch', type: 'text', required: true, localized: true },
-        { name: 'trustedBy', type: 'text', required: true, localized: true },
-        { name: 'statsProjects', type: 'text', localized: true, defaultValue: 'Projects Delivered' },
-        { name: 'statsUptime', type: 'text', localized: true, defaultValue: 'Uptime SLA' },
-        { name: 'statsSupport', type: 'text', localized: true, defaultValue: 'Support' },
-        { name: 'next', type: 'text', required: true, localized: true },
+        bilingualText('description', 'Description', { required: true, type: 'textarea' }),
+        bilingualText('exploreSolutions', 'CTA: Explore Solutions', { required: true }),
+        bilingualText('getInTouch', 'CTA: Get in Touch', { required: true }),
+        bilingualText('trustedBy', 'Trusted By label', { required: true }),
+        bilingualText('statsProjects', 'Stats: Projects label'),
+        bilingualText('statsUptime', 'Stats: Uptime label'),
+        bilingualText('statsSupport', 'Stats: Support label'),
+        bilingualText('next', 'Next button label', { required: true }),
       ],
     },
 
@@ -220,21 +147,23 @@ export const SiteContent: GlobalConfig = {
     {
       name: 'about',
       type: 'group',
+      label: 'About Us Section',
       fields: [
-        { name: 'label', type: 'text', required: true, localized: true },
-        { name: 'headingLine1', type: 'text', required: true, localized: true },
-        { name: 'headingWord1', type: 'text', required: true, localized: true },
-        { name: 'headingLine2', type: 'text', required: true, localized: true },
-        { name: 'headingWord2', type: 'text', required: true, localized: true },
-        { name: 'paragraph1', type: 'textarea', required: true, localized: true },
-        { name: 'paragraph2', type: 'textarea', required: true, localized: true },
+        bilingualText('label', 'Section Label', { required: true }),
+        bilingualText('headingLine1', 'Heading Line 1', { required: true }),
+        bilingualText('headingWord1', 'Heading Accent Word 1', { required: true }),
+        bilingualText('headingLine2', 'Heading Line 2', { required: true }),
+        bilingualText('headingWord2', 'Heading Accent Word 2', { required: true }),
+        bilingualText('paragraph1', 'Paragraph 1', { required: true, type: 'textarea' }),
+        bilingualText('paragraph2', 'Paragraph 2', { required: true, type: 'textarea' }),
         {
           name: 'stats',
           type: 'array',
+          label: 'Statistics',
           fields: [
-            { name: 'target', type: 'number', required: true },
-            { name: 'suffix', type: 'text', required: true },
-            { name: 'label', type: 'text', required: true, localized: true },
+            { name: 'target', type: 'number', required: true, admin: { description: 'Number value' } },
+            { name: 'suffix', type: 'text', required: true, admin: { description: 'e.g. "+", "%", "K+"' } },
+            bilingualText('label', 'Label', { required: true }),
           ],
         },
       ],
@@ -244,11 +173,12 @@ export const SiteContent: GlobalConfig = {
     {
       name: 'offer',
       type: 'group',
+      label: 'What We Offer Section',
       fields: [
-        { name: 'label', type: 'text', required: true, localized: true },
-        { name: 'heading', type: 'text', required: true, localized: true },
-        { name: 'headingAccent', type: 'text', required: true, localized: true },
-        { name: 'description', type: 'textarea', required: true, localized: true },
+        bilingualText('label', 'Section Label', { required: true }),
+        bilingualText('heading', 'Heading', { required: true }),
+        bilingualText('headingAccent', 'Heading Accent', { required: true }),
+        bilingualText('description', 'Description', { required: true, type: 'textarea' }),
       ],
     },
 
@@ -256,12 +186,13 @@ export const SiteContent: GlobalConfig = {
     {
       name: 'services',
       type: 'group',
+      label: 'Services Section',
       fields: [
-        { name: 'label', type: 'text', required: true, localized: true },
-        { name: 'heading', type: 'text', required: true, localized: true },
-        { name: 'headingAccent', type: 'text', required: true, localized: true },
-        { name: 'description', type: 'textarea', required: true, localized: true },
-        { name: 'learnMore', type: 'text', required: true, localized: true },
+        bilingualText('label', 'Section Label', { required: true }),
+        bilingualText('heading', 'Heading', { required: true }),
+        bilingualText('headingAccent', 'Heading Accent', { required: true }),
+        bilingualText('description', 'Description', { required: true, type: 'textarea' }),
+        bilingualText('learnMore', 'Learn More text', { required: true }),
       ],
     },
 
@@ -269,12 +200,13 @@ export const SiteContent: GlobalConfig = {
     {
       name: 'projects',
       type: 'group',
+      label: 'Projects Section',
       fields: [
-        { name: 'label', type: 'text', required: true, localized: true },
-        { name: 'heading', type: 'text', required: true, localized: true },
-        { name: 'headingAccent', type: 'text', required: true, localized: true },
-        { name: 'description', type: 'textarea', required: true, localized: true },
-        { name: 'viewCaseStudy', type: 'text', required: true, localized: true },
+        bilingualText('label', 'Section Label', { required: true }),
+        bilingualText('heading', 'Heading', { required: true }),
+        bilingualText('headingAccent', 'Heading Accent', { required: true }),
+        bilingualText('description', 'Description', { required: true, type: 'textarea' }),
+        bilingualText('viewCaseStudy', 'View Case Study text', { required: true }),
       ],
     },
 
@@ -282,11 +214,12 @@ export const SiteContent: GlobalConfig = {
     {
       name: 'technology',
       type: 'group',
+      label: 'Technology Section',
       fields: [
-        { name: 'label', type: 'text', required: true, localized: true },
-        { name: 'heading', type: 'text', required: true, localized: true },
-        { name: 'headingAccent', type: 'text', required: true, localized: true },
-        { name: 'description', type: 'textarea', required: true, localized: true },
+        bilingualText('label', 'Section Label', { required: true }),
+        bilingualText('heading', 'Heading', { required: true }),
+        bilingualText('headingAccent', 'Heading Accent', { required: true }),
+        bilingualText('description', 'Description', { required: true, type: 'textarea' }),
       ],
     },
 
@@ -294,30 +227,34 @@ export const SiteContent: GlobalConfig = {
     {
       name: 'contact',
       type: 'group',
+      label: 'Contact Section',
       fields: [
-        { name: 'label', type: 'text', required: true, localized: true },
-        { name: 'heading', type: 'text', required: true, localized: true },
-        { name: 'headingAccent', type: 'text', required: true, localized: true },
-        { name: 'description', type: 'textarea', required: true, localized: true },
+        bilingualText('label', 'Section Label', { required: true }),
+        bilingualText('heading', 'Heading', { required: true }),
+        bilingualText('headingAccent', 'Heading Accent', { required: true }),
+        bilingualText('description', 'Description', { required: true, type: 'textarea' }),
         {
           name: 'features',
           type: 'array',
-          localized: true,
-          fields: [{ name: 'text', type: 'text', required: true }],
+          label: 'Feature Lines',
+          fields: [
+            bilingualText('text', 'Feature text', { required: true }),
+          ],
         },
         {
           name: 'form',
           type: 'group',
+          label: 'Form Labels',
           fields: [
-            { name: 'name', type: 'text', required: true, localized: true },
-            { name: 'namePlaceholder', type: 'text', required: true, localized: true },
-            { name: 'email', type: 'text', required: true, localized: true },
-            { name: 'emailPlaceholder', type: 'text', required: true, localized: true },
-            { name: 'message', type: 'text', required: true, localized: true },
-            { name: 'messagePlaceholder', type: 'text', required: true, localized: true },
-            { name: 'send', type: 'text', required: true, localized: true },
-            { name: 'successTitle', type: 'text', required: true, localized: true },
-            { name: 'successMessage', type: 'text', required: true, localized: true },
+            bilingualText('name', 'Name label', { required: true }),
+            bilingualText('namePlaceholder', 'Name placeholder', { required: true }),
+            bilingualText('email', 'Email label', { required: true }),
+            bilingualText('emailPlaceholder', 'Email placeholder', { required: true }),
+            bilingualText('message', 'Message label', { required: true }),
+            bilingualText('messagePlaceholder', 'Message placeholder', { required: true }),
+            bilingualText('send', 'Send button', { required: true }),
+            bilingualText('successTitle', 'Success title', { required: true }),
+            bilingualText('successMessage', 'Success message', { required: true }),
           ],
         },
       ],
@@ -329,27 +266,27 @@ export const SiteContent: GlobalConfig = {
       type: 'group',
       label: 'Branding & SEO',
       fields: [
-        { name: 'siteName', type: 'text', required: true, defaultValue: 'InST', admin: { description: 'Short site name shown in navbar and footer' } },
-        { name: 'siteFullName', type: 'text', required: true, defaultValue: 'Innovative Solutions Tech', admin: { description: 'Full company name for SEO' } },
-        { name: 'siteDescription', type: 'textarea', required: true, localized: true, admin: { description: 'Meta description for SEO' } },
-        { name: 'logoText', type: 'text', required: true, defaultValue: 'In', admin: { description: 'Text inside the logo square (e.g. "In")' } },
-        { name: 'logo', type: 'upload', relationTo: 'media', admin: { description: 'Logo image (replaces text logo if set)' } },
-        { name: 'favicon', type: 'upload', relationTo: 'media', admin: { description: 'Favicon / browser tab icon' } },
-        { name: 'contactEmail', type: 'email', required: true, defaultValue: 'info@inst-sa.com', admin: { description: 'Email that receives contact form submissions' } },
+        { name: 'siteName', type: 'text', required: true, defaultValue: 'InST', admin: { description: 'Short site name' } },
+        { name: 'siteFullName', type: 'text', required: true, defaultValue: 'Innovative Solutions Tech', admin: { description: 'Full company name' } },
+        bilingualText('siteDescription', 'SEO Description', { required: true, type: 'textarea' }),
+        { name: 'logoText', type: 'text', required: true, defaultValue: 'In', admin: { description: 'Logo square text' } },
+        { name: 'logo', type: 'upload', relationTo: 'media', admin: { description: 'Logo image (replaces text)' } },
+        { name: 'favicon', type: 'upload', relationTo: 'media', admin: { description: 'Favicon' } },
+        { name: 'contactEmail', type: 'email', required: true, defaultValue: 'info@inst-sa.com' },
       ],
     },
 
-    // ─── Social Media Links ───────────────────────────
+    // ─── Social Media ───────────────────────────────────
     {
       name: 'social',
       type: 'group',
       label: 'Social Media',
       fields: [
-        { name: 'linkedinUrl', type: 'text', defaultValue: 'https://linkedin.com/company/inst-tech', admin: { description: 'LinkedIn company page URL' } },
-        { name: 'twitterUrl', type: 'text', defaultValue: 'https://x.com/inst_tech', admin: { description: 'Twitter/X profile URL' } },
-        { name: 'githubUrl', type: 'text', defaultValue: 'https://github.com/inst-tech', admin: { description: 'GitHub organization URL' } },
-        { name: 'instagramUrl', type: 'text', admin: { description: 'Instagram profile URL (optional)' } },
-        { name: 'youtubeUrl', type: 'text', admin: { description: 'YouTube channel URL (optional)' } },
+        { name: 'linkedinUrl', type: 'text', defaultValue: 'https://linkedin.com/company/inst-tech' },
+        { name: 'twitterUrl', type: 'text', defaultValue: 'https://x.com/inst_tech' },
+        { name: 'githubUrl', type: 'text', defaultValue: 'https://github.com/inst-tech' },
+        { name: 'instagramUrl', type: 'text' },
+        { name: 'youtubeUrl', type: 'text' },
       ],
     },
 
@@ -357,24 +294,27 @@ export const SiteContent: GlobalConfig = {
     {
       name: 'footer',
       type: 'group',
+      label: 'Footer',
       fields: [
-        { name: 'copyright', type: 'text', required: true, localized: true },
+        bilingualText('copyright', 'Copyright text', { required: true }),
         {
           name: 'company',
           type: 'group',
+          label: 'Company Links',
           fields: [
-            { name: 'about', type: 'text', required: true, localized: true },
-            { name: 'services', type: 'text', required: true, localized: true },
-            { name: 'projects', type: 'text', required: true, localized: true },
+            bilingualText('about', 'About link', { required: true }),
+            bilingualText('services', 'Services link', { required: true }),
+            bilingualText('projects', 'Projects link', { required: true }),
           ],
         },
         {
           name: 'connect',
           type: 'group',
+          label: 'Connect Links',
           fields: [
-            { name: 'linkedin', type: 'text', required: true, localized: true },
-            { name: 'twitter', type: 'text', required: true, localized: true },
-            { name: 'github', type: 'text', required: true, localized: true },
+            bilingualText('linkedin', 'LinkedIn label', { required: true }),
+            bilingualText('twitter', 'Twitter label', { required: true }),
+            bilingualText('github', 'GitHub label', { required: true }),
           ],
         },
       ],
@@ -384,12 +324,14 @@ export const SiteContent: GlobalConfig = {
     {
       name: 'slides',
       type: 'group',
+      label: 'Slide Names',
       fields: [
         {
           name: 'names',
           type: 'array',
-          localized: true,
-          fields: [{ name: 'name', type: 'text', required: true }],
+          fields: [
+            bilingualText('name', 'Slide Name', { required: true }),
+          ],
         },
       ],
     },

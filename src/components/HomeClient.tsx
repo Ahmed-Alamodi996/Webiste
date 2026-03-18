@@ -27,7 +27,7 @@ import type {
 } from "@/lib/cms-types";
 
 interface HomeClientProps {
-  siteContent: { en: CMSSiteContent; ar: CMSSiteContent } | null;
+  siteContent: CMSSiteContent | { en: CMSSiteContent; ar: CMSSiteContent } | null;
   projects: CMSProject[];
   offerings: CMSOffering[];
   services: CMSService[];
