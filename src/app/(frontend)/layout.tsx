@@ -28,31 +28,47 @@ const syne = Syne({
   display: "swap",
 });
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://inst.tech";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://inst-sa.com";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
-  title: "InST — Innovative Solutions Tech | Engineering the Future",
+  title: "InST — Innovative Solutions Tech | انوفيتيف سلوشنز تيك | Engineering the Future",
   description:
-    "Premium software engineering and AI solutions for forward-thinking companies. We architect enterprise-grade digital products that define industries.",
+    "Innovative Solutions Tech (InST) — شركة انوفيتيف سلوشنز تيك | Premium software engineering, AI solutions, cloud architecture, and cybersecurity for enterprise companies. حلول هندسة البرمجيات والذكاء الاصطناعي المتميزة للشركات.",
   keywords: [
-    "AI",
+    "Innovative Solutions Tech",
+    "InST",
+    "انوفيتيف سلوشنز تيك",
+    "AI solutions",
     "machine learning",
     "cloud architecture",
     "software engineering",
     "cybersecurity",
     "data analytics",
     "enterprise software",
+    "ذكاء اصطناعي",
+    "حلول تقنية",
+    "هندسة برمجيات",
+    "أمن سيبراني",
+    "بنية سحابية",
+    "Saudi Arabia",
+    "السعودية",
+    "تحول رقمي",
   ],
   alternates: {
     canonical: "/",
+    languages: {
+      "en": "https://inst-sa.com",
+      "ar": "https://inst.sa",
+    },
   },
   openGraph: {
-    title: "InST — Innovative Solutions Tech",
+    title: "InST — Innovative Solutions Tech | انوفيتيف سلوشنز تيك",
     description:
-      "Engineering the future of intelligent solutions. Premium technology for visionary companies.",
+      "Engineering the future of intelligent solutions. Premium technology for visionary companies. حلول تقنية متميزة للشركات الطموحة.",
     type: "website",
     locale: "en_US",
+    alternateLocale: "ar_SA",
     url: BASE_URL,
     siteName: "InST — Innovative Solutions Tech",
     images: [
@@ -60,15 +76,15 @@ export const metadata: Metadata = {
         url: "/og-image.png",
         width: 1200,
         height: 630,
-        alt: "InST — Innovative Solutions Tech",
+        alt: "InST — Innovative Solutions Tech | انوفيتيف سلوشنز تيك",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "InST — Innovative Solutions Tech",
+    title: "InST — Innovative Solutions Tech | انوفيتيف سلوشنز تيك",
     description:
-      "Engineering the future of intelligent solutions. Premium technology for visionary companies.",
+      "Engineering the future of intelligent solutions. حلول تقنية متميزة للشركات الطموحة.",
     images: ["/og-image.png"],
   },
   robots: {
@@ -87,21 +103,28 @@ export default function FrontendLayout({
     "@graph": [
       {
         "@type": "Organization",
-        name: "InST - Innovative Solutions Tech",
+        name: "Innovative Solutions Tech",
+        alternateName: ["InST", "انوفيتيف سلوشنز تيك"],
         url: BASE_URL,
         logo: `${BASE_URL}/og-image.png`,
         description:
-          "Premium software engineering and AI solutions for forward-thinking companies.",
+          "Premium software engineering, AI solutions, cloud architecture, and cybersecurity for enterprise companies.",
         contactPoint: {
           "@type": "ContactPoint",
           contactType: "sales",
+          email: "info@inst.sa",
           availableLanguage: ["English", "Arabic"],
         },
+        sameAs: [
+          "https://inst.sa",
+          "https://inst-sa.com",
+        ],
       },
       {
         "@type": "WebSite",
-        name: "InST — Innovative Solutions Tech",
+        name: "InST — Innovative Solutions Tech | انوفيتيف سلوشنز تيك",
         url: BASE_URL,
+        inLanguage: ["en", "ar"],
       },
     ],
   };

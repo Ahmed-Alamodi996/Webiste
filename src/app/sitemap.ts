@@ -4,7 +4,7 @@ import type { MetadataRoute } from "next";
 
 export const dynamic = "force-dynamic";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://inst.tech";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://inst-sa.com";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes: MetadataRoute.Sitemap = [
