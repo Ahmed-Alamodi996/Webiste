@@ -1,5 +1,19 @@
 import type { CollectionConfig } from 'payload'
 
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://inst-sa.com'
+
+// Ping Google & Bing to re-crawl sitemap when projects change
+async function pingSearchEngines() {
+  const sitemapUrl = encodeURIComponent(`${BASE_URL}/sitemap.xml`)
+  try {
+    await fetch(`https://www.google.com/ping?sitemap=${sitemapUrl}`)
+    await fetch(`https://www.bing.com/ping?sitemap=${sitemapUrl}`)
+    console.log('Pinged Google & Bing with updated sitemap')
+  } catch {
+    // Non-critical — ignore
+  }
+}
+
 export const Projects: CollectionConfig = {
   slug: 'projects',
   access: {
@@ -10,6 +24,14 @@ export const Projects: CollectionConfig = {
   },
   admin: {
     useAsTitle: 'title_en',
+  },
+  hooks: {
+    afterChange: [
+      async () => { await pingSearchEngines() },
+    ],
+    afterDelete: [
+      async () => { await pingSearchEngines() },
+    ],
   },
   fields: [
     {
