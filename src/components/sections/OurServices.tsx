@@ -7,33 +7,7 @@ import GradientMesh from "@/components/ui/GradientMesh";
 import { useLanguage } from "@/context/LanguageContext";
 import type { CMSService } from "@/lib/cms-types";
 
-const fallbackServiceMeta = [
-  {
-    id: "ai",
-    technologies: ["PyTorch", "TensorFlow", "LangChain", "OpenAI", "Hugging Face", "MLflow"],
-    accent: "#00C896",
-  },
-  {
-    id: "cloud",
-    technologies: ["AWS", "GCP", "Azure", "Kubernetes", "Terraform", "Docker"],
-    accent: "#2563EB",
-  },
-  {
-    id: "product",
-    technologies: ["React", "Next.js", "React Native", "Node.js", "PostgreSQL", "GraphQL"],
-    accent: "#7C3AED",
-  },
-  {
-    id: "security",
-    technologies: ["Zero Trust", "SOC 2", "HIPAA", "Vault", "WAF", "SIEM"],
-    accent: "#F59E0B",
-  },
-  {
-    id: "data",
-    technologies: ["Spark", "Kafka", "Snowflake", "dbt", "Airflow", "Looker"],
-    accent: "#EC4899",
-  },
-];
+// No static fallbacks — CMS data only
 
 function ServiceItem({
   title,
@@ -227,7 +201,7 @@ export default function OurServices({ services, className = "min-h-screen min-h-
   const [openIndex, setOpenIndex] = useState<number>(0);
   const { t, isRTL } = useLanguage();
 
-  const useCMS = services && services.length > 0;
+  if (!services || services.length === 0) return null;
 
   return (
     <section id="services" className={`relative ${className} flex flex-col justify-center overflow-x-hidden py-12 sm:py-0`}>
@@ -255,35 +229,20 @@ export default function OurServices({ services, className = "min-h-screen min-h-
 
         {/* Accordion */}
         <div className="glass rounded-3xl p-2 md:p-4 glow-border">
-          {useCMS
-            ? services.map((service, i) => (
-                <ServiceItem
-                  key={service.id}
-                  title={service.title}
-                  overview={service.overview}
-                  technologies={service.technologies.map((t) => t.name)}
-                  accent={service.accentColor}
-                  isOpen={openIndex === i}
-                  onToggle={() => setOpenIndex(openIndex === i ? -1 : i)}
-                  index={i}
-                  learnMore={t.services.learnMore}
-                  isRTL={isRTL}
-                />
-              ))
-            : t.services.items.map((service, i) => (
-                <ServiceItem
-                  key={fallbackServiceMeta[i].id}
-                  title={service.title}
-                  overview={service.overview}
-                  technologies={fallbackServiceMeta[i].technologies}
-                  accent={fallbackServiceMeta[i].accent}
-                  isOpen={openIndex === i}
-                  onToggle={() => setOpenIndex(openIndex === i ? -1 : i)}
-                  index={i}
-                  learnMore={t.services.learnMore}
-                  isRTL={isRTL}
-                />
-              ))}
+          {services.map((service, i) => (
+            <ServiceItem
+              key={service.id}
+              title={service.title}
+              overview={service.overview}
+              technologies={service.technologies.map((t) => t.name)}
+              accent={service.accentColor}
+              isOpen={openIndex === i}
+              onToggle={() => setOpenIndex(openIndex === i ? -1 : i)}
+              index={i}
+              learnMore={t.services.learnMore}
+              isRTL={isRTL}
+            />
+          ))}
         </div>
       </div>
     </section>

@@ -17,8 +17,7 @@ const iconMap: Record<string, typeof Brain> = {
   barChart3: BarChart3,
 };
 
-const fallbackIcons = [Brain, Cloud, Shield, Zap, Globe, BarChart3];
-const fallbackAccents = ["#00C896", "#2563EB", "#7C3AED", "#F59E0B", "#EC4899", "#06B6D4"];
+// No static fallbacks — CMS data only
 
 function OfferCard({
   icon: Icon,
@@ -131,7 +130,7 @@ interface WhatWeOfferProps {
 export default function WhatWeOffer({ offerings, className = "min-h-[100dvh]" }: WhatWeOfferProps) {
   const { t, isRTL } = useLanguage();
 
-  const useCMS = offerings && offerings.length > 0;
+  if (!offerings || offerings.length === 0) return null;
 
   return (
     <section id="offer" className={`relative ${className} flex flex-col justify-center overflow-hidden py-12 sm:py-0`}>
@@ -166,27 +165,16 @@ export default function WhatWeOffer({ offerings, className = "min-h-[100dvh]" }:
           animate="visible"
           className="grid grid-cols-2 lg:grid-cols-3 gap-[clamp(0.5rem,1.5vw,1rem)]"
         >
-          {useCMS
-            ? offerings.map((offering, i) => (
-                <OfferCard
-                  key={offering.id}
-                  icon={iconMap[offering.icon] || Brain}
-                  title={offering.title}
-                  description={offering.description}
-                  accent={offering.accentColor}
-                  index={i}
-                />
-              ))
-            : t.offer.items.map((offering, i) => (
-                <OfferCard
-                  key={offering.title}
-                  icon={fallbackIcons[i]}
-                  title={offering.title}
-                  description={offering.description}
-                  accent={fallbackAccents[i]}
-                  index={i}
-                />
-              ))}
+          {offerings.map((offering, i) => (
+            <OfferCard
+              key={offering.id}
+              icon={iconMap[offering.icon] || Brain}
+              title={offering.title}
+              description={offering.description}
+              accent={offering.accentColor}
+              index={i}
+            />
+          ))}
         </motion.div>
       </div>
     </section>

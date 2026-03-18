@@ -5,38 +5,7 @@ import InfiniteMarquee from "@/components/ui/InfiniteMarquee";
 import { useLanguage } from "@/context/LanguageContext";
 import type { CMSTechnology } from "@/lib/cms-types";
 
-const fallbackTechRow1 = [
-  { name: "React", color: "#61DAFB" },
-  { name: "Next.js", color: "#888888" },
-  { name: "TypeScript", color: "#3178C6" },
-  { name: "Node.js", color: "#339933" },
-  { name: "Python", color: "#3776AB" },
-  { name: "PostgreSQL", color: "#4169E1" },
-  { name: "Kubernetes", color: "#326CE5" },
-  { name: "Docker", color: "#2496ED" },
-];
-
-const fallbackTechRow2 = [
-  { name: "AWS", color: "#FF9900" },
-  { name: "Terraform", color: "#7B42BC" },
-  { name: "GraphQL", color: "#E10098" },
-  { name: "Redis", color: "#DC382D" },
-  { name: "TensorFlow", color: "#FF6F00" },
-  { name: "PyTorch", color: "#EE4C2C" },
-  { name: "Kafka", color: "#888888" },
-  { name: "Go", color: "#00ADD8" },
-];
-
-const fallbackTechRow3 = [
-  { name: "Rust", color: "#CE412B" },
-  { name: "Swift", color: "#F05138" },
-  { name: "MongoDB", color: "#47A248" },
-  { name: "Snowflake", color: "#29B5E8" },
-  { name: "OpenAI", color: "#00A67E" },
-  { name: "Figma", color: "#F24E1E" },
-  { name: "Vercel", color: "#888888" },
-  { name: "GitHub", color: "#888888" },
-];
+// No static fallbacks — CMS data only
 
 function TechPill({
   name,
@@ -98,31 +67,20 @@ interface TechnologyProps {
 export default function Technology({ technologies, className = "min-h-screen min-h-[100dvh]" }: TechnologyProps) {
   const { t, isRTL } = useLanguage();
 
-  // Group CMS technologies by row, or fall back to hardcoded data
-  const useCMS = technologies && technologies.length > 0;
+  if (!technologies || technologies.length === 0) return null;
 
-  let techRow1: { name: string; color: string }[];
-  let techRow2: { name: string; color: string }[];
-  let techRow3: { name: string; color: string }[];
-
-  if (useCMS) {
-    techRow1 = technologies
-      .filter((t) => t.row === "1")
-      .sort((a, b) => a.order - b.order)
-      .map((t) => ({ name: t.name, color: t.color }));
-    techRow2 = technologies
-      .filter((t) => t.row === "2")
-      .sort((a, b) => a.order - b.order)
-      .map((t) => ({ name: t.name, color: t.color }));
-    techRow3 = technologies
-      .filter((t) => t.row === "3")
-      .sort((a, b) => a.order - b.order)
-      .map((t) => ({ name: t.name, color: t.color }));
-  } else {
-    techRow1 = fallbackTechRow1;
-    techRow2 = fallbackTechRow2;
-    techRow3 = fallbackTechRow3;
-  }
+  const techRow1 = technologies
+    .filter((t) => t.row === "1")
+    .sort((a, b) => a.order - b.order)
+    .map((t) => ({ name: t.name, color: t.color }));
+  const techRow2 = technologies
+    .filter((t) => t.row === "2")
+    .sort((a, b) => a.order - b.order)
+    .map((t) => ({ name: t.name, color: t.color }));
+  const techRow3 = technologies
+    .filter((t) => t.row === "3")
+    .sort((a, b) => a.order - b.order)
+    .map((t) => ({ name: t.name, color: t.color }));
 
   return (
     <section id="technology" className={`relative ${className} flex flex-col justify-center overflow-hidden py-12 sm:py-0`}>

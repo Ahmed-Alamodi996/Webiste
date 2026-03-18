@@ -13,28 +13,7 @@ function sanitizeHexColor(color: string | undefined): string {
   return /^#[0-9A-Fa-f]{6}$/.test(color) ? color : "#888888";
 }
 
-const fallbackProjectMeta = [
-  {
-    gradient: "from-emerald-500/20 to-cyan-500/20",
-    accentColor: "#00C896",
-    stat: "50M+",
-  },
-  {
-    gradient: "from-blue-500/20 to-violet-500/20",
-    accentColor: "#2563EB",
-    stat: "99.99%",
-  },
-  {
-    gradient: "from-violet-500/20 to-pink-500/20",
-    accentColor: "#7C3AED",
-    stat: "$2B+",
-  },
-  {
-    gradient: "from-amber-500/20 to-orange-500/20",
-    accentColor: "#F59E0B",
-    stat: "1TB+",
-  },
-];
+// No static fallbacks — CMS data only
 
 const cardVariants = {
   enter: (direction: number) => ({
@@ -70,9 +49,7 @@ export default function FeaturedProjects({ projects, className = "min-h-screen m
   const [spotlightPos, setSpotlightPos] = useState({ x: 0, y: 0 });
   const [isHoveringCard, setIsHoveringCard] = useState(false);
 
-  // Use CMS projects if available, otherwise fall back to static data
-  const useCMS = projects && projects.length > 0;
-  const totalItems = useCMS ? projects.length : fallbackProjectMeta.length;
+  const totalItems = projects?.length ?? 0;
 
   const goTo = useCallback(
     (index: number) => {
@@ -84,22 +61,20 @@ export default function FeaturedProjects({ projects, className = "min-h-screen m
 
   const next = useCallback(() => {
     setDirection(1);
-    setActiveIndex((prev) => (prev + 1) % totalItems);
+    setActiveIndex((prev) => (prev + 1) % (totalItems || 1));
   }, [totalItems]);
 
   const prev = useCallback(() => {
     setDirection(-1);
-    setActiveIndex((prev) => (prev - 1 + totalItems) % totalItems);
+    setActiveIndex((prev) => (prev - 1 + (totalItems || 1)) % (totalItems || 1));
   }, [totalItems]);
 
-  // Auto-advance every 5s
   useEffect(() => {
-    if (isPaused) return;
+    if (isPaused || !totalItems) return;
     const timer = setInterval(next, 5000);
     return () => clearInterval(timer);
-  }, [isPaused, next]);
+  }, [isPaused, next, totalItems]);
 
-  // Spotlight mouse tracking
   const handleCardMouseMove = useCallback((e: React.MouseEvent) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
@@ -109,23 +84,20 @@ export default function FeaturedProjects({ projects, className = "min-h-screen m
     });
   }, []);
 
-  // Get current item data
-  const meta = useCMS
-    ? {
-        gradient: projects[activeIndex].gradient,
-        accentColor: sanitizeHexColor(projects[activeIndex].accentColor),
-        stat: projects[activeIndex].stat,
-      }
-    : fallbackProjectMeta[activeIndex];
+  if (!projects || projects.length === 0) return null;
 
-  const projectText = useCMS
-    ? {
-        title: projects[activeIndex].title,
-        category: projects[activeIndex].category,
-        description: projects[activeIndex].description,
-        statLabel: projects[activeIndex].statLabel,
-      }
-    : t.projects.items[activeIndex];
+  const meta = {
+    gradient: projects[activeIndex].gradient,
+    accentColor: sanitizeHexColor(projects[activeIndex].accentColor),
+    stat: projects[activeIndex].stat,
+  };
+
+  const projectText = {
+    title: projects[activeIndex].title,
+    category: projects[activeIndex].category,
+    description: projects[activeIndex].description,
+    statLabel: projects[activeIndex].statLabel,
+  };
 
   return (
     <section
@@ -274,7 +246,7 @@ export default function FeaturedProjects({ projects, className = "min-h-screen m
                       {projectText.description}
                     </p>
 
-                    {useCMS && projects[activeIndex].slug ? (
+                    {projects[activeIndex].slug ? (
                       <Link
                         href={`/projects/${projects[activeIndex].slug}`}
                         data-cursor-hover
@@ -360,7 +332,7 @@ export default function FeaturedProjects({ projects, className = "min-h-screen m
                       width: activeIndex === i ? 32 : 8,
                       backgroundColor:
                         activeIndex === i
-                          ? (useCMS ? sanitizeHexColor(projects[i].accentColor) : fallbackProjectMeta[i].accentColor)
+                          ? sanitizeHexColor(projects[i].accentColor)
                           : "rgba(156, 163, 175, 0.3)",
                     }}
                     transition={{
