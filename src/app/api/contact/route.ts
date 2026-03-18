@@ -145,6 +145,46 @@ export async function POST(request: Request) {
       },
     });
 
+    // Send email notification via mail server
+    try {
+      const siteContent = await payload.findGlobal({ slug: "site-content" });
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const contactEmail = (siteContent as any)?.branding?.contactEmail || "info@inst.sa";
+
+      const { exec } = await import("child_process");
+      const { promisify } = await import("util");
+      const execAsync = promisify(exec);
+
+      const emailBody = [
+        `From: "InST Website" <info@inst.sa>`,
+        `To: ${contactEmail}`,
+        `Reply-To: ${trimmedEmail}`,
+        `Subject: New Contact Form: ${trimmedName}`,
+        `Content-Type: text/html; charset=UTF-8`,
+        ``,
+        `<div style="font-family:Arial,sans-serif;max-width:600px">`,
+        `<h2 style="color:#00C896;border-bottom:2px solid #00C896;padding-bottom:10px">New Contact Form</h2>`,
+        `<p><strong>Name:</strong> ${trimmedName}</p>`,
+        `<p><strong>Email:</strong> <a href="mailto:${trimmedEmail}">${trimmedEmail}</a></p>`,
+        `<p><strong>Message:</strong></p>`,
+        `<div style="background:#f5f5f5;padding:15px;border-radius:8px">${trimmedMessage.replace(/\n/g, "<br>")}</div>`,
+        `<hr style="margin-top:20px;border:none;border-top:1px solid #eee">`,
+        `<p style="color:#999;font-size:12px">Sent from contact form at inst-sa.com</p>`,
+        `</div>`,
+      ].join("\n");
+
+      // Send via docker-mailserver's sendmail
+      const safeBody = emailBody.replace(/'/g, "'\\''");
+      await execAsync(
+        `echo '${safeBody}' | docker exec -i inst-mail sendmail -t`,
+        { timeout: 15000 }
+      );
+      console.log(`Contact form notification sent to ${contactEmail}`);
+    } catch (emailErr) {
+      // Form still saved to CMS even if email fails
+      console.error("Email notification failed:", emailErr);
+    }
+
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error("Contact form submission error:", error);
