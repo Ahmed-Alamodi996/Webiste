@@ -21,9 +21,11 @@ const ar: Translations = {
     exploreSolutions: "استكشف الحلول",
     getInTouch: "تواصل معنا",
     trustedBy: "موثوق من قادة الصناعة",
-    statsProjects: "مشاريع منجزة",
-    statsUptime: "وقت تشغيل مضمون",
-    statsSupport: "دعم فني",
+    stats: [
+      { value: "50+", label: "مشاريع منجزة" },
+      { value: "99.9%", label: "وقت تشغيل مضمون" },
+      { value: "24/7", label: "دعم فني" },
+    ],
     next: "التالي",
   },
 

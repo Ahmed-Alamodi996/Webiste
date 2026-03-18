@@ -89,9 +89,12 @@ function buildTranslations(cms: any, locale: Locale, fallback: Translations): Tr
       exploreSolutions: pick(cms.hero, 'exploreSolutions', l) ?? fallback.hero.exploreSolutions,
       getInTouch: pick(cms.hero, 'getInTouch', l) ?? fallback.hero.getInTouch,
       trustedBy: pick(cms.hero, 'trustedBy', l) ?? fallback.hero.trustedBy,
-      statsProjects: pick(cms.hero, 'statsProjects', l) ?? fallback.hero.statsProjects,
-      statsUptime: pick(cms.hero, 'statsUptime', l) ?? fallback.hero.statsUptime,
-      statsSupport: pick(cms.hero, 'statsSupport', l) ?? fallback.hero.statsSupport,
+      stats: cms.hero?.stats?.length
+        ? cms.hero.stats.map((s: { value: string; label_en?: string; label_ar?: string }) => ({
+            value: s.value,
+            label: (l === 'ar' ? s.label_ar : s.label_en) ?? s.label_en ?? '',
+          }))
+        : fallback.hero.stats,
       next: pick(cms.hero, 'next', l) ?? fallback.hero.next,
     },
     about: {

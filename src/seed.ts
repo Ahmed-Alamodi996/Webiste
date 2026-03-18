@@ -484,9 +484,11 @@ async function seed() {
         exploreSolutions_en: enData.hero.exploreSolutions, exploreSolutions_ar: arData.hero.exploreSolutions,
         getInTouch_en: enData.hero.getInTouch, getInTouch_ar: arData.hero.getInTouch,
         trustedBy_en: enData.hero.trustedBy, trustedBy_ar: arData.hero.trustedBy,
-        statsProjects_en: enData.hero.statsProjects, statsProjects_ar: arData.hero.statsProjects,
-        statsUptime_en: enData.hero.statsUptime, statsUptime_ar: arData.hero.statsUptime,
-        statsSupport_en: enData.hero.statsSupport, statsSupport_ar: arData.hero.statsSupport,
+        stats: [
+          { value: '50+', label_en: 'Projects Delivered', label_ar: 'مشاريع منجزة' },
+          { value: '99.9%', label_en: 'Uptime SLA', label_ar: 'وقت تشغيل مضمون' },
+          { value: '24/7', label_en: 'Support', label_ar: 'دعم فني' },
+        ],
         next_en: enData.hero.next, next_ar: arData.hero.next,
       },
       about: {

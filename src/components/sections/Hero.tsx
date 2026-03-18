@@ -208,11 +208,7 @@ export default function Hero() {
           transition={{ delay: 1.8, duration: 1 }}
           className="mt-10 sm:mt-20 flex flex-wrap items-center justify-center gap-6 sm:gap-10"
         >
-          {[
-            { value: "50+", label: t.hero.statsProjects || "Projects Delivered" },
-            { value: "99.9%", label: t.hero.statsUptime || "Uptime SLA" },
-            { value: "24/7", label: t.hero.statsSupport || "Support" },
-          ].map((stat) => (
+          {(t.hero.stats || []).map((stat) => (
             <div key={stat.label} className="flex flex-col items-center gap-1">
               <span className="text-lg sm:text-xl font-bold text-brand-green">{stat.value}</span>
               <span className="text-[10px] sm:text-xs uppercase tracking-[0.15em]" style={{ color: "var(--text-muted)" }}>
