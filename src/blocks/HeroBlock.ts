@@ -5,21 +5,25 @@ export const HeroBlock: Block = {
   labels: { singular: 'Hero', plural: 'Heroes' },
   fields: [
     {
-      name: 'heading',
-      type: 'text',
-      required: true,
-      localized: true,
+      type: 'row',
+      fields: [
+        { name: 'heading_en', label: 'Heading (EN)', type: 'text', required: true, admin: { width: '50%' } },
+        { name: 'heading_ar', label: 'Heading (AR)', type: 'text', required: true, admin: { width: '50%' } },
+      ],
     },
     {
-      name: 'headingAccent',
-      type: 'text',
-      localized: true,
-      admin: { description: 'Gradient-highlighted portion of the heading' },
+      type: 'row',
+      fields: [
+        { name: 'headingAccent_en', label: 'Heading Accent (EN)', type: 'text', admin: { width: '50%', description: 'Gradient-highlighted portion of the heading' } },
+        { name: 'headingAccent_ar', label: 'Heading Accent (AR)', type: 'text', admin: { width: '50%', description: 'Gradient-highlighted portion of the heading' } },
+      ],
     },
     {
-      name: 'description',
-      type: 'textarea',
-      localized: true,
+      type: 'row',
+      fields: [
+        { name: 'description_en', label: 'Description (EN)', type: 'textarea', admin: { width: '50%' } },
+        { name: 'description_ar', label: 'Description (AR)', type: 'textarea', admin: { width: '50%' } },
+      ],
     },
     {
       name: 'backgroundImage',
@@ -32,7 +36,13 @@ export const HeroBlock: Block = {
       label: 'Call-to-Action Buttons',
       maxRows: 3,
       fields: [
-        { name: 'label', type: 'text', required: true, localized: true },
+        {
+          type: 'row',
+          fields: [
+            { name: 'label_en', label: 'Label (EN)', type: 'text', required: true, admin: { width: '50%' } },
+            { name: 'label_ar', label: 'Label (AR)', type: 'text', required: true, admin: { width: '50%' } },
+          ],
+        },
         { name: 'href', type: 'text', required: true },
         {
           name: 'variant',

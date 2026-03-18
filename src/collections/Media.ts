@@ -35,12 +35,11 @@ export const Media: CollectionConfig = {
   },
   fields: [
     {
-      name: 'alt',
-      type: 'text',
-      localized: true,
-      admin: {
-        description: 'Descriptive alt text for accessibility',
-      },
+      type: 'row',
+      fields: [
+        { name: 'alt_en', label: 'Alt Text (EN)', type: 'text', admin: { width: '50%', description: 'Descriptive alt text for accessibility' } },
+        { name: 'alt_ar', label: 'Alt Text (AR)', type: 'text', admin: { width: '50%', description: 'Descriptive alt text for accessibility' } },
+      ],
     },
   ],
 }

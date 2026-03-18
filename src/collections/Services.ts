@@ -13,16 +13,18 @@ export const Services: CollectionConfig = {
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
-      required: true,
-      localized: true,
+      type: 'row',
+      fields: [
+        { name: 'title_en', label: 'Title (EN)', type: 'text', required: true, admin: { width: '50%' } },
+        { name: 'title_ar', label: 'Title (AR)', type: 'text', required: true, admin: { width: '50%' } },
+      ],
     },
     {
-      name: 'overview',
-      type: 'textarea',
-      required: true,
-      localized: true,
+      type: 'row',
+      fields: [
+        { name: 'overview_en', label: 'Overview (EN)', type: 'textarea', required: true, admin: { width: '50%' } },
+        { name: 'overview_ar', label: 'Overview (AR)', type: 'textarea', required: true, admin: { width: '50%' } },
+      ],
     },
     {
       name: 'technologies',

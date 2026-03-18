@@ -13,16 +13,18 @@ export const Offerings: CollectionConfig = {
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
-      required: true,
-      localized: true,
+      type: 'row',
+      fields: [
+        { name: 'title_en', label: 'Title (EN)', type: 'text', required: true, admin: { width: '50%' } },
+        { name: 'title_ar', label: 'Title (AR)', type: 'text', required: true, admin: { width: '50%' } },
+      ],
     },
     {
-      name: 'description',
-      type: 'textarea',
-      required: true,
-      localized: true,
+      type: 'row',
+      fields: [
+        { name: 'description_en', label: 'Description (EN)', type: 'textarea', required: true, admin: { width: '50%' } },
+        { name: 'description_ar', label: 'Description (AR)', type: 'textarea', required: true, admin: { width: '50%' } },
+      ],
     },
     {
       name: 'icon',

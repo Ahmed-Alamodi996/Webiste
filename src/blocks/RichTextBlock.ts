@@ -5,10 +5,11 @@ export const RichTextBlock: Block = {
   labels: { singular: 'Rich Text', plural: 'Rich Text' },
   fields: [
     {
-      name: 'content',
-      type: 'richText',
-      required: true,
-      localized: true,
+      type: 'row',
+      fields: [
+        { name: 'content_en', label: 'Content (EN)', type: 'richText', required: true, admin: { width: '50%' } },
+        { name: 'content_ar', label: 'Content (AR)', type: 'richText', required: true, admin: { width: '50%' } },
+      ],
     },
     {
       name: 'maxWidth',

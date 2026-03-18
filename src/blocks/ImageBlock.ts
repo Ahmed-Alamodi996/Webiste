@@ -10,7 +10,13 @@ export const ImageBlock: Block = {
       relationTo: 'media',
       required: true,
     },
-    { name: 'caption', type: 'text', localized: true },
+    {
+      type: 'row',
+      fields: [
+        { name: 'caption_en', label: 'Caption (EN)', type: 'text', admin: { width: '50%' } },
+        { name: 'caption_ar', label: 'Caption (AR)', type: 'text', admin: { width: '50%' } },
+      ],
+    },
     {
       name: 'size',
       type: 'select',

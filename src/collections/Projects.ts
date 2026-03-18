@@ -13,10 +13,11 @@ export const Projects: CollectionConfig = {
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
-      required: true,
-      localized: true,
+      type: 'row',
+      fields: [
+        { name: 'title_en', label: 'Title (EN)', type: 'text', required: true, admin: { width: '50%' } },
+        { name: 'title_ar', label: 'Title (AR)', type: 'text', required: true, admin: { width: '50%' } },
+      ],
     },
     {
       name: 'slug',
@@ -28,16 +29,18 @@ export const Projects: CollectionConfig = {
       },
     },
     {
-      name: 'category',
-      type: 'text',
-      required: true,
-      localized: true,
+      type: 'row',
+      fields: [
+        { name: 'category_en', label: 'Category (EN)', type: 'text', required: true, admin: { width: '50%' } },
+        { name: 'category_ar', label: 'Category (AR)', type: 'text', required: true, admin: { width: '50%' } },
+      ],
     },
     {
-      name: 'description',
-      type: 'textarea',
-      required: true,
-      localized: true,
+      type: 'row',
+      fields: [
+        { name: 'description_en', label: 'Description (EN)', type: 'textarea', required: true, admin: { width: '50%' } },
+        { name: 'description_ar', label: 'Description (AR)', type: 'textarea', required: true, admin: { width: '50%' } },
+      ],
     },
     {
       name: 'stat',
@@ -48,13 +51,11 @@ export const Projects: CollectionConfig = {
       },
     },
     {
-      name: 'statLabel',
-      type: 'text',
-      required: true,
-      localized: true,
-      admin: {
-        description: 'e.g. "predictions/day"',
-      },
+      type: 'row',
+      fields: [
+        { name: 'statLabel_en', label: 'Stat Label (EN)', type: 'text', required: true, admin: { width: '50%', description: 'e.g. "predictions/day"' } },
+        { name: 'statLabel_ar', label: 'Stat Label (AR)', type: 'text', required: true, admin: { width: '50%', description: 'e.g. "predictions/day"' } },
+      ],
     },
     {
       name: 'gradient',
@@ -120,12 +121,11 @@ export const Projects: CollectionConfig = {
       ],
     },
     {
-      name: 'content',
-      type: 'richText',
-      localized: true,
-      admin: {
-        description: 'Long-form project description / case study',
-      },
+      type: 'row',
+      fields: [
+        { name: 'content_en', label: 'Content (EN)', type: 'richText', admin: { width: '50%', description: 'Long-form project description / case study' } },
+        { name: 'content_ar', label: 'Content (AR)', type: 'richText', admin: { width: '50%', description: 'Long-form project description / case study' } },
+      ],
     },
     {
       name: 'techStack',

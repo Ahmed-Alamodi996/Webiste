@@ -45,10 +45,11 @@ export const Pages: CollectionConfig = {
   },
   fields: [
     {
-      name: 'title',
-      type: 'text',
-      required: true,
-      localized: true,
+      type: 'row',
+      fields: [
+        { name: 'title_en', label: 'Title (EN)', type: 'text', required: true, admin: { width: '50%' } },
+        { name: 'title_ar', label: 'Title (AR)', type: 'text', required: true, admin: { width: '50%' } },
+      ],
     },
     {
       name: 'slug',
@@ -107,8 +108,20 @@ export const Pages: CollectionConfig = {
       label: 'SEO',
       admin: { description: 'Search engine optimization fields' },
       fields: [
-        { name: 'metaTitle', type: 'text', localized: true },
-        { name: 'metaDescription', type: 'textarea', localized: true },
+        {
+          type: 'row',
+          fields: [
+            { name: 'metaTitle_en', label: 'Meta Title (EN)', type: 'text', admin: { width: '50%' } },
+            { name: 'metaTitle_ar', label: 'Meta Title (AR)', type: 'text', admin: { width: '50%' } },
+          ],
+        },
+        {
+          type: 'row',
+          fields: [
+            { name: 'metaDescription_en', label: 'Meta Description (EN)', type: 'textarea', admin: { width: '50%' } },
+            { name: 'metaDescription_ar', label: 'Meta Description (AR)', type: 'textarea', admin: { width: '50%' } },
+          ],
+        },
         { name: 'ogImage', type: 'upload', relationTo: 'media' },
       ],
     },
