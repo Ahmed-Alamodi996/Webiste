@@ -57,11 +57,22 @@ export default function SlideContainer({ slides }: SlideContainerProps) {
     if (viewMode !== "slides") return;
 
     const handleWheel = (e: WheelEvent) => {
-      e.preventDefault();
       if (cooldownRef.current) return;
       const threshold = 30;
       if (Math.abs(e.deltaY) < threshold) return;
 
+      // Check if slide content is scrollable
+      const scrollable = document.querySelector("[data-scrollable]") as HTMLElement | null;
+      if (scrollable && scrollable.scrollHeight > scrollable.clientHeight + 10) {
+        const atTop = scrollable.scrollTop <= 5;
+        const atBottom = scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight - 5;
+
+        // Allow native scroll within slide content
+        if (e.deltaY > 0 && !atBottom) return;
+        if (e.deltaY < 0 && !atTop) return;
+      }
+
+      e.preventDefault();
       cooldownRef.current = true;
       if (e.deltaY > 0) nextSlide();
       else prevSlide();
@@ -104,53 +115,62 @@ export default function SlideContainer({ slides }: SlideContainerProps) {
 
     let touchStartY = 0;
     let touchStartTime = 0;
+    let startScrollTop = 0;
+    let slideRef: HTMLElement | null = null;
+
+    const getSlideEl = () =>
+      document.querySelector("[data-scrollable]") as HTMLElement | null;
 
     const handleTouchStart = (e: TouchEvent) => {
       touchStartY = e.touches[0].clientY;
       touchStartTime = Date.now();
+      slideRef = getSlideEl();
+      startScrollTop = slideRef?.scrollTop ?? 0;
     };
 
     const handleTouchEnd = (e: TouchEvent) => {
       const deltaY = touchStartY - e.changedTouches[0].clientY;
       const elapsed = Date.now() - touchStartTime;
       const velocity = Math.abs(deltaY) / elapsed;
-      const isValidSwipe = Math.abs(deltaY) > 50 || (Math.abs(deltaY) > 25 && velocity > 0.3);
 
+      // Require a strong deliberate swipe
+      const isValidSwipe = Math.abs(deltaY) > 80 || (Math.abs(deltaY) > 40 && velocity > 0.5);
       if (!isValidSwipe) return;
 
-      // Check if slide content is scrollable and not at edge
-      const target = e.target as HTMLElement;
-      const scrollable = target.closest("[data-scrollable]") as HTMLElement | null;
-      if (scrollable && scrollable.scrollHeight > scrollable.clientHeight) {
-        const atTop = scrollable.scrollTop <= 5;
-        const atBottom = scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight - 5;
-        // Only change slide if at scroll boundary
+      // If slide has scrollable content, only change at boundaries
+      if (slideRef && slideRef.scrollHeight > slideRef.clientHeight + 10) {
+        const atTop = slideRef.scrollTop <= 5;
+        const atBottom =
+          slideRef.scrollTop + slideRef.clientHeight >= slideRef.scrollHeight - 5;
+        const didScroll = Math.abs(slideRef.scrollTop - startScrollTop) > 10;
+
+        // If the user actually scrolled content, don't change slide
+        if (didScroll) return;
+
+        // Only change slide if at the very edge
         if (deltaY > 0 && !atBottom) return;
         if (deltaY < 0 && !atTop) return;
       }
 
+      if (cooldownRef.current) return;
+      cooldownRef.current = true;
       if (deltaY > 0) nextSlide();
       else prevSlide();
+      setTimeout(() => { cooldownRef.current = false; }, 900);
     };
 
     const handleTouchMove = (e: TouchEvent) => {
       const target = e.target as HTMLElement;
-      // Allow native scrolling within scrollable slide content
-      const scrollable = target.closest("[data-scrollable]") as HTMLElement | null;
       if (target.closest("input, textarea, select")) return;
-      if (scrollable && scrollable.scrollHeight > scrollable.clientHeight) {
-        // Allow scroll if content overflows — don't prevent default
-        const atTop = scrollable.scrollTop <= 0;
-        const atBottom = scrollable.scrollTop + scrollable.clientHeight >= scrollable.scrollHeight - 1;
-        const deltaY = touchStartY - e.touches[0].clientY;
-        // Only prevent default if at the edges (to trigger slide change)
-        if ((atTop && deltaY < 0) || (atBottom && deltaY > 0)) {
-          // At edge, let the touchEnd handler deal with slide navigation
-          return;
-        }
-        // Mid-scroll, allow native scrolling
+
+      // Always allow scrolling within the slide
+      const scrollable = getSlideEl();
+      if (scrollable && scrollable.scrollHeight > scrollable.clientHeight + 10) {
+        // Content is scrollable — allow native scroll
         return;
       }
+
+      // No scrollable content — prevent bounce/pull
       e.preventDefault();
     };
 
