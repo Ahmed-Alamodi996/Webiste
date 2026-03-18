@@ -6,7 +6,8 @@ import { staggerContainer, staggerItem } from "@/lib/animations";
 import TiltCard from "@/components/ui/TiltCard";
 import GradientMesh from "@/components/ui/GradientMesh";
 import { useLanguage } from "@/context/LanguageContext";
-import type { CMSOffering } from "@/lib/cms-types";
+import type { CMSOffering, CMSOfferingRaw } from "@/lib/cms-types";
+import { resolveOffering } from "@/lib/cms-types";
 
 const iconMap: Record<string, typeof Brain> = {
   brain: Brain,
@@ -123,14 +124,15 @@ function OfferCard({
 }
 
 interface WhatWeOfferProps {
-  offerings?: CMSOffering[];
+  offerings?: (CMSOffering | CMSOfferingRaw)[];
   className?: string;
 }
 
-export default function WhatWeOffer({ offerings, className = "min-h-[100dvh]" }: WhatWeOfferProps) {
-  const { t, isRTL } = useLanguage();
+export default function WhatWeOffer({ offerings: rawOfferings, className = "min-h-[100dvh]" }: WhatWeOfferProps) {
+  const { t, isRTL, locale } = useLanguage();
 
-  if (!offerings || offerings.length === 0) return null;
+  if (!rawOfferings || rawOfferings.length === 0) return null;
+  const offerings = rawOfferings.map((o) => 'title_en' in o ? resolveOffering(o as CMSOfferingRaw, locale) : o as CMSOffering);
 
   return (
     <section id="offer" className={`relative ${className} flex flex-col justify-center overflow-hidden py-12 sm:py-0`}>

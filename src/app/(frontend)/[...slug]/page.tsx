@@ -7,9 +7,9 @@ import type {
   CMSPage,
   CMSMedia,
   CMSSiteContent,
-  CMSProject,
-  CMSOffering,
-  CMSService,
+  CMSProjectRaw,
+  CMSOfferingRaw,
+  CMSServiceRaw,
   CMSTechnology,
   PageBlock,
 } from "@/lib/cms-types";
@@ -80,9 +80,9 @@ export default async function DynamicPage({ params }: PageProps) {
   const needsTechnologies = needsCollection(blocks, "technology");
 
   let siteContent: { en: CMSSiteContent; ar: CMSSiteContent } | null = null;
-  let projects: CMSProject[] = [];
-  let offerings: CMSOffering[] = [];
-  let services: CMSService[] = [];
+  let projects: CMSProjectRaw[] = [];
+  let offerings: CMSOfferingRaw[] = [];
+  let services: CMSServiceRaw[] = [];
   let technologies: CMSTechnology[] = [];
 
   try {
@@ -106,7 +106,7 @@ export default async function DynamicPage({ params }: PageProps) {
         payload
           .find({ collection: "projects", sort: "order", limit: 100 })
           .then((res) => {
-            projects = res.docs as unknown as CMSProject[];
+            projects = res.docs as unknown as CMSProjectRaw[];
           }),
       );
     }
@@ -115,7 +115,7 @@ export default async function DynamicPage({ params }: PageProps) {
         payload
           .find({ collection: "offerings", sort: "order", limit: 100 })
           .then((res) => {
-            offerings = res.docs as unknown as CMSOffering[];
+            offerings = res.docs as unknown as CMSOfferingRaw[];
           }),
       );
     }
@@ -124,7 +124,7 @@ export default async function DynamicPage({ params }: PageProps) {
         payload
           .find({ collection: "services", sort: "order", limit: 100 })
           .then((res) => {
-            services = res.docs as unknown as CMSService[];
+            services = res.docs as unknown as CMSServiceRaw[];
           }),
       );
     }

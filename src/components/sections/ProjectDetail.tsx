@@ -5,12 +5,14 @@ import { ArrowLeft, ExternalLink, Play } from "lucide-react";
 import Link from "next/link";
 import Image from "next/image";
 import { useState } from "react";
-import type { CMSProject, CMSMedia } from "@/lib/cms-types";
+import type { CMSProjectRaw, CMSProject, CMSMedia } from "@/lib/cms-types";
+import { resolveProject } from "@/lib/cms-types";
 import CustomCursor from "@/components/layout/CustomCursor";
 import { RichTextContent } from "@/components/ui/RichTextContent";
+import { useLanguage } from "@/context/LanguageContext";
 
 interface ProjectDetailProps {
-  project: CMSProject;
+  project: CMSProjectRaw;
 }
 
 /** Type-guard: is the upload field a populated media object (not just an ID string)? */
@@ -40,7 +42,9 @@ function sanitizeHexColor(color: string | undefined): string {
   return /^#[0-9A-Fa-f]{6}$/.test(color) ? color : "#888888";
 }
 
-export default function ProjectDetail({ project }: ProjectDetailProps) {
+export default function ProjectDetail({ project: rawProject }: ProjectDetailProps) {
+  const { locale } = useLanguage();
+  const project = resolveProject(rawProject, locale);
   const safeAccent = sanitizeHexColor(project.accentColor);
   const hasCover = isMedia(project.coverImage);
   const hasGallery =

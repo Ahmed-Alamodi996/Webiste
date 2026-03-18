@@ -1,10 +1,10 @@
 "use client";
 
 import FeaturedProjects from "@/components/sections/FeaturedProjects";
-import type { CMSProject } from "@/lib/cms-types";
 
 interface PageFeaturedProjectsProps {
-  projects?: CMSProject[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  projects?: any[];
 }
 
 export default function PageFeaturedProjects({ projects }: PageFeaturedProjectsProps) {

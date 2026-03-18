@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ArrowUpRight, ChevronLeft, ChevronRight } from "lucide-react";
 import Link from "next/link";
 import { useLanguage } from "@/context/LanguageContext";
-import type { CMSProject } from "@/lib/cms-types";
+import type { CMSProject, CMSProjectRaw } from "@/lib/cms-types";
+import { resolveProject } from "@/lib/cms-types";
 
 /** Sanitize a hex color value to prevent CSS injection */
 function sanitizeHexColor(color: string | undefined): string {
@@ -34,11 +35,14 @@ const cardVariants = {
 };
 
 interface FeaturedProjectsProps {
-  projects?: CMSProject[];
+  projects?: (CMSProject | CMSProjectRaw)[];
   className?: string;
 }
 
-export default function FeaturedProjects({ projects, className = "min-h-screen min-h-[100dvh]" }: FeaturedProjectsProps) {
+export default function FeaturedProjects({ projects: rawProjects, className = "min-h-screen min-h-[100dvh]" }: FeaturedProjectsProps) {
+  const { locale } = useLanguage();
+  // Resolve bilingual fields — works whether data is already resolved or raw
+  const projects = rawProjects?.map((p) => 'title_en' in p ? resolveProject(p as CMSProjectRaw, locale) : p as CMSProject);
   const [activeIndex, setActiveIndex] = useState(0);
   const [direction, setDirection] = useState(1);
   const [isPaused, setIsPaused] = useState(false);

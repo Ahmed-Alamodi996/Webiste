@@ -1,10 +1,10 @@
 "use client";
 
 import OurServices from "@/components/sections/OurServices";
-import type { CMSService } from "@/lib/cms-types";
 
 interface PageServicesProps {
-  services?: CMSService[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  services?: any[];
 }
 
 export default function PageServices({ services }: PageServicesProps) {

@@ -2,9 +2,9 @@
 
 import type {
   PageBlock,
-  CMSProject,
-  CMSOffering,
-  CMSService,
+  CMSProjectRaw,
+  CMSOfferingRaw,
+  CMSServiceRaw,
   CMSTechnology,
 } from "@/lib/cms-types";
 
@@ -21,9 +21,9 @@ import Spacer from "./Spacer";
 
 interface BlockRendererProps {
   blocks: PageBlock[];
-  projects?: CMSProject[];
-  offerings?: CMSOffering[];
-  services?: CMSService[];
+  projects?: CMSProjectRaw[];
+  offerings?: CMSOfferingRaw[];
+  services?: CMSServiceRaw[];
   technologies?: CMSTechnology[];
 }
 

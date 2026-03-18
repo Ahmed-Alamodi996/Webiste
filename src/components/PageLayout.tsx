@@ -7,19 +7,19 @@ import { ThemeProvider } from "@/context/ThemeContext";
 import { LanguageProvider } from "@/context/LanguageContext";
 import type {
   PageBlock,
-  CMSProject,
-  CMSOffering,
-  CMSService,
+  CMSProjectRaw,
+  CMSOfferingRaw,
+  CMSServiceRaw,
   CMSTechnology,
   CMSSiteContent,
 } from "@/lib/cms-types";
 
 interface PageLayoutProps {
   blocks: PageBlock[];
-  siteContent: { en: CMSSiteContent; ar: CMSSiteContent } | null;
-  projects?: CMSProject[];
-  offerings?: CMSOffering[];
-  services?: CMSService[];
+  siteContent: { en: CMSSiteContent; ar: CMSSiteContent } | CMSSiteContent | null;
+  projects?: CMSProjectRaw[];
+  offerings?: CMSOfferingRaw[];
+  services?: CMSServiceRaw[];
   technologies?: CMSTechnology[];
 }
 

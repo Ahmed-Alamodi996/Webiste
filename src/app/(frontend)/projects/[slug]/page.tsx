@@ -3,7 +3,7 @@ import config from "@payload-config";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
 import ProjectDetail from "@/components/sections/ProjectDetail";
-import type { CMSProject, CMSMedia } from "@/lib/cms-types";
+import type { CMSProjectRaw, CMSMedia } from "@/lib/cms-types";
 
 export const dynamic = "force-dynamic";
 
@@ -23,17 +23,17 @@ export async function generateMetadata({
       limit: 1,
     });
     if (result.docs.length > 0) {
-      const project = result.docs[0] as unknown as CMSProject;
+      const project = result.docs[0] as unknown as CMSProjectRaw;
       const coverImage =
         project.coverImage && typeof project.coverImage === "object"
           ? (project.coverImage as CMSMedia).url
           : undefined;
       return {
-        title: `${project.title} | InST`,
-        description: project.description,
+        title: `${project.title_en || "Project"} | InST`,
+        description: project.description_en,
         openGraph: {
-          title: project.title,
-          description: project.description,
+          title: project.title_en,
+          description: project.description_en,
           type: "article",
           images: coverImage ? [{ url: coverImage }] : undefined,
         },
@@ -48,7 +48,7 @@ export async function generateMetadata({
 export default async function ProjectPage({ params }: ProjectPageProps) {
   const { slug } = await params;
 
-  let project: CMSProject | null = null;
+  let project: CMSProjectRaw | null = null;
 
   try {
     const payload = await getPayload({ config });
@@ -60,7 +60,7 @@ export default async function ProjectPage({ params }: ProjectPageProps) {
     });
 
     if (result.docs.length > 0) {
-      project = result.docs[0] as unknown as CMSProject;
+      project = result.docs[0] as unknown as CMSProjectRaw;
     }
   } catch {
     // CMS unavailable

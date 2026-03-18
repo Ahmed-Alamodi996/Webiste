@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, ArrowRight } from "lucide-react";
 import GradientMesh from "@/components/ui/GradientMesh";
 import { useLanguage } from "@/context/LanguageContext";
-import type { CMSService } from "@/lib/cms-types";
+import type { CMSService, CMSServiceRaw } from "@/lib/cms-types";
+import { resolveService } from "@/lib/cms-types";
 
 // No static fallbacks — CMS data only
 
@@ -193,15 +194,16 @@ function ServiceItem({
 }
 
 interface OurServicesProps {
-  services?: CMSService[];
+  services?: (CMSService | CMSServiceRaw)[];
   className?: string;
 }
 
-export default function OurServices({ services, className = "min-h-screen min-h-[100dvh]" }: OurServicesProps) {
+export default function OurServices({ services: rawServices, className = "min-h-screen min-h-[100dvh]" }: OurServicesProps) {
   const [openIndex, setOpenIndex] = useState<number>(0);
-  const { t, isRTL } = useLanguage();
+  const { t, isRTL, locale } = useLanguage();
 
-  if (!services || services.length === 0) return null;
+  if (!rawServices || rawServices.length === 0) return null;
+  const services = rawServices.map((s) => 'title_en' in s ? resolveService(s as CMSServiceRaw, locale) : s as CMSService);
 
   return (
     <section id="services" className={`relative ${className} flex flex-col justify-center overflow-x-hidden py-12 sm:py-0`}>
