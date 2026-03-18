@@ -5,17 +5,17 @@ import HomeClient from "@/components/HomeClient";
 export const dynamic = "force-dynamic";
 import type {
   CMSSiteContent,
-  CMSProject,
-  CMSOffering,
-  CMSService,
+  CMSProjectRaw,
+  CMSOfferingRaw,
+  CMSServiceRaw,
   CMSTechnology,
 } from "@/lib/cms-types";
 
 export default async function Home() {
   let siteContent: CMSSiteContent | null = null;
-  let projects: CMSProject[] = [];
-  let offerings: CMSOffering[] = [];
-  let services: CMSService[] = [];
+  let projects: CMSProjectRaw[] = [];
+  let offerings: CMSOfferingRaw[] = [];
+  let services: CMSServiceRaw[] = [];
   let technologies: CMSTechnology[] = [];
 
   try {
@@ -37,9 +37,9 @@ export default async function Home() {
       ]);
 
     siteContent = siteContentData as unknown as CMSSiteContent;
-    projects = projectsRes.docs as unknown as CMSProject[];
-    offerings = offeringsRes.docs as unknown as CMSOffering[];
-    services = servicesRes.docs as unknown as CMSService[];
+    projects = projectsRes.docs as unknown as CMSProjectRaw[];
+    offerings = offeringsRes.docs as unknown as CMSOfferingRaw[];
+    services = servicesRes.docs as unknown as CMSServiceRaw[];
     technologies = technologiesRes.docs as unknown as CMSTechnology[];
   } catch {
     console.warn(

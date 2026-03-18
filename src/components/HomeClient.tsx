@@ -19,18 +19,19 @@ import Technology from "@/components/sections/Technology";
 import Contact from "@/components/sections/Contact";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import type {
-  CMSProject,
-  CMSOffering,
-  CMSService,
+  CMSProjectRaw,
+  CMSOfferingRaw,
+  CMSServiceRaw,
   CMSTechnology,
   CMSSiteContent,
 } from "@/lib/cms-types";
+import { resolveProject, resolveOffering, resolveService } from "@/lib/cms-types";
 
 interface HomeClientProps {
   siteContent: CMSSiteContent | { en: CMSSiteContent; ar: CMSSiteContent } | null;
-  projects: CMSProject[];
-  offerings: CMSOffering[];
-  services: CMSService[];
+  projects: CMSProjectRaw[];
+  offerings: CMSOfferingRaw[];
+  services: CMSServiceRaw[];
   technologies: CMSTechnology[];
 }
 
@@ -42,8 +43,13 @@ function HomeInner({
   technologies,
 }: Omit<HomeClientProps, "siteContent">) {
   const [isLoaded, setIsLoaded] = useState(false);
-  const { t } = useLanguage();
+  const { t, locale } = useLanguage();
   const themeSettings = t.theme;
+
+  // Resolve bilingual CMS data to current locale
+  const resolvedProjects = projects.map((p) => resolveProject(p, locale));
+  const resolvedOfferings = offerings.map((o) => resolveOffering(o, locale));
+  const resolvedServices = services.map((s) => resolveService(s, locale));
 
   const handleLoadComplete = useCallback(() => {
     setIsLoaded(true);
@@ -51,10 +57,10 @@ function HomeInner({
 
   const slides = [
     <Hero key="hero" />,
-    <WhatWeOffer key="offer" offerings={offerings} />,
-    <FeaturedProjects key="projects" projects={projects} />,
+    <WhatWeOffer key="offer" offerings={resolvedOfferings} />,
+    <FeaturedProjects key="projects" projects={resolvedProjects} />,
     <AboutUs key="about" />,
-    <OurServices key="services" services={services} />,
+    <OurServices key="services" services={resolvedServices} />,
     <Technology key="technology" technologies={technologies} />,
     <Contact key="contact" />,
   ];

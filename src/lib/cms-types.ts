@@ -10,6 +10,54 @@ export interface CMSMedia {
   alt?: string
 }
 
+// Raw CMS types — bilingual fields with _en/_ar suffixes
+export interface CMSProjectRaw {
+  id: string
+  title_en?: string
+  title_ar?: string
+  slug: string
+  category_en?: string
+  category_ar?: string
+  description_en?: string
+  description_ar?: string
+  stat: string
+  statLabel_en?: string
+  statLabel_ar?: string
+  gradient: string
+  accentColor: string
+  order: number
+  coverImage?: CMSMedia | string
+  gallery?: { image: CMSMedia | string }[]
+  content_en?: Record<string, unknown>
+  content_ar?: Record<string, unknown>
+  techStack?: { name: string; color?: string }[]
+  video?: { url?: string; provider?: 'youtube' | 'vimeo' | 'direct' }
+  liveUrl?: string
+}
+
+export interface CMSOfferingRaw {
+  id: string
+  title_en?: string
+  title_ar?: string
+  description_en?: string
+  description_ar?: string
+  icon: 'brain' | 'cloud' | 'shield' | 'zap' | 'globe' | 'barChart3'
+  accentColor: string
+  order: number
+}
+
+export interface CMSServiceRaw {
+  id: string
+  title_en?: string
+  title_ar?: string
+  overview_en?: string
+  overview_ar?: string
+  technologies: { name: string }[]
+  accentColor: string
+  order: number
+}
+
+// Resolved types — single language, used by components
 export interface CMSProject {
   id: string
   title: string
@@ -21,7 +69,6 @@ export interface CMSProject {
   gradient: string
   accentColor: string
   order: number
-  // Rich detail fields (optional)
   coverImage?: CMSMedia | string
   gallery?: { image: CMSMedia | string }[]
   content?: Record<string, unknown>
@@ -46,6 +93,37 @@ export interface CMSService {
   technologies: { name: string }[]
   accentColor: string
   order: number
+}
+
+// Resolve bilingual → single language
+export function resolveProject(raw: CMSProjectRaw, locale: string): CMSProject {
+  const l = locale === 'ar' ? 'ar' : 'en'
+  return {
+    ...raw,
+    title: raw[`title_${l}`] || raw.title_en || '',
+    category: raw[`category_${l}`] || raw.category_en || '',
+    description: raw[`description_${l}`] || raw.description_en || '',
+    statLabel: raw[`statLabel_${l}`] || raw.statLabel_en || '',
+    content: raw[`content_${l}`] || raw.content_en,
+  }
+}
+
+export function resolveOffering(raw: CMSOfferingRaw, locale: string): CMSOffering {
+  const l = locale === 'ar' ? 'ar' : 'en'
+  return {
+    ...raw,
+    title: raw[`title_${l}`] || raw.title_en || '',
+    description: raw[`description_${l}`] || raw.description_en || '',
+  }
+}
+
+export function resolveService(raw: CMSServiceRaw, locale: string): CMSService {
+  const l = locale === 'ar' ? 'ar' : 'en'
+  return {
+    ...raw,
+    title: raw[`title_${l}`] || raw.title_en || '',
+    overview: raw[`overview_${l}`] || raw.overview_en || '',
+  }
 }
 
 export interface CMSTechnology {
