@@ -461,178 +461,185 @@ async function seed() {
     console.log('Admin user may already exist, skipping...')
   }
 
-  // 2. Seed SiteContent global (EN)
-  console.log('Seeding SiteContent (EN)...')
+  // 2. Seed SiteContent global (bilingual — both EN and AR in one update)
+  console.log('Seeding SiteContent...')
   await payload.updateGlobal({
     slug: 'site-content',
-    locale: 'en',
     data: {
-      nav: enData.nav,
+      nav: {
+        services_en: enData.nav.services, services_ar: arData.nav.services,
+        projects_en: enData.nav.projects, projects_ar: arData.nav.projects,
+        about_en: enData.nav.about, about_ar: arData.nav.about,
+        technology_en: enData.nav.technology, technology_ar: arData.nav.technology,
+        contact_en: enData.nav.contact, contact_ar: arData.nav.contact,
+        getInTouch_en: enData.nav.getInTouch, getInTouch_ar: arData.nav.getInTouch,
+      },
       hero: {
-        tagline: enData.hero.tagline,
-        headlineLine1: enData.hero.headlineLine1.filter(Boolean).map((word) => ({ word })),
-        headlineLine2: enData.hero.headlineLine2.map((word) => ({ word })),
-        description: enData.hero.description,
-        exploreSolutions: enData.hero.exploreSolutions,
-        getInTouch: enData.hero.getInTouch,
-        trustedBy: enData.hero.trustedBy,
-        statsProjects: enData.hero.statsProjects,
-        statsUptime: enData.hero.statsUptime,
-        statsSupport: enData.hero.statsSupport,
-        next: enData.hero.next,
+        tagline_en: enData.hero.tagline, tagline_ar: arData.hero.tagline,
+        headlineLine1_en: enData.hero.headlineLine1.filter(Boolean).join(' '),
+        headlineLine1_ar: arData.hero.headlineLine1.filter(Boolean).join(' '),
+        headlineLine2_en: enData.hero.headlineLine2.join(' '),
+        headlineLine2_ar: arData.hero.headlineLine2.join(' '),
+        description_en: enData.hero.description, description_ar: arData.hero.description,
+        exploreSolutions_en: enData.hero.exploreSolutions, exploreSolutions_ar: arData.hero.exploreSolutions,
+        getInTouch_en: enData.hero.getInTouch, getInTouch_ar: arData.hero.getInTouch,
+        trustedBy_en: enData.hero.trustedBy, trustedBy_ar: arData.hero.trustedBy,
+        statsProjects_en: enData.hero.statsProjects, statsProjects_ar: arData.hero.statsProjects,
+        statsUptime_en: enData.hero.statsUptime, statsUptime_ar: arData.hero.statsUptime,
+        statsSupport_en: enData.hero.statsSupport, statsSupport_ar: arData.hero.statsSupport,
+        next_en: enData.hero.next, next_ar: arData.hero.next,
       },
       about: {
-        label: enData.about.label,
-        headingLine1: enData.about.headingLine1,
-        headingWord1: enData.about.headingWord1,
-        headingLine2: enData.about.headingLine2,
-        headingWord2: enData.about.headingWord2,
-        paragraph1: enData.about.paragraph1,
-        paragraph2: enData.about.paragraph2,
-        stats: enData.about.stats,
+        label_en: enData.about.label, label_ar: arData.about.label,
+        headingLine1_en: enData.about.headingLine1, headingLine1_ar: arData.about.headingLine1,
+        headingWord1_en: enData.about.headingWord1, headingWord1_ar: arData.about.headingWord1,
+        headingLine2_en: enData.about.headingLine2, headingLine2_ar: arData.about.headingLine2,
+        headingWord2_en: enData.about.headingWord2, headingWord2_ar: arData.about.headingWord2,
+        paragraph1_en: enData.about.paragraph1, paragraph1_ar: arData.about.paragraph1,
+        paragraph2_en: enData.about.paragraph2, paragraph2_ar: arData.about.paragraph2,
+        stats: enData.about.stats.map((s, i) => ({
+          target: s.target, suffix: s.suffix,
+          label_en: s.label, label_ar: arData.about.stats[i]?.label ?? s.label,
+        })),
       },
-      offer: enData.offer,
-      services: enData.services,
-      projects: enData.projects,
-      technology: enData.technology,
+      offer: {
+        label_en: enData.offer.label, label_ar: arData.offer.label,
+        heading_en: enData.offer.heading, heading_ar: arData.offer.heading,
+        headingAccent_en: enData.offer.headingAccent, headingAccent_ar: arData.offer.headingAccent,
+        description_en: enData.offer.description, description_ar: arData.offer.description,
+      },
+      services: {
+        label_en: enData.services.label, label_ar: arData.services.label,
+        heading_en: enData.services.heading, heading_ar: arData.services.heading,
+        headingAccent_en: enData.services.headingAccent, headingAccent_ar: arData.services.headingAccent,
+        description_en: enData.services.description, description_ar: arData.services.description,
+        learnMore_en: enData.services.learnMore, learnMore_ar: arData.services.learnMore,
+      },
+      projects: {
+        label_en: enData.projects.label, label_ar: arData.projects.label,
+        heading_en: enData.projects.heading, heading_ar: arData.projects.heading,
+        headingAccent_en: enData.projects.headingAccent, headingAccent_ar: arData.projects.headingAccent,
+        description_en: enData.projects.description, description_ar: arData.projects.description,
+        viewCaseStudy_en: enData.projects.viewCaseStudy, viewCaseStudy_ar: arData.projects.viewCaseStudy,
+      },
+      technology: {
+        label_en: enData.technology.label, label_ar: arData.technology.label,
+        heading_en: enData.technology.heading, heading_ar: arData.technology.heading,
+        headingAccent_en: enData.technology.headingAccent, headingAccent_ar: arData.technology.headingAccent,
+        description_en: enData.technology.description, description_ar: arData.technology.description,
+      },
       contact: {
-        ...enData.contact,
-        features: enData.contact.features.map((text) => ({ text })),
+        label_en: enData.contact.label, label_ar: arData.contact.label,
+        heading_en: enData.contact.heading, heading_ar: arData.contact.heading,
+        headingAccent_en: enData.contact.headingAccent, headingAccent_ar: arData.contact.headingAccent,
+        description_en: enData.contact.description, description_ar: arData.contact.description,
+        features: enData.contact.features.map((text, i) => ({
+          text_en: text, text_ar: arData.contact.features[i] ?? text,
+        })),
+        form: {
+          name_en: enData.contact.form.name, name_ar: arData.contact.form.name,
+          namePlaceholder_en: enData.contact.form.namePlaceholder, namePlaceholder_ar: arData.contact.form.namePlaceholder,
+          email_en: enData.contact.form.email, email_ar: arData.contact.form.email,
+          emailPlaceholder_en: enData.contact.form.emailPlaceholder, emailPlaceholder_ar: arData.contact.form.emailPlaceholder,
+          message_en: enData.contact.form.message, message_ar: arData.contact.form.message,
+          messagePlaceholder_en: enData.contact.form.messagePlaceholder, messagePlaceholder_ar: arData.contact.form.messagePlaceholder,
+          send_en: enData.contact.form.send, send_ar: arData.contact.form.send,
+          successTitle_en: enData.contact.form.successTitle, successTitle_ar: arData.contact.form.successTitle,
+          successMessage_en: enData.contact.form.successMessage, successMessage_ar: arData.contact.form.successMessage,
+        },
       },
-      footer: enData.footer,
+      footer: {
+        copyright_en: enData.footer.copyright, copyright_ar: arData.footer.copyright,
+        company: {
+          about_en: enData.footer.company.about, about_ar: arData.footer.company.about,
+          services_en: enData.footer.company.services, services_ar: arData.footer.company.services,
+          projects_en: enData.footer.company.projects, projects_ar: arData.footer.company.projects,
+        },
+        connect: {
+          linkedin_en: enData.footer.connect.linkedin, linkedin_ar: arData.footer.connect.linkedin,
+          twitter_en: enData.footer.connect.twitter, twitter_ar: arData.footer.connect.twitter,
+          github_en: enData.footer.connect.github, github_ar: arData.footer.connect.github,
+        },
+      },
       slides: {
-        names: enData.slides.names.map((name) => ({ name })),
+        names: enData.slides.names.map((name, i) => ({
+          name_en: name, name_ar: arData.slides.names[i] ?? name,
+        })),
+      },
+      branding: {
+        siteName: 'InST',
+        siteFullName: 'Innovative Solutions Tech',
+        siteDescription_en: 'Premium software engineering and AI solutions for forward-thinking companies.',
+        siteDescription_ar: 'حلول هندسة البرمجيات والذكاء الاصطناعي المتميزة للشركات الطموحة.',
+        logoText: 'In',
+        contactEmail: 'info@inst-sa.com',
+      },
+      social: {
+        linkedinUrl: 'https://linkedin.com/company/inst-tech',
+        twitterUrl: 'https://x.com/inst_tech',
+        githubUrl: 'https://github.com/inst-tech',
       },
     },
   })
 
-  // 3. Seed SiteContent global (AR)
-  console.log('Seeding SiteContent (AR)...')
-  await payload.updateGlobal({
-    slug: 'site-content',
-    locale: 'ar',
-    data: {
-      nav: arData.nav,
-      hero: {
-        tagline: arData.hero.tagline,
-        headlineLine1: arData.hero.headlineLine1.filter(Boolean).map((word) => ({ word })),
-        headlineLine2: arData.hero.headlineLine2.map((word) => ({ word })),
-        description: arData.hero.description,
-        exploreSolutions: arData.hero.exploreSolutions,
-        getInTouch: arData.hero.getInTouch,
-        trustedBy: arData.hero.trustedBy,
-        statsProjects: arData.hero.statsProjects,
-        statsUptime: arData.hero.statsUptime,
-        statsSupport: arData.hero.statsSupport,
-        next: arData.hero.next,
-      },
-      about: {
-        label: arData.about.label,
-        headingLine1: arData.about.headingLine1,
-        headingWord1: arData.about.headingWord1,
-        headingLine2: arData.about.headingLine2,
-        headingWord2: arData.about.headingWord2,
-        paragraph1: arData.about.paragraph1,
-        paragraph2: arData.about.paragraph2,
-        stats: arData.about.stats,
-      },
-      offer: arData.offer,
-      services: arData.services,
-      projects: arData.projects,
-      technology: arData.technology,
-      contact: {
-        ...arData.contact,
-        features: arData.contact.features.map((text) => ({ text })),
-      },
-      footer: arData.footer,
-      slides: {
-        names: arData.slides.names.map((name) => ({ name })),
-      },
-    },
-  })
-
-  // 4. Seed Projects
+  // 3. Seed Projects (bilingual)
   console.log('Seeding Projects...')
   for (const project of projectsData) {
-    const doc = await payload.create({
+    await payload.create({
       collection: 'projects',
-      locale: 'en',
       data: {
-        title: project.en.title,
+        title_en: project.en.title,
+        title_ar: project.ar.title,
         slug: project.en.title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-        category: project.en.category,
-        description: project.en.description,
-        statLabel: project.en.statLabel,
+        category_en: project.en.category,
+        category_ar: project.ar.category,
+        description_en: project.en.description,
+        description_ar: project.ar.description,
+        statLabel_en: project.en.statLabel,
+        statLabel_ar: project.ar.statLabel,
         stat: project.stat,
         gradient: project.gradient,
         accentColor: project.accentColor,
         order: project.order,
       },
     })
-    await payload.update({
-      collection: 'projects',
-      id: doc.id,
-      locale: 'ar',
-      data: {
-        title: project.ar.title,
-        category: project.ar.category,
-        description: project.ar.description,
-        statLabel: project.ar.statLabel,
-      },
-    })
   }
 
-  // 5. Seed Offerings
+  // 4. Seed Offerings (bilingual)
   console.log('Seeding Offerings...')
   for (const offering of offeringsData) {
-    const doc = await payload.create({
+    await payload.create({
       collection: 'offerings',
-      locale: 'en',
       data: {
-        title: offering.en.title,
-        description: offering.en.description,
+        title_en: offering.en.title,
+        title_ar: offering.ar.title,
+        description_en: offering.en.description,
+        description_ar: offering.ar.description,
         icon: offering.icon,
         accentColor: offering.accentColor,
         order: offering.order,
       },
     })
-    await payload.update({
-      collection: 'offerings',
-      id: doc.id,
-      locale: 'ar',
-      data: {
-        title: offering.ar.title,
-        description: offering.ar.description,
-      },
-    })
   }
 
-  // 6. Seed Services
+  // 5. Seed Services (bilingual)
   console.log('Seeding Services...')
   for (const service of servicesData) {
-    const doc = await payload.create({
+    await payload.create({
       collection: 'services',
-      locale: 'en',
       data: {
-        title: service.en.title,
-        overview: service.en.overview,
+        title_en: service.en.title,
+        title_ar: service.ar.title,
+        overview_en: service.en.overview,
+        overview_ar: service.ar.overview,
         technologies: service.technologies.map((name) => ({ name })),
         accentColor: service.accentColor,
         order: service.order,
       },
     })
-    await payload.update({
-      collection: 'services',
-      id: doc.id,
-      locale: 'ar',
-      data: {
-        title: service.ar.title,
-        overview: service.ar.overview,
-      },
-    })
   }
 
-  // 7. Seed Technologies
+  // 6. Seed Technologies
   console.log('Seeding Technologies...')
   for (const tech of technologiesData) {
     await payload.create({

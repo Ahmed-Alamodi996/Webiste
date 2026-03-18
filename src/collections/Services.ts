@@ -9,7 +9,7 @@ export const Services: CollectionConfig = {
     delete: ({ req: { user } }) => Boolean(user),
   },
   admin: {
-    useAsTitle: 'title',
+    useAsTitle: 'title_en',
   },
   fields: [
     {

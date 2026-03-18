@@ -24,7 +24,7 @@ export const Pages: CollectionConfig = {
     delete: ({ req: { user } }) => Boolean(user),
   },
   admin: {
-    useAsTitle: 'title',
+    useAsTitle: 'title_en',
     defaultColumns: ['title', 'slug', 'status', 'updatedAt'],
   },
   versions: { drafts: true },

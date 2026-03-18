@@ -16,7 +16,8 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git -c user.name=\"Alamo\" -c user.email=\"alamo@inst.com\" add -A)",
-      "Bash(git -c user.name=\"Alamo\" -c user.email=\"alamo@inst.com\" commit -m \"backup: pre-visual-enhancements snapshot\" --no-verify)"
+      "Bash(git -c user.name=\"Alamo\" -c user.email=\"alamo@inst.com\" commit -m \"backup: pre-visual-enhancements snapshot\" --no-verify)",
+      "Bash(where mongosh:*)"
     ]
   }
 }
