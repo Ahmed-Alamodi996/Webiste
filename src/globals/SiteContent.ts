@@ -283,6 +283,30 @@ export const SiteContent: GlobalConfig = {
       ],
     },
 
+    // ─── SEO ────────────────────────────────────────────
+    {
+      name: 'seo',
+      type: 'group',
+      label: 'SEO & Meta Tags',
+      admin: { description: 'Search engine optimization settings. Changes appear in Google search results.' },
+      fields: [
+        bilingualText('metaTitle', 'Page Title', { required: true }),
+        bilingualText('metaDescription', 'Meta Description', { required: true, type: 'textarea' }),
+        {
+          name: 'keywords',
+          type: 'array',
+          label: 'Keywords',
+          admin: { description: 'Search keywords (EN + AR). Add as many as relevant.' },
+          fields: [
+            { name: 'keyword', type: 'text', required: true },
+          ],
+        },
+        { name: 'ogImage', type: 'upload', relationTo: 'media', admin: { description: 'Open Graph image (shown when sharing on social media). Recommended: 1200x630px' } },
+        { name: 'googleVerification', type: 'text', admin: { description: 'Google Search Console verification code (the meta tag content value)' } },
+        { name: 'bingVerification', type: 'text', admin: { description: 'Bing Webmaster verification code' } },
+      ],
+    },
+
     // ─── Social Media ───────────────────────────────────
     {
       name: 'social',

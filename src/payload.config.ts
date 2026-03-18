@@ -10,6 +10,7 @@ import { Offerings } from './collections/Offerings'
 import { Services } from './collections/Services'
 import { Technologies } from './collections/Technologies'
 import { FormSubmissions } from './collections/FormSubmissions'
+import { EmailAccounts } from './collections/EmailAccounts'
 import { Media } from './collections/Media'
 import { Pages } from './collections/Pages'
 import { SiteContent } from './globals/SiteContent'
@@ -38,7 +39,7 @@ export default buildConfig({
     ],
     defaultLocale: 'en',
   },
-  collections: [Users, Media, Projects, Offerings, Services, Technologies, FormSubmissions, Pages],
+  collections: [Users, Media, Projects, Offerings, Services, Technologies, FormSubmissions, Pages, EmailAccounts],
   globals: [SiteContent],
   typescript: {
     outputFile: path.resolve(dirname, 'payload-types.ts'),
