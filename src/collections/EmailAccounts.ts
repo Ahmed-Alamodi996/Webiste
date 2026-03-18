@@ -16,6 +16,14 @@ export const EmailAccounts: CollectionConfig = {
     delete: ({ req: { user } }) => Boolean(user),
   },
   hooks: {
+    beforeValidate: [
+      ({ data }) => {
+        if (data?.username && data?.domain) {
+          data.email = `${data.username}@${data.domain}`
+        }
+        return data
+      },
+    ],
     afterChange: [
       async ({ doc, operation, previousDoc }) => {
         const { exec } = await import('child_process')
@@ -124,18 +132,7 @@ export const EmailAccounts: CollectionConfig = {
       type: 'text',
       unique: true,
       admin: {
-        readOnly: true,
-        description: 'Auto-generated from username + domain',
-      },
-      hooks: {
-        beforeValidate: [
-          ({ data, siblingData }) => {
-            if (siblingData?.username && siblingData?.domain) {
-              return `${siblingData.username}@${siblingData.domain}`
-            }
-            return data
-          },
-        ],
+        description: 'Full email address (auto-filled from username + domain)',
       },
     },
     {
