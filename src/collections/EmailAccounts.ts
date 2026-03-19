@@ -24,6 +24,18 @@ export const EmailAccounts: CollectionConfig = {
         return data
       },
     ],
+    afterRead: [
+      ({ doc }) => {
+        if (doc.email) {
+          const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://inst-sa.com'
+          doc.setupLinks = {
+            setupPage: `${baseUrl}/api/email-setup?email=${doc.email}&type=page`,
+            iosProfile: `${baseUrl}/api/email-setup?email=${doc.email}&type=ios`,
+          }
+        }
+        return doc
+      },
+    ],
     afterChange: [
       async ({ doc, operation, previousDoc }) => {
         const { exec } = await import('child_process')
@@ -42,7 +54,6 @@ export const EmailAccounts: CollectionConfig = {
           }
         }
 
-        // Handle password change
         if (operation === 'update' && doc.changePassword) {
           try {
             await execAsync(
@@ -55,7 +66,6 @@ export const EmailAccounts: CollectionConfig = {
           }
         }
 
-        // Handle disable/enable
         if (operation === 'update' && previousDoc?.status !== doc.status) {
           if (doc.status === 'disabled') {
             try {
@@ -98,71 +108,34 @@ export const EmailAccounts: CollectionConfig = {
     {
       type: 'row',
       fields: [
-        {
-          name: 'username',
-          type: 'text',
-          required: true,
-          admin: { width: '40%', description: 'e.g. "info", "admin", "support"' },
-        },
-        {
-          name: 'domain',
-          type: 'select',
-          required: true,
-          defaultValue: 'inst.sa',
-          options: [
-            { label: 'inst.sa', value: 'inst.sa' },
-            { label: 'inst-sa.com', value: 'inst-sa.com' },
-          ],
-          admin: { width: '30%' },
-        },
-        {
-          name: 'status',
-          type: 'select',
-          defaultValue: 'active',
-          options: [
-            { label: 'Active', value: 'active' },
-            { label: 'Disabled', value: 'disabled' },
-          ],
-          admin: { width: '30%' },
-        },
+        { name: 'username', type: 'text', required: true, admin: { width: '40%', description: 'e.g. "info", "admin", "support"' } },
+        { name: 'domain', type: 'select', required: true, defaultValue: 'inst.sa', options: [{ label: 'inst.sa', value: 'inst.sa' }, { label: 'inst-sa.com', value: 'inst-sa.com' }], admin: { width: '30%' } },
+        { name: 'status', type: 'select', defaultValue: 'active', options: [{ label: 'Active', value: 'active' }, { label: 'Disabled', value: 'disabled' }], admin: { width: '30%' } },
       ],
     },
-    {
-      name: 'email',
-      type: 'text',
-      unique: true,
-      admin: {
-        description: 'Full email address (auto-filled from username + domain)',
-      },
-    },
-    {
-      name: 'initialPassword',
-      type: 'text',
-      required: true,
-      admin: {
-        description: 'Password for the email account. Use a strong password.',
-      },
-    },
-    {
-      name: 'changePassword',
-      type: 'text',
-      admin: {
-        description: 'Enter a new password here and save to change the email account password. Leave empty to keep current.',
-      },
-    },
+    { name: 'email', type: 'text', unique: true, admin: { description: 'Full email address (auto-filled from username + domain)' } },
+    { name: 'initialPassword', type: 'text', required: true, admin: { description: 'Password for the email account.' } },
+    { name: 'changePassword', type: 'text', admin: { description: 'Enter new password and save to change. Leave empty to keep current.' } },
     {
       name: 'mailServerSettings',
       type: 'group',
-      label: 'Connection Settings (for email clients)',
-      admin: {
-        readOnly: true,
-        description: 'Use these settings in Outlook, Thunderbird, Gmail app, etc.',
-      },
+      label: 'Connection Settings',
+      admin: { description: 'Use these settings in Outlook, Thunderbird, Gmail app, etc.' },
       fields: [
         { name: 'imapServer', type: 'text', defaultValue: 'mail.inst.sa', admin: { readOnly: true, description: 'IMAP Server' } },
-        { name: 'imapPort', type: 'text', defaultValue: '993', admin: { readOnly: true, description: 'IMAP Port (SSL)' } },
+        { name: 'imapPort', type: 'text', defaultValue: '993', admin: { readOnly: true, description: 'IMAP Port (SSL/TLS)' } },
         { name: 'smtpServer', type: 'text', defaultValue: 'mail.inst.sa', admin: { readOnly: true, description: 'SMTP Server' } },
-        { name: 'smtpPort', type: 'text', defaultValue: '587', admin: { readOnly: true, description: 'SMTP Port (STARTTLS)' } },
+        { name: 'smtpPort', type: 'text', defaultValue: '465', admin: { readOnly: true, description: 'SMTP Port (SSL/TLS)' } },
+      ],
+    },
+    {
+      name: 'setupLinks',
+      type: 'group',
+      label: 'Quick Setup Links (share with users)',
+      admin: { description: 'Send these links to users — iOS auto-installs, others show instructions' },
+      fields: [
+        { name: 'setupPage', type: 'text', admin: { readOnly: true, description: 'Setup instructions page' } },
+        { name: 'iosProfile', type: 'text', admin: { readOnly: true, description: 'iOS auto-install profile download' } },
       ],
     },
   ],
