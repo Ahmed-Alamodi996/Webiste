@@ -72,14 +72,21 @@ function HomeInner({
       </AnimatePresence>
 
       <SlideProvider defaultViewMode={themeSettings?.defaultViewMode || "slides"}>
-        {/* CMS-controlled effects */}
-        {themeSettings?.enableCustomCursor !== false && <CustomCursor />}
-        {themeSettings?.enableFloatingOrbs !== false && <FloatingOrbs />}
+        {/* CMS-controlled effects (desktop only — mobile perf) */}
+        {themeSettings?.enableCustomCursor !== false && (
+          <div className="hidden md:block"><CustomCursor /></div>
+        )}
+        {themeSettings?.enableFloatingOrbs !== false && (
+          <div className="hidden sm:block"><FloatingOrbs /></div>
+        )}
 
         <div className={themeSettings?.enableNoiseTexture !== false ? "noise-overlay" : ""}>
           <Navbar />
           <main id="main-content" aria-busy={!isLoaded}>
-            <div style={isLoaded ? undefined : { opacity: 0, position: "fixed", pointerEvents: "none" }}>
+            <div
+              className={isLoaded ? "" : "preloader-hidden"}
+              aria-hidden={!isLoaded}
+            >
               <SlideContainer slides={slides} />
             </div>
           </main>

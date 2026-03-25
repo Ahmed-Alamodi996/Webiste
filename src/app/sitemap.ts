@@ -4,7 +4,7 @@ import type { MetadataRoute } from "next";
 
 export const dynamic = "force-dynamic";
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://inst-sa.com";
+const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || "https://inst.sa";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const routes: MetadataRoute.Sitemap = [
@@ -14,12 +14,23 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "weekly",
       priority: 1,
     },
+    {
+      url: `${BASE_URL}/privacy-policy`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${BASE_URL}/terms`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
   ];
 
   try {
     const payload = await getPayload({ config });
 
-    // Add project pages
     const projects = await payload.find({
       collection: "projects",
       limit: 1000,
@@ -35,7 +46,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     }
 
-    // Add CMS pages
     const pages = await payload.find({
       collection: "pages",
       where: { status: { equals: "published" } },
@@ -52,7 +62,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     }
   } catch {
-    // CMS unavailable — return static routes only
+    // CMS unavailable
   }
 
   return routes;
